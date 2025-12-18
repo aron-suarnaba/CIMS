@@ -1,0 +1,11 @@
+@import 'bootstrap-icons/font/bootstrap-icons.css';
+@import 'bootstrap/dist/css/bootstrap.min.css';
+@import 'admin-lte/dist/css/adminlte.css';
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
+.clickable-card {
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+.formal-font {
+    font-family: 'open-sans' ,'Roboto', 'sans-serif';
+}
