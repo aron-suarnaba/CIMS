@@ -1,15 +1,22 @@
 <script setup>
 import { router } from '@inertiajs/vue3';
 
+const toggleSidebar = () => {
+    const body = document.body;
+    if (body.classList.contains('sidebar-collapse')) {
+        body.classList.remove('sidebar-collapse');
+        body.classList.add('sidebar-open');
+    } else {
+        body.classList.add('sidebar-collapse');
+        body.classList.remove('sidebar-open');
+    }
+};
+
 const handleLogout = () => {
     router.post(route('logout'));
 };
 import avatarPath from '/public/img/avatar.png';
-const toggleSidebar = () => {
-    document.body.classList.toggle('sidebar-open');
-};
 </script>
-
 <template>
     <nav
         class="app-header navbar navbar-expand bg-primary bg-gradient"

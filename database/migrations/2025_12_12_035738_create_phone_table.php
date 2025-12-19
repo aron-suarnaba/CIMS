@@ -22,6 +22,7 @@ return new class extends Migration
             $table->string('imei_one')->nullable();
             $table->string('imei_two')->nullable();
             $table->string('remarks')->nullable();
+            $table->string('status')->nullable();
             $table->string('issued_accessories')->nullable();
             $table->boolean('with_cashout')->nullable();
             $table->string('issued_to')->nullable();

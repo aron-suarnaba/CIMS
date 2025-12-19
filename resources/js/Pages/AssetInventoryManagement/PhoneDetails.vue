@@ -145,25 +145,19 @@ const formatDate = (dateString, locale = 'en-US') => {
                             </div>
                         </div>
                     </div>
-                    <div class="row mt-2">
-                        <div
-                            class=".col-sm-12 col-md-2 mb-md-0 mt-5 text-center"
-                        >
-                            <img
-                                :src="getPhoneImagePath(props.phone)"
-                                class="img-fluid rounded"
-                                style="max-height: 250px"
-                                :alt="props.phone.model"
-                            />
-                        </div>
-
+                    <div class="row mx-auto mt-2">
                         <div class="col-sm-12 col-md-5">
                             <h2 class="card-title fw-bold fs-4 mb-2">
                                 Smartphone Details
                             </h2>
-
+                            <img
+                                :src="getPhoneImagePath(props.phone)"
+                                class="img-fluid my-3 rounded"
+                                style="max-height: 250px"
+                                :alt="props.phone.model"
+                            />
                             <table
-                                class="table-striped table-bordered table-hover bg-dark table"
+                                class="table-striped table-bordered table-hover bg-dark table-responsive table"
                             >
                                 <tbody>
                                     <tr>
@@ -234,7 +228,7 @@ const formatDate = (dateString, locale = 'en-US') => {
                                 Issuance
                             </h2>
                             <table
-                                class="table-bordered table-responsive table"
+                                class="table-striped table-bordered table-hover table-responsive mb-3 table"
                             >
                                 <tbody>
                                     <tr>
@@ -312,8 +306,16 @@ const formatDate = (dateString, locale = 'en-US') => {
                                             </div>
                                         </td>
                                     </tr>
+                                </tbody>
+                            </table>
+                            <h2 class="card-title fw-bold fs-4 mb-2">Return</h2>
+                            <table
+                                class="table-striped table-bordered table-hover table-responsive mb-3 table"
+                            >
+                                <tbody>
                                     <tr>
-                                        <th scope="row"></th>
+                                        <th></th>
+                                        <td></td>
                                     </tr>
                                 </tbody>
                             </table>

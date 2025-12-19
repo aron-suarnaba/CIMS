@@ -1,4 +1,5 @@
 import { createInertiaApp } from '@inertiajs/vue3';
+import 'admin-lte';
 import 'admin-lte/dist/js/adminlte.min.js';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';

@@ -163,7 +163,6 @@ const getPhoneImagePath = (phone) => {
                             aria-expanded="false"
                         >
                             <i class="bi bi-funnel"></i>
-                            {{ filterBrand || 'Filter' }}
                         </button>
                         <ul class="dropdown-menu">
                             <li v-for="brand in availableBrands" :key="brand">
