@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Phone;
+use App\Models\PhoneTransaction;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -43,16 +44,31 @@ class PhoneController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'brand' => 'required|string',
+            'model' => 'required|string',
+            'serial_num' => 'required|string|unique:phones,serial_num',
+            'imei_one' => 'required|string|unique:phones,imei_one',
+            'imei_two' => 'nullable|string',
+            'ram' => 'required|string',
+            'rom' => 'required|string',
+        ]);
+
+        $validated['status'] = 'available';
+
+        Phone::create($validated);
+
+        return redirect()->route('phone.create')->with('message', 'Phone registered successfully.');
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(Phone $phone)
+    public function show(Phone $phone, PhoneTransaction $phoneTransaction)
     {
         return Inertia::render('AssetInventoryManagement/PhoneDetails', [
             'phone' => $phone,
+            'phone_transaction' => $phoneTransaction,
         ]);
     }
 

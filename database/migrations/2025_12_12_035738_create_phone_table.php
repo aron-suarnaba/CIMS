@@ -4,47 +4,58 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
     public function up(): void
     {
-        Schema::create('phone', function (Blueprint $table) {
+        Schema::create('phones', function (Blueprint $table) {
             $table->id();
-            $table->timestamps();
-            $table->string('model');
-            $table->string('serial_num');
             $table->string('brand');
-            $table->string('ram');
-            $table->string('rom')->nullable();
-            $table->string('imei_one')->nullable();
+            $table->string('model');
+            $table->string('serial_num')->unique();
+            $table->string('imei_one')->unique();
             $table->string('imei_two')->nullable();
-            $table->string('remarks')->nullable();
-            $table->string('status')->nullable();
-            $table->string('issued_accessories')->nullable();
-            $table->boolean('with_cashout')->nullable();
-            $table->string('issued_to')->nullable();
-            $table->string('issued_to_department')->nullable();
-            $table->date('date_issued')->nullable();
-            $table->string('issued_by')->nullable();
-            $table->boolean('issuedAcknowledgementIT')->nullable();
-            $table->boolean('issuedAcknowledgementPurchasing')->nullable();
-            $table->string('returned_accessories')->nullable();
-            $table->string('returned_by')->nullable();
-            $table->date('returned_date')->nullable();
+            $table->string('ram');
+            $table->string('rom');
+            $table->string('purchase_date')->nullable();
+            $table->string('status')->default('available'); // available, issued, maintenance
+            $table->timestamps();
+        });
+
+        Schema::create('phone_transactions', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('phone_id')->constrained('phones')->onDelete('cascade');
+
+            // Issuance Info
+            $table->string('issued_to');
+            $table->string('department');
+            $table->date('date_issued');
+            $table->string('issued_by');
+            $table->text('issued_accessories')->nullable();
+            $table->boolean('it_ack_issued')->default(false);
+            $table->boolean('purch_ack_issued')->default(false);
+
+            // Return Info (Starts as Null)
+            $table->date('date_returned')->nullable();
             $table->string('returned_to')->nullable();
-            $table->boolean('returnedAcknowledgementIT')->nullable();
-            $table->boolean('returnedAcknowledgementPurchasing')->nullable();
+            $table->text('returned_accessories')->nullable();
+            $table->boolean('it_ack_returned')->default(false);
+            $table->boolean('purch_ack_returned')->default(false);
+
+            $table->string('remarks')->nullable();
+            $table->timestamps();
         });
     }
+
 
     /**
      * Reverse the migrations.
      */
     public function down(): void
     {
-        Schema::dropIfExists('phone');
+        Schema::dropIfExists('phone_transactions'); // Drop child first
+        Schema::dropIfExists('phones');             // Then parent
     }
 };

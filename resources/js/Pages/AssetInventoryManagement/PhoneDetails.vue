@@ -134,10 +134,19 @@ const formatDate = (dateString, locale = 'en-US') => {
                             >
                                 <button
                                     type="button"
-                                    class="btn btn-primary bg-gradient"
+                                    class="btn btn-info bg-gradient"
+                                    v-if="props.phone.status === 'available'"
                                 >
                                     <i class="bi bi-pencil-square"></i>
-                                    Edit Details
+                                    Issue
+                                </button>
+                                <button
+                                    type="button"
+                                    class="btn btn-warning bg-gradient d-flex justify-content-center align-items-center"
+                                    v-else-if="props.phone.status === 'issued'"
+                                >
+                                    <i class="bi bi-arrow-return-left me-1"></i>
+                                    Return
                                 </button>
                                 <button class="btn btn-danger">
                                     <i class="bi bi-trash"></i> Delete Phone
@@ -314,8 +323,87 @@ const formatDate = (dateString, locale = 'en-US') => {
                             >
                                 <tbody>
                                     <tr>
-                                        <th></th>
-                                        <td></td>
+                                        <th scope="row">Returned Date</th>
+                                        <td>
+                                            {{
+                                                formatDate(
+                                                    props.phone.returned_date,
+                                                ) || 'Not yet returned'
+                                            }}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">Returned By</th>
+                                        <td>
+                                            {{
+                                                props.phone.returned_by ||
+                                                'Not yet returned'
+                                            }}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">Returned To</th>
+                                        <td>
+                                            {{
+                                                props.phone.returned_to ||
+                                                'Not yet returned'
+                                            }}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">
+                                            Returned Accessories
+                                        </th>
+                                        <td>
+                                            {{
+                                                props.phone
+                                                    .returned_accessories ||
+                                                'Not yet returned'
+                                            }}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">Acknowledgement</th>
+                                        <td
+                                            class="d-flex justify-content-around gap-1"
+                                        >
+                                            <div class="form-check">
+                                                <input
+                                                    class="form-check-input"
+                                                    type="checkbox"
+                                                    value=""
+                                                    id="ITAcknowledgement"
+                                                    :checked="
+                                                        !!props.phone
+                                                            .returnedAcknowledgementIT
+                                                    "
+                                                    disabled
+                                                />
+                                                <label
+                                                    for="ITAcknowledgement"
+                                                    class="form-check-label"
+                                                    >IT</label
+                                                >
+                                            </div>
+                                            <div class="form-check">
+                                                <input
+                                                    class="form-check-input"
+                                                    type="checkbox"
+                                                    value=""
+                                                    id="PurchasingAcknowledgement"
+                                                    :checked="
+                                                        !!props.phone
+                                                            .returnedAcknowledgementPurchasing
+                                                    "
+                                                    disabled
+                                                />
+                                                <label
+                                                    for="PurchasingAcknowledgement"
+                                                    class="form-check-label"
+                                                    >Purchasing</label
+                                                >
+                                            </div>
+                                        </td>
                                     </tr>
                                 </tbody>
                             </table>

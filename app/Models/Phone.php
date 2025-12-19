@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\PhoneTransaction;
 
 class Phone extends Model
 {
@@ -14,7 +15,7 @@ class Phone extends Model
      *
      * @var string
      */
-    protected $table = 'phone'; // Specifies the table name if it deviates from the pluralized model name (Phone -> phones)
+    protected $table = 'phones'; // Specifies the table name if it deviates from the pluralized model name (Phone -> phones)
 
     /**
      * The attributes that are mass assignable.
@@ -26,24 +27,15 @@ class Phone extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'model',
         'brand',
+        'model',
         'serial_num',
-        'ramRom',
-        'imei',
-        'issued_accessories',
-        'with_cashout',
-        'issued_to',
-        'date_issued',
-        'issued_by',
-        'issuedAcknowledgementIT',
-        'issuedAcknowledgementPurchasing',
-        'returned_accessories',
-        'returned_by',
-        'returned_date',
-        'returned_to',
-        'returnedAcknowledgementIT',
-        'returnedAcknowledgementPurchasing',
+        'imei_one',
+        'imei_two',
+        'ram',
+        'rom',
+        'purchase_date',
+        'status',
     ];
 
     /**
@@ -54,13 +46,7 @@ class Phone extends Model
      * @var array<string, string>
      */
     protected $casts = [
-        'with_cashout' => 'boolean',
-        'issuedAcknowledgementIT' => 'boolean',
-        'issuedAcknowledgementPurchasing' => 'boolean',
-        'returnedAcknowledgementIT' => 'boolean',
-        'returnedAcknowledgementPurchasing' => 'boolean',
-        'date_issued' => 'date',
-        'returned_date' => 'date',
+        'purchase_date' => 'date',
     ];
 
     public function getRouteKeyName()
@@ -68,10 +54,14 @@ class Phone extends Model
         return 'serial_num';
     }
 
-    public function user()
+    public function transactions()
     {
-        return $this->belongsTo(User::class, 'issued_by')
-            ->belongsTo(User::class, 'returned_to');
+        return $this->hasMany(PhoneTransaction::class, 'phone_id');
+    }
+
+    public function currentTransaction()
+    {
+        return $this->hasOne(PhoneTransaction::class, 'phone_id')->whereNull('date_returned');
     }
     //  */
 }

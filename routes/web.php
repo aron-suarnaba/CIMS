@@ -31,11 +31,14 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/AssetAndInventoryManagement/Phone', [PhoneController::class, 'index'])
         ->name('phone.index');
+    Route::post('/AssetAndInventoryManagement/Phone/AddPhone', [PhoneController::class, 'store'])
+        ->name('phone.store');
 
     Route::get('/AssetAndInventoryManagement/Phone/AddPhone', [PhoneController::class, 'create'])
         ->name('phone.create');
 
     Route::get('/AssetAndInventoryManagement/Phone/{phone}', [PhoneController::class, 'show'])
         ->name('phone.show');
+
 
 });

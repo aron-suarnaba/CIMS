@@ -19,6 +19,10 @@ import OppoImage from '/public/img/phone/oppo.png';
 import RedmiImage from '/public/img/phone/redmi.png';
 import SamsungImage from '/public/img/phone/samsung.png';
 import VivoImage from '/public/img/phone/vivo.png';
+import RealmeImage from '/public/img/phone/realme.png';
+import XiaomiImage from '/public/img/phone/xiaomi.png';
+import HonorImage from '/public/img/phone/honor.png';
+import TechnoImage from '/public/img/phone/techno.png';
 import DefaultImage from '/public/img/phone/default.png';
 
 const filterBrand = ref(
@@ -30,6 +34,7 @@ const availableBrands = [
     'Oppo',
     'Redmi',
     'Samsung',
+    'Realme',
     'Vivo',
 ];
 const applyFilter = (brand) => {
@@ -76,6 +81,18 @@ const getPhoneImagePath = (phone) => {
     }
     if (brand.includes('samsung')) {
         return SamsungImage;
+    }
+    if (brand.includes('xiaomi')) {
+        return XiaomiImage;
+    }
+    if (brand.includes('realme')) {
+        return RealmeImage;
+    }
+    if (brand.includes('honor')) {
+        return HonorImage;
+    }
+    if (brand.includes('techno')) {
+        return TechnoImage;
     }
     if (brand.includes('vivo')) {
         return VivoImage;
@@ -187,7 +204,7 @@ const getPhoneImagePath = (phone) => {
 
             <div class="row justify-content-start mb-3 mt-5">
                 <div
-                    class="col-6 col-sm-4 col-md-2 d-flex justify-content-center"
+                    class="col-6 col-sm-4 col-md-2 d-flex justify-content-center mb-3"
                     v-for="phone in props.phones.data"
                     :key="phone.id"
                 >
@@ -206,6 +223,17 @@ const getPhoneImagePath = (phone) => {
                         <h6 class="card-subtitle text-body-secondary mb-1">
                             {{ phone.issued_to }}
                         </h6>
+                        <span
+                            :class="{
+                                'badge bg-success':
+                                    phone.status === 'available',
+                                'badge bg-primary': phone.status === 'issued',
+                                'badge bg-warning':
+                                    phone.status === 'maintenance',
+                            }"
+                        >
+                            {{ phone.status }}
+                        </span>
                     </PhoneCard>
                 </div>
 

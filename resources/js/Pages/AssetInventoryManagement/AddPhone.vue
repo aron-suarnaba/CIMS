@@ -7,7 +7,7 @@ import BackButton from '@/Components/BackButton.vue';
 const form = useForm({
     brand: '',
     model: '',
-    serial_number: '',
+    serial_num: '',
     purchase_date: '',
     ram: '',
     rom: '',
@@ -155,7 +155,7 @@ const PhoneBrands = ['Apple', 'Oppo', 'Redmi', 'Samsung', 'Vivo'];
                                         <input
                                             type="text"
                                             id="PhoneSerialNumber"
-                                            v-model="form.serial_number"
+                                            v-model="form.serial_num"
                                             class="form-control"
                                             placeholder="Enter Serial Number"
                                             required
