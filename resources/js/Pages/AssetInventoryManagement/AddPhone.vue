@@ -237,11 +237,10 @@ const PhoneBrands = ['Apple', 'Oppo', 'Redmi', 'Samsung', 'Vivo'];
                                         class="btn btn-success"
                                         :disabled="form.processing"
                                     >
-                                        <i class="bi bi-plus"></i>
                                         {{
                                             form.processing
                                                 ? 'Saving...'
-                                                : 'Add Phone'
+                                                : 'Submit'
                                         }}
                                     </button>
                                 </div>

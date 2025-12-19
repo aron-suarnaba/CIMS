@@ -61,6 +61,24 @@ class PhoneController extends Controller
         return redirect()->route('phone.create')->with('message', 'Phone registered successfully.');
     }
 
+    public function phoneTransStore(PhoneTransaction $phoneTransaction, Phone $phone, Request $request)
+    {
+            $validated = $request->validate([
+            'brand' => 'required|string',
+            'model' => 'required|string',
+            'serial_num' => 'required|string|unique:phones,serial_num',
+            'imei_one' => 'required|string|unique:phones,imei_one',
+            'imei_two' => 'nullable|string',
+            'ram' => 'required|string',
+            'rom' => 'required|string',
+        ]);
+
+
+        PhoneTransaction::create($validated);
+
+        return redirect()->route('phone.show')->with('message', 'Phone Issued successfully.');
+    }
+
     /**
      * Display the specified resource.
      */

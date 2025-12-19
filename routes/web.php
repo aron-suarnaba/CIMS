@@ -31,6 +31,7 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/AssetAndInventoryManagement/Phone', [PhoneController::class, 'index'])
         ->name('phone.index');
+
     Route::post('/AssetAndInventoryManagement/Phone/AddPhone', [PhoneController::class, 'store'])
         ->name('phone.store');
 
@@ -40,5 +41,6 @@ Route::middleware('auth')->group(function () {
     Route::get('/AssetAndInventoryManagement/Phone/{phone}', [PhoneController::class, 'show'])
         ->name('phone.show');
 
-
+    Route::post('/AssetAndInventoryManagement/Phone', [PhoneController::class, 'phoneTransStore'])
+        ->name('phone.trans.store');
 });

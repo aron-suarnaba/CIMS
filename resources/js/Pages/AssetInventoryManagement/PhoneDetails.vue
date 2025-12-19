@@ -3,6 +3,8 @@ import HomeLayout from '@/Layouts/HomeLayout.vue';
 import { defineOptions, defineProps } from 'vue';
 import { router } from '@inertiajs/vue3';
 import BackButton from '@/Components/BackButton.vue';
+import Modals from '@/Components/Modals.vue';
+import { useForm } from '@inertiajs/vue3';
 
 defineOptions({ layout: HomeLayout });
 
@@ -10,6 +12,10 @@ const props = defineProps({
     phone: {
         type: Object,
         required: true,
+    },
+    phone_transaction: {
+        type: Object,
+        required: false,
     },
 });
 
@@ -32,6 +38,10 @@ import OppoImage from '/public/img/phone/oppo.png';
 import RedmiImage from '/public/img/phone/redmi.png';
 import SamsungImage from '/public/img/phone/samsung.png';
 import VivoImage from '/public/img/phone/vivo.png';
+import RealmeImage from '/public/img/phone/realme.png';
+import XiaomiImage from '/public/img/phone/xiaomi.png';
+import HonorImage from '/public/img/phone/honor.png';
+import TechnoImage from '/public/img/phone/techno.png';
 import DefaultImage from '/public/img/phone/default.png';
 
 const getPhoneImagePath = (phone) => {
@@ -49,6 +59,18 @@ const getPhoneImagePath = (phone) => {
     if (brand.includes('samsung')) {
         return SamsungImage;
     }
+    if (brand.includes('xiaomi')) {
+        return XiaomiImage;
+    }
+    if (brand.includes('realme')) {
+        return RealmeImage;
+    }
+    if (brand.includes('honor')) {
+        return HonorImage;
+    }
+    if (brand.includes('techno')) {
+        return TechnoImage;
+    }
     if (brand.includes('vivo')) {
         return VivoImage;
     }
@@ -65,6 +87,24 @@ const formatDate = (dateString, locale = 'en-US') => {
         month: 'long',
         day: 'numeric',
     }).format(date);
+};
+
+const form = useForm({
+    issued_by: '',
+    issued_to: '',
+    department: '',
+    date_issued: new Date().toISOString().substr(0, 10),
+    issued_accessories: [],
+    it_ack_issued: false,
+    purch_ack_issued: false,
+});
+
+const submit = () => {
+    form.post(route('phone.issue', props.phone.id), {
+        onSuccess: () => {
+            form.reset();
+        },
+    });
 };
 </script>
 
@@ -136,6 +176,8 @@ const formatDate = (dateString, locale = 'en-US') => {
                                     type="button"
                                     class="btn btn-info bg-gradient"
                                     v-if="props.phone.status === 'available'"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#IssuePhoneModal"
                                 >
                                     <i class="bi bi-pencil-square"></i>
                                     Issue
@@ -219,15 +261,6 @@ const formatDate = (dateString, locale = 'en-US') => {
                                             {{ props.phone.imei_two || 'N/A' }}
                                         </td>
                                     </tr>
-                                    <tr>
-                                        <th scope="row">Accessories</th>
-                                        <td>
-                                            {{
-                                                props.phone
-                                                    .issued_accessories || 'N/A'
-                                            }}
-                                        </td>
-                                    </tr>
                                 </tbody>
                             </table>
                         </div>
@@ -243,22 +276,30 @@ const formatDate = (dateString, locale = 'en-US') => {
                                     <tr>
                                         <th scope="row">Issued By</th>
                                         <td>
-                                            {{ props.phone.issued_by || 'N/A' }}
+                                            {{
+                                                props.phone_transaction
+                                                    .issued_by ||
+                                                'Not yet issued'
+                                            }}
                                         </td>
                                     </tr>
                                     <tr>
                                         <th scope="row">Issued To</th>
                                         <td>
-                                            {{ props.phone.issued_to || 'N/A' }}
+                                            {{
+                                                props.phone_transaction
+                                                    .issued_to ||
+                                                'Not yet issued'
+                                            }}
                                         </td>
                                     </tr>
                                     <tr>
                                         <th scope="row">Issued Department</th>
                                         <td>
                                             {{
-                                                props.phone
-                                                    .issued_to_department ||
-                                                'N/A'
+                                                props.phone_transaction
+                                                    .department ||
+                                                'Not yet issued'
                                             }}
                                         </td>
                                     </tr>
@@ -267,8 +308,20 @@ const formatDate = (dateString, locale = 'en-US') => {
                                         <td>
                                             {{
                                                 formatDate(
-                                                    props.phone.date_issued,
-                                                ) || 'N/A'
+                                                    props.phone_transaction
+                                                        .date_issued,
+                                                ) || 'Not yet issued'
+                                            }}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">Issued Accessories</th>
+                                        <td>
+                                            {{
+                                                formatDate(
+                                                    props.phone_transaction
+                                                        .issued_accessories,
+                                                ) || 'Not yet issued'
                                             }}
                                         </td>
                                     </tr>
@@ -413,6 +466,132 @@ const formatDate = (dateString, locale = 'en-US') => {
             </div>
         </div>
     </div>
+    <Modals id="IssuePhoneModal" title="Issue Phone">
+        <template #body>
+            <form @submit.prevent="submit">
+                <div class="row border-bottom border-1 mb-3 pb-4">
+                    <div class="col-sm-12 col-md-6">
+                        <label for="IssuedBy" class="form-label"
+                            >Issued By</label
+                        >
+                        <input
+                            type="text"
+                            id="IssuedBy"
+                            class="form-control"
+                            v-model="form.issued_by"
+                        />
+                    </div>
+                    <div class="col-sm-12 col-md-6">
+                        <label for="IssuedTo" class="form-label"
+                            >Issued Date</label
+                        >
+                        <input
+                            type="date"
+                            id="IssuedTo"
+                            class="form-control"
+                            v-model="form.date_issued"
+                        />
+                    </div>
+                </div>
+                <div class="row border-bottom border-1 mb-3 pb-4">
+                    <div class="col-sm-12 col-md-6">
+                        <label for="IssuedTo" class="form-label"
+                            >Issued To</label
+                        >
+                        <input
+                            type="text"
+                            id="IssuedTo"
+                            class="form-control"
+                            v-model="form.issued_to"
+                        />
+                    </div>
+                    <div class="col-sm-12 col-md-6">
+                        <label for="Department" class="form-label"
+                            >Issued To</label
+                        >
+                        <input
+                            type="text"
+                            id="Department"
+                            class="form-control"
+                            v-model="form.department"
+                        />
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-12 col-md-6">
+                        <label for="IssuedAccessories" class="form-label"
+                            >Issued Accessories</label
+                        >
+                        <div class="form-check" id="IssuedAccessories">
+                            <input
+                                class="form-check-input"
+                                type="checkbox"
+                                value="earphones"
+                                id="earphonesOptions"
+                            />
+                            <label class="form-check-label" for="earphones">
+                                Earphones
+                            </label>
+                            <input
+                                class="form-check-input"
+                                type="checkbox"
+                                value="earphones"
+                                id="chargerOptions"
+                            />
+                        </div>
+                        <div class="form-check">
+                            <input
+                                class="form-check-input"
+                                type="checkbox"
+                                value="charger"
+                                id="checkChecked"
+                                checked
+                            />
+                            <label class="form-check-label" for="checkChecked">
+                                Charger
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-sm-12 col-md-6">
+                        <label for="IssueAcknowledgement" class="form-label"
+                            >Acknowledgement</label
+                        >
+                        <div class="form-check" id="IssuedAccessories">
+                            <input
+                                class="form-check-input"
+                                type="checkbox"
+                                value="true"
+                                id="ITAcknowledgementRadio"
+                            />
+                            <label
+                                class="form-check-label"
+                                for="ITAcknowledgementRadio"
+                            >
+                                IT
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input
+                                class="form-check-input"
+                                type="checkbox"
+                                value="true"
+                                id="PurchAcknowledgementRadio"
+                            />
+                            <label
+                                class="form-check-label"
+                                for="PurchAcknowledgementRadio"
+                            >
+                                Purchasing
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </template>
+        <template #footer>
+            <button type="submit" class="btn btn-success">Submit</button>
+        </template>
+    </Modals>
 </template>
 <style scoped>
 tr td {

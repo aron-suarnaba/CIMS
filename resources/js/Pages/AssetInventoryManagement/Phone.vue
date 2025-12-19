@@ -214,7 +214,7 @@ const getPhoneImagePath = (phone) => {
                         <img
                             :src="getPhoneImagePath(phone)"
                             class="img-fluid"
-                            style="height: 10rem"
+                            style="height: 8rem"
                             :alt="phone.model"
                         />
                         <h4 class="card-title formal-font my-2">
@@ -228,8 +228,8 @@ const getPhoneImagePath = (phone) => {
                                 'badge bg-success':
                                     phone.status === 'available',
                                 'badge bg-primary': phone.status === 'issued',
-                                'badge bg-warning':
-                                    phone.status === 'maintenance',
+                                'badge bg-warning text-dark':
+                                    phone.status === 'returned',
                             }"
                         >
                             {{ phone.status }}
