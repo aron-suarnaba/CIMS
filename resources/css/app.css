@@ -9,3 +9,6 @@
 .formal-font {
     font-family: 'open-sans' ,'Roboto', 'sans-serif';
 }
+.hover-card {
+    transform: translate(2px, 3px);
+}

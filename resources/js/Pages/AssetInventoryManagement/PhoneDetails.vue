@@ -109,489 +109,334 @@ const submit = () => {
 </script>
 
 <template>
-    <div class="app-content-header">
-        <div class="container">
-            <div class="row my-4">
-                <div class="col-sm-6">
-                    <h1 class="h3 mb-0">
-                        {{ props.phone.model }}
-                    </h1>
-                </div>
-                <div class="col-sm-6">
-                    <ol class="breadcrumb float-sm-end">
+    <div class="app-content-header border-bottom bg-white py-3">
+        <div class="container-fluid">
+            <div class="d-flex justify-content-between align-items-center">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-0">
                         <li class="breadcrumb-item">
-                            <a
-                                :href="Home"
-                                @click.prevent="gotoHome"
-                                class="text-underline"
-                                >Home</a
-                            >
-                        </li>
-                        <li class="breadcrumb-item">
-                            <a
-                                :href="AssetInventoryManagementIndex"
-                                @click.prevent="
-                                    gotoAssetInventoryManagementIndex
-                                "
-                                class="text-underline"
-                                >Asset & Inventory Management</a
-                            >
+                            <a :href="Home" @click.prevent="gotoHome">Home</a>
                         </li>
                         <li class="breadcrumb-item">
                             <a
                                 :href="PhoneIndex"
                                 @click.prevent="gotoPhoneIndex"
-                                class="text-underline"
-                                >Smartphone</a
+                                >Inventory</a
                             >
                         </li>
-                        <li class="breadcrumb-item active" aria-current="page">
+                        <li class="breadcrumb-item active">
                             {{ props.phone.model }}
                         </li>
                     </ol>
+                </nav>
+                <div class="d-flex gap-2">
+                    <BackButton
+                        @click.prevent="router.get(route('phone.index'))"
+                    />
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="app-content">
-        <div class="container">
-            <div class="card shadow-sm">
-                <div class="card-body pt-0">
-                    <div class="row my-3">
-                        <div class="col-sm-12 col-md-8">
-                            <BackButton
-                                @click.prevent="
-                                    router.get(route('phone.index'))
-                                "
-                            />
-                        </div>
+    <div class="app-content mt-4">
+        <div class="container-fluid">
+            <div class="row g-4">
+                <div class="col-12">
+                    <div class="card bg-light mb-4 border-0 shadow-sm">
                         <div
-                            class="col-sm-12 col-md-4 d-flex justify-content-end gap-2"
+                            class="card-body d-flex justify-content-between align-items-center"
                         >
-                            <div
-                                class="button-group d-flex justify-content-end gap-2"
-                            >
+                            <h5 class="fw-bold text-secondary mb-0">
+                                Asset Management
+                            </h5>
+                            <div class="btn-group shadow-sm">
                                 <button
-                                    type="button"
-                                    class="btn btn-info bg-gradient"
                                     v-if="props.phone.status === 'available'"
+                                    class="btn btn-primary"
                                     data-bs-toggle="modal"
                                     data-bs-target="#IssuePhoneModal"
                                 >
-                                    <i class="bi bi-pencil-square"></i>
-                                    Issue
+                                    <i class="bi bi-person-plus me-1"></i> Issue
+                                    Asset
                                 </button>
                                 <button
-                                    type="button"
-                                    class="btn btn-warning bg-gradient d-flex justify-content-center align-items-center"
                                     v-else-if="props.phone.status === 'issued'"
+                                    class="btn btn-warning"
                                 >
                                     <i class="bi bi-arrow-return-left me-1"></i>
-                                    Return
-                                </button>
-                                <button class="btn btn-danger">
-                                    <i class="bi bi-trash"></i> Delete Phone
+                                    Process Return
                                 </button>
                             </div>
                         </div>
                     </div>
-                    <div class="row mx-auto mt-2">
-                        <div class="col-sm-12 col-md-5">
-                            <h2 class="card-title fw-bold fs-4 mb-2">
-                                Smartphone Details
-                            </h2>
-                            <img
-                                :src="getPhoneImagePath(props.phone)"
-                                class="img-fluid my-3 rounded"
-                                style="max-height: 250px"
-                                :alt="props.phone.model"
-                            />
-                            <table
-                                class="table-striped table-bordered table-hover bg-dark table-responsive table"
-                            >
-                                <tbody>
-                                    <tr>
-                                        <th scope="row">Model</th>
-                                        <td>{{ props.phone.model }}</td>
-                                    </tr>
-                                    <tr>
-                                        <th scope="row" style="width: 30%">
-                                            Serial Number
-                                        </th>
-                                        <td>{{ props.phone.serial_num }}</td>
-                                    </tr>
-                                    <tr>
-                                        <th scope="row">Purchase Date</th>
-                                        <td>
-                                            {{
-                                                formatDate(
-                                                    props.phone.created_at,
-                                                ) || 'N/A'
-                                            }}
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <th scope="row">Status</th>
-                                        <td>
-                                            {{ props.phone.status || 'N/A' }}
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <th scope="row">RAM</th>
-                                        <td>
-                                            {{ props.phone.ram || 'N/A' }}
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <th scope="row">ROM</th>
-                                        <td>
-                                            {{ props.phone.rom || 'N/A' }}
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <th scope="row">IMEI 1</th>
-                                        <td>
-                                            {{ props.phone.imei_one || 'N/A' }}
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <th scope="row">IMEI 2</th>
-                                        <td>
-                                            {{ props.phone.imei_two || 'N/A' }}
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                </div>
+            </div>
+            <div class="row g-4">
+                <div class="col-sm-12 col-xl-4 col-lg-5">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header bg-dark py-3 text-white">
+                            <h5 class="fw-bold mb-0">Device Specifications</h5>
                         </div>
+                        <div class="card-body">
+                            <div class="mb-4 text-center">
+                                <img
+                                    :src="getPhoneImagePath(props.phone)"
+                                    class="img-fluid bg-light rounded p-3"
+                                    style="max-height: 220px"
+                                    :alt="props.phone.model"
+                                />
+                                <h3 class="fw-bold mb-0 mt-3">
+                                    {{ props.phone.brand }}
+                                    {{ props.phone.model }}
+                                </h3>
+                                <span
+                                    :class="[
+                                        'badge mt-2 px-3 py-2',
+                                        props.phone.status === 'available'
+                                            ? 'bg-success'
+                                            : 'bg-primary',
+                                    ]"
+                                >
+                                    Status: {{ props.phone.status }}
+                                </span>
+                            </div>
 
-                        <div class="col-sm-12 col-md-5">
-                            <h2 class="card-title fw-bold fs-4 mb-2">
-                                Issuance
-                            </h2>
-                            <table
-                                class="table-striped table-bordered table-hover table-responsive mb-3 table"
+                            <ul class="list-group list-group-flush border-top">
+                                <li
+                                    class="list-group-item d-flex justify-content-between"
+                                >
+                                    <span class="text-muted"
+                                        >Serial Number</span
+                                    >
+                                    <span class="fw-bold">{{
+                                        props.phone.serial_num
+                                    }}</span>
+                                </li>
+                                <li
+                                    class="list-group-item d-flex justify-content-between"
+                                >
+                                    <span class="text-muted">IMEI 1</span>
+                                    <span class="font-monospace small">{{
+                                        props.phone.imei_one || 'N/A'
+                                    }}</span>
+                                </li>
+                                <li
+                                    class="list-group-item d-flex justify-content-between"
+                                >
+                                    <span class="text-muted">IMEI 2</span>
+                                    <span class="font-monospace small">{{
+                                        props.phone.imei_two || 'N/A'
+                                    }}</span>
+                                </li>
+                                <li
+                                    class="list-group-item d-flex justify-content-between"
+                                >
+                                    <span class="text-muted">RAM / ROM</span>
+                                    <span
+                                        >{{ props.phone.ram || 'N/A' }} /
+                                        {{ props.phone.rom || 'N/A' }}</span
+                                    >
+                                </li>
+                                <li
+                                    class="list-group-item d-flex justify-content-between"
+                                >
+                                    <span class="text-muted"
+                                        >Purchase Date</span
+                                    >
+                                    <span>{{
+                                        formatDate(props.phone.created_at) ||
+                                        'N/A'
+                                    }}</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div
+                            class="card-footer border-0 bg-transparent pb-3 text-center"
+                        >
+                            <button class="btn btn-outline-danger btn-sm w-100">
+                                <i class="bi bi-trash me-1"></i> Delete Asset
+                                Record
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-sm-12 col-xl-8 col-lg-7">
+                    <div class="card mb-4 border-0 shadow-sm">
+                        <div
+                            class="card-header bg-primary d-flex justify-content-between align-items-center text-white"
+                        >
+                            <h5 class="fw-bold mb-0">
+                                Current / Last Issuance
+                            </h5>
+                            <i class="bi bi-send-check fs-4"></i>
+                        </div>
+                        <div class="card-body">
+                            <div class="row g-3">
+                                <div class="col-md-6 border-end">
+                                    <label
+                                        class="small text-muted text-uppercase fw-bold"
+                                        >Recipient Info</label
+                                    >
+                                    <p class="fw-bold fs-5 text-dark mb-1">
+                                        {{
+                                            props.phone_transaction
+                                                ?.issued_to || 'Not yet issued'
+                                        }}
+                                    </p>
+                                    <p class="text-secondary small mb-0">
+                                        <i class="bi bi-building me-1"></i>
+                                        {{
+                                            props.phone_transaction
+                                                ?.department || 'Not yet issued'
+                                        }}
+                                    </p>
+                                </div>
+                                <div class="col-md-6 px-md-4">
+                                    <label
+                                        class="small text-muted text-uppercase fw-bold"
+                                        >Issuance Logistics</label
+                                    >
+                                    <p class="mb-1">
+                                        <strong>Date:</strong>
+                                        {{
+                                            formatDate(
+                                                props.phone_transaction
+                                                    ?.date_issued,
+                                            ) || 'Not yet issued'
+                                        }}
+                                    </p>
+                                    <p class="mb-0">
+                                        <strong>By:</strong>
+                                        {{
+                                            props.phone_transaction
+                                                ?.issued_by || 'Not yet issued'
+                                        }}
+                                    </p>
+                                </div>
+                                <div class="col-12 mt-4">
+                                    <div
+                                        class="bg-light d-flex align-items-center flex-wrap gap-4 rounded p-3"
+                                    >
+                                        <div class="d-flex align-items-center">
+                                            <i
+                                                class="bi bi-headphones text-primary me-2"
+                                            ></i>
+                                            <strong>Accessories:</strong>
+                                            <span class="text-muted ms-2">{{
+                                                props.phone_transaction
+                                                    ?.issued_accessories ||
+                                                'None'
+                                            }}</span>
+                                        </div>
+                                        <div
+                                            class="vr d-none d-md-block mx-2"
+                                        ></div>
+                                        <div class="d-flex align-items-center">
+                                            <i
+                                                class="bi bi-check-circle-fill text-success me-2"
+                                            ></i>
+                                            <strong>Ack:</strong>
+                                            <span
+                                                class="badge text-dark ms-2 border bg-white"
+                                                >IT:
+                                                {{
+                                                    props.phone
+                                                        .issuedAcknowledgementIT
+                                                        ? 'Yes'
+                                                        : 'No'
+                                                }}</span
+                                            >
+                                            <span
+                                                class="badge text-dark ms-2 border bg-white"
+                                                >Purchasing:
+                                                {{
+                                                    props.phone
+                                                        .issuedAcknowledgementPurchasing
+                                                        ? 'Yes'
+                                                        : 'No'
+                                                }}</span
+                                            >
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div
+                        class="card border-start border-0 border-4 shadow-sm"
+                        :class="
+                            props.phone.returned_date
+                                ? 'border-warning'
+                                : 'border-secondary'
+                        "
+                    >
+                        <div class="card-header bg-white">
+                            <h5
+                                class="fw-bold mb-0"
+                                :class="
+                                    props.phone.returned_date
+                                        ? 'text-warning'
+                                        : 'text-muted'
+                                "
                             >
-                                <tbody>
-                                    <tr>
-                                        <th scope="row">Issued By</th>
-                                        <td>
-                                            {{
-                                                props.phone_transaction
-                                                    .issued_by ||
-                                                'Not yet issued'
-                                            }}
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <th scope="row">Issued To</th>
-                                        <td>
-                                            {{
-                                                props.phone_transaction
-                                                    .issued_to ||
-                                                'Not yet issued'
-                                            }}
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <th scope="row">Issued Department</th>
-                                        <td>
-                                            {{
-                                                props.phone_transaction
-                                                    .department ||
-                                                'Not yet issued'
-                                            }}
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <th scope="row">Issued Date</th>
-                                        <td>
-                                            {{
-                                                formatDate(
-                                                    props.phone_transaction
-                                                        .date_issued,
-                                                ) || 'Not yet issued'
-                                            }}
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <th scope="row">Issued Accessories</th>
-                                        <td>
-                                            {{
-                                                formatDate(
-                                                    props.phone_transaction
-                                                        .issued_accessories,
-                                                ) || 'Not yet issued'
-                                            }}
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <th scope="row">Acknowledgement</th>
-                                        <td
-                                            class="d-flex justify-content-around gap-1"
-                                        >
-                                            <div class="form-check">
-                                                <input
-                                                    class="form-check-input"
-                                                    type="checkbox"
-                                                    value=""
-                                                    id="ITAcknowledgement"
-                                                    :checked="
-                                                        !!props.phone
-                                                            .issuedAcknowledgementIT
-                                                    "
-                                                    disabled
-                                                />
-                                                <label
-                                                    for="ITAcknowledgement"
-                                                    class="form-check-label"
-                                                    >IT</label
-                                                >
-                                            </div>
-                                            <div class="form-check">
-                                                <input
-                                                    class="form-check-input"
-                                                    type="checkbox"
-                                                    value=""
-                                                    id="PurchasingAcknowledgement"
-                                                    :checked="
-                                                        !!props.phone
-                                                            .issuedAcknowledgementPurchasing
-                                                    "
-                                                    disabled
-                                                />
-                                                <label
-                                                    for="PurchasingAcknowledgement"
-                                                    class="form-check-label"
-                                                    >Purchasing</label
-                                                >
-                                            </div>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                            <h2 class="card-title fw-bold fs-4 mb-2">Return</h2>
-                            <table
-                                class="table-striped table-bordered table-hover table-responsive mb-3 table"
+                                Return Details
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div
+                                v-if="props.phone.returned_date"
+                                class="row g-3"
                             >
-                                <tbody>
-                                    <tr>
-                                        <th scope="row">Returned Date</th>
-                                        <td>
-                                            {{
-                                                formatDate(
-                                                    props.phone.returned_date,
-                                                ) || 'Not yet returned'
-                                            }}
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <th scope="row">Returned By</th>
-                                        <td>
-                                            {{
-                                                props.phone.returned_by ||
-                                                'Not yet returned'
-                                            }}
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <th scope="row">Returned To</th>
-                                        <td>
-                                            {{
-                                                props.phone.returned_to ||
-                                                'Not yet returned'
-                                            }}
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <th scope="row">
-                                            Returned Accessories
-                                        </th>
-                                        <td>
-                                            {{
-                                                props.phone
-                                                    .returned_accessories ||
-                                                'Not yet returned'
-                                            }}
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <th scope="row">Acknowledgement</th>
-                                        <td
-                                            class="d-flex justify-content-around gap-1"
+                                <div class="col-md-4">
+                                    <label class="small text-muted d-block"
+                                        >Returned Date</label
+                                    >
+                                    <span class="fw-bold">{{
+                                        formatDate(props.phone.returned_date)
+                                    }}</span>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="small text-muted d-block"
+                                        >Returned By</label
+                                    >
+                                    <span class="fw-bold">{{
+                                        props.phone.returned_by
+                                    }}</span>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="small text-muted d-block"
+                                        >Returned To</label
+                                    >
+                                    <span class="fw-bold">{{
+                                        props.phone.returned_to
+                                    }}</span>
+                                </div>
+                                <div class="col-12">
+                                    <div
+                                        class="bg-light small rounded border p-2"
+                                    >
+                                        <strong
+                                            >Return Note / Accessories:</strong
                                         >
-                                            <div class="form-check">
-                                                <input
-                                                    class="form-check-input"
-                                                    type="checkbox"
-                                                    value=""
-                                                    id="ITAcknowledgement"
-                                                    :checked="
-                                                        !!props.phone
-                                                            .returnedAcknowledgementIT
-                                                    "
-                                                    disabled
-                                                />
-                                                <label
-                                                    for="ITAcknowledgement"
-                                                    class="form-check-label"
-                                                    >IT</label
-                                                >
-                                            </div>
-                                            <div class="form-check">
-                                                <input
-                                                    class="form-check-input"
-                                                    type="checkbox"
-                                                    value=""
-                                                    id="PurchasingAcknowledgement"
-                                                    :checked="
-                                                        !!props.phone
-                                                            .returnedAcknowledgementPurchasing
-                                                    "
-                                                    disabled
-                                                />
-                                                <label
-                                                    for="PurchasingAcknowledgement"
-                                                    class="form-check-label"
-                                                    >Purchasing</label
-                                                >
-                                            </div>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                                        {{
+                                            props.phone.returned_accessories ||
+                                            'None specified'
+                                        }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div v-else class="text-muted py-3 text-center">
+                                <i class="bi bi-info-circle me-1"></i> No return
+                                history for the current transaction.
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    <Modals id="IssuePhoneModal" title="Issue Phone">
-        <template #body>
-            <form @submit.prevent="submit">
-                <div class="row border-bottom border-1 mb-3 pb-4">
-                    <div class="col-sm-12 col-md-6">
-                        <label for="IssuedBy" class="form-label"
-                            >Issued By</label
-                        >
-                        <input
-                            type="text"
-                            id="IssuedBy"
-                            class="form-control"
-                            v-model="form.issued_by"
-                        />
-                    </div>
-                    <div class="col-sm-12 col-md-6">
-                        <label for="IssuedTo" class="form-label"
-                            >Issued Date</label
-                        >
-                        <input
-                            type="date"
-                            id="IssuedTo"
-                            class="form-control"
-                            v-model="form.date_issued"
-                        />
-                    </div>
-                </div>
-                <div class="row border-bottom border-1 mb-3 pb-4">
-                    <div class="col-sm-12 col-md-6">
-                        <label for="IssuedTo" class="form-label"
-                            >Issued To</label
-                        >
-                        <input
-                            type="text"
-                            id="IssuedTo"
-                            class="form-control"
-                            v-model="form.issued_to"
-                        />
-                    </div>
-                    <div class="col-sm-12 col-md-6">
-                        <label for="Department" class="form-label"
-                            >Issued To</label
-                        >
-                        <input
-                            type="text"
-                            id="Department"
-                            class="form-control"
-                            v-model="form.department"
-                        />
-                    </div>
-                </div>
-                <div class="row mb-3">
-                    <div class="col-sm-12 col-md-6">
-                        <label for="IssuedAccessories" class="form-label"
-                            >Issued Accessories</label
-                        >
-                        <div class="form-check" id="IssuedAccessories">
-                            <input
-                                class="form-check-input"
-                                type="checkbox"
-                                value="earphones"
-                                id="earphonesOptions"
-                            />
-                            <label class="form-check-label" for="earphones">
-                                Earphones
-                            </label>
-                            <input
-                                class="form-check-input"
-                                type="checkbox"
-                                value="earphones"
-                                id="chargerOptions"
-                            />
-                        </div>
-                        <div class="form-check">
-                            <input
-                                class="form-check-input"
-                                type="checkbox"
-                                value="charger"
-                                id="checkChecked"
-                                checked
-                            />
-                            <label class="form-check-label" for="checkChecked">
-                                Charger
-                            </label>
-                        </div>
-                    </div>
-                    <div class="col-sm-12 col-md-6">
-                        <label for="IssueAcknowledgement" class="form-label"
-                            >Acknowledgement</label
-                        >
-                        <div class="form-check" id="IssuedAccessories">
-                            <input
-                                class="form-check-input"
-                                type="checkbox"
-                                value="true"
-                                id="ITAcknowledgementRadio"
-                            />
-                            <label
-                                class="form-check-label"
-                                for="ITAcknowledgementRadio"
-                            >
-                                IT
-                            </label>
-                        </div>
-                        <div class="form-check">
-                            <input
-                                class="form-check-input"
-                                type="checkbox"
-                                value="true"
-                                id="PurchAcknowledgementRadio"
-                            />
-                            <label
-                                class="form-check-label"
-                                for="PurchAcknowledgementRadio"
-                            >
-                                Purchasing
-                            </label>
-                        </div>
-                    </div>
-                </div>
-            </form>
-        </template>
-        <template #footer>
-            <button type="submit" class="btn btn-success">Submit</button>
-        </template>
-    </Modals>
 </template>
 <style scoped>
 tr td {
