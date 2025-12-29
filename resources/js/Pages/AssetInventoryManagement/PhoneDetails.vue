@@ -5,6 +5,7 @@ import { router } from '@inertiajs/vue3';
 import BackButton from '@/Components/BackButton.vue';
 import Modals from '@/Components/Modals.vue';
 import { useForm } from '@inertiajs/vue3';
+import Breadcrumb from '@/Components/Breadcrumb.vue';
 
 defineOptions({ layout: HomeLayout });
 
@@ -19,20 +20,15 @@ const props = defineProps({
     },
 });
 
-const AssetInventoryManagementIndex = route('AssetAndInventoryManagement');
-const Home = route('dashboard');
-const PhoneIndex = route('phone.index');
+const myBreadcrumb = [
+    { label: 'Home', url: route('dashboard') },
+    { label: 'Inventory', url: route('AssetAndInventoryManagement') },
+    { label: 'Smartphone Asset', url: route('phone.index') },
+    { label: 'Smartphone Asset Details' },
+];
 
-const gotoAssetInventoryManagementIndex = () => {
-    router.get(AssetInventoryManagementIndex);
-};
-const gotoHome = () => {
-    router.get(Home);
-};
-const gotoPhoneIndex = () => {
-    router.get(PhoneIndex);
-};
 
+// Import phone brand images
 import iPhoneImage from '/public/img/phone/iphone.png';
 import OppoImage from '/public/img/phone/oppo.png';
 import RedmiImage from '/public/img/phone/redmi.png';
@@ -111,30 +107,9 @@ const submit = () => {
 <template>
     <div class="app-content-header border-bottom bg-white py-3">
         <div class="container-fluid">
-            <div class="d-flex justify-content-between align-items-center">
-                <nav aria-label="breadcrumb">
-                    <ol class="breadcrumb mb-0">
-                        <li class="breadcrumb-item">
-                            <a :href="Home" @click.prevent="gotoHome">Home</a>
-                        </li>
-                        <li class="breadcrumb-item">
-                            <a
-                                :href="PhoneIndex"
-                                @click.prevent="gotoPhoneIndex"
-                                >Inventory</a
-                            >
-                        </li>
-                        <li class="breadcrumb-item active">
-                            {{ props.phone.model }}
-                        </li>
-                    </ol>
-                </nav>
-                <div class="d-flex gap-2">
-                    <BackButton
-                        @click.prevent="router.get(route('phone.index'))"
-                    />
-                </div>
-            </div>
+            <Breadcrumb 
+            :breadcrumbs="myBreadcrumb"
+            />
         </div>
     </div>
 
@@ -146,9 +121,11 @@ const submit = () => {
                         <div
                             class="card-body d-flex justify-content-between align-items-center"
                         >
-                            <h5 class="fw-bold text-secondary mb-0">
-                                Asset Management
-                            </h5>
+                            <BackButton
+                                @click.prevent="
+                                    router.get(route('phone.index'))
+                                "
+                            />
                             <div class="btn-group shadow-sm">
                                 <button
                                     v-if="props.phone.status === 'available'"
@@ -336,9 +313,15 @@ const submit = () => {
                                             <i
                                                 class="bi bi-check-circle-fill text-success me-2"
                                             ></i>
-                                            <strong>Ack:</strong>
+                                            <strong>Acknowledgement:</strong>
                                             <span
-                                                class="badge text-dark ms-2 border bg-white"
+                                                class="badge text-dark ms-2 border"
+                                                :class="
+                                                    props.phone
+                                                        .issuedAcknowledgementIT
+                                                        ? 'bg-success'
+                                                        : 'bg-danger text-white'
+                                                "
                                                 >IT:
                                                 {{
                                                     props.phone
@@ -348,7 +331,13 @@ const submit = () => {
                                                 }}</span
                                             >
                                             <span
-                                                class="badge text-dark ms-2 border bg-white"
+                                                class="badge text-dark ms-2 border"
+                                                :class="
+                                                    props.phone
+                                                        .issuedAcknowledgementIT
+                                                        ? 'bg-success'
+                                                        : 'bg-danger text-white'
+                                                "
                                                 >Purchasing:
                                                 {{
                                                     props.phone
@@ -437,7 +426,60 @@ const submit = () => {
             </div>
         </div>
     </div>
+
+    <Modals id="IssuePhoneModal" title="Issue Phone Asset" size="modal-lg">
+        <template #body>
+            <form @submit.prevent="submit">
+                <div class="mb-3">
+                    <label for="issued_to" class="form-label">Issued To</label>
+                    <input
+                        type="text"
+                        id="issued_to"
+                        v-model="form.issued_to"
+                        class="form-control"
+                        required
+                    />
+                </div>
+                <div class="mb-3">
+                    <label for="department" class="form-label"
+                        >Department</label
+                    >
+                    <input
+                        type="text"
+                        id="department"
+                        v-model="form.department"
+                        class="form-control"
+                        required
+                    />
+                </div>
+                <div class="mb-3">
+                    <label for="date_issued" class="form-label"
+                        >Date Issued</label
+                    >
+                    <input
+                        type="date"
+                        id="date_issued"
+                        v-model="form.date_issued"
+                        class="form-control"
+                        required
+                    />
+                </div>
+                <div class="mb-3">
+                    <label for="issued_accessories" class="form-label"
+                        >Issued Accessories</label
+                    >
+                    <input
+                        type="text"
+                        id="issued_accessories"
+                        v-model="form.issued_accessories"
+                        class="form-control"
+                    />
+                </div>
+            </form>
+        </template>
+    </Modals>
 </template>
+
 <style scoped>
 tr td {
     align-items: center;
