@@ -10,13 +10,15 @@ class PhoneTransactionFactory extends Factory
     public function definition(): array
     {
         return [
+            'serial_num' => null, // Will be provided by the Seeder
             'issued_to' => $this->faker->name(),
-            'department' => $this->faker->randomElement(['IT', 'Marketing', 'HR', 'Planning', 'Production', 'Accounting', 'Purchasing', 'Reception', 'TSQA', 'Prepress']),
+            'department' => $this->faker->jobTitle(),
             'date_issued' => $this->faker->date(),
-            'issued_by' => 'Admin User',
-            'issued_accessories' => 'Charger, Case, Screen Protector',
+            'issued_by' => 'IT Admin',
+            'issued_accessories' => 'Charger, Case',
             'it_ack_issued' => true,
             'purch_ack_issued' => true,
+            'date_returned' => null,
             'remarks' => 'Brand new unit issued.',
             'created_at' => now(),
             'updated_at' => now(),

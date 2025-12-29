@@ -56,12 +56,14 @@ class Phone extends Model
 
     public function transactions()
     {
-        return $this->hasMany(PhoneTransaction::class, 'phone_id');
+        return $this->hasMany(PhoneTransaction::class, 'serial_num', 'serial_num');
     }
 
     public function currentTransaction()
     {
-        return $this->hasOne(PhoneTransaction::class, 'phone_id')->whereNull('date_returned');
+        return $this->hasOne(PhoneTransaction::class, 'serial_num', 'serial_num')
+        ->whereNull('date_returned')
+        ->latestOfMany();
     }
     //  */
 }

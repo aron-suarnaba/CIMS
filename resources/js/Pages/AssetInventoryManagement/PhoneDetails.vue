@@ -1,6 +1,5 @@
 <script setup>
 import HomeLayout from '@/Layouts/HomeLayout.vue';
-import { defineOptions, defineProps } from 'vue';
 import { router } from '@inertiajs/vue3';
 import BackButton from '@/Components/BackButton.vue';
 import Modals from '@/Components/Modals.vue';
@@ -27,7 +26,6 @@ const myBreadcrumb = [
     { label: 'Smartphone Asset Details' },
 ];
 
-
 // Import phone brand images
 import iPhoneImage from '/public/img/phone/iphone.png';
 import OppoImage from '/public/img/phone/oppo.png';
@@ -39,6 +37,7 @@ import XiaomiImage from '/public/img/phone/xiaomi.png';
 import HonorImage from '/public/img/phone/honor.png';
 import TechnoImage from '/public/img/phone/techno.png';
 import DefaultImage from '/public/img/phone/default.png';
+import { ref, watch } from 'vue';
 
 const getPhoneImagePath = (phone) => {
     const brand = phone.brand ? phone.brand.toLowerCase() : '';
@@ -85,20 +84,27 @@ const formatDate = (dateString, locale = 'en-US') => {
     }).format(date);
 };
 
+const selectedAcc = ref([]);
+
 const form = useForm({
     issued_by: '',
     issued_to: '',
     department: '',
     date_issued: new Date().toISOString().substr(0, 10),
-    issued_accessories: [],
+    issued_accessories: '',
     it_ack_issued: false,
     purch_ack_issued: false,
+});
+
+watch(selectedAcc, (newVal) => {
+    form.issued_accessories = newVal.join(', ');
 });
 
 const submit = () => {
     form.post(route('phone.issue', props.phone.id), {
         onSuccess: () => {
             form.reset();
+            selectedAcc.value = [];
         },
     });
 };
@@ -107,9 +113,7 @@ const submit = () => {
 <template>
     <div class="app-content-header border-bottom bg-white py-3">
         <div class="container-fluid">
-            <Breadcrumb 
-            :breadcrumbs="myBreadcrumb"
-            />
+            <Breadcrumb :breadcrumbs="myBreadcrumb" />
         </div>
     </div>
 
@@ -427,7 +431,11 @@ const submit = () => {
         </div>
     </div>
 
-    <Modals id="IssuePhoneModal" title="Issue Phone Asset" size="modal-lg">
+    <Modals
+        id="IssuePhoneModal"
+        title="Issue Phone Asset"
+        header-class="bg-primary text-white bg-gradient"
+    >
         <template #body>
             <form @submit.prevent="submit">
                 <div class="mb-3">
@@ -464,18 +472,122 @@ const submit = () => {
                         required
                     />
                 </div>
+
                 <div class="mb-3">
-                    <label for="issued_accessories" class="form-label"
-                        >Issued Accessories</label
+                    <label class="form-label">Acknowledgement</label>
+                    <div
+                        class="d-flex justify-content-around align-items-center g-2 rounded border p-2"
+                    >
+                        <div class="form-check">
+                            <input
+                                type="checkbox"
+                                v-model="form.it_ack_issued"
+                                id="ITAcknowledgement"
+                                class="form-check-input"
+                            />
+                            <label
+                                for="ITAcknowledgement"
+                                class="form-check-label"
+                                >IT</label
+                            >
+                        </div>
+                        <div class="form-check">
+                            <input
+                                type="checkbox"
+                                v-model="form.purch_ack_issued"
+                                id="PurchAcknowledgement"
+                                class="form-check-input"
+                            />
+                            <label
+                                for="PurchAcknowledgement"
+                                class="form-check-label"
+                                >Purchasing</label
+                            >
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Select Accessories</label>
+                    <div
+                        class="d-flex justify-content-around align-items-center rounded border p-2"
+                    >
+                        <div class="form-check">
+                            <input
+                                class="form-check-input"
+                                type="checkbox"
+                                value="Charger"
+                                v-model="selectedAcc"
+                                id="chargerCheckInput"
+                            />
+                            <label
+                                class="form-check-label"
+                                for="chargerCheckInput"
+                                >Charger</label
+                            >
+                        </div>
+                        <div class="form-check">
+                            <input
+                                class="form-check-input"
+                                type="checkbox"
+                                value="Headphones"
+                                v-model="selectedAcc"
+                                id="headphonesCheckInput"
+                            />
+                            <label
+                                class="form-check-label"
+                                for="headphonesCheckInput"
+                                >Headphones</label
+                            >
+                        </div>
+                        <div class="form-check">
+                            <input
+                                class="form-check-input"
+                                type="checkbox"
+                                value="Case"
+                                v-model="selectedAcc"
+                                id="caseCheckInput"
+                            />
+                            <label class="form-check-label" for="caseCheckInput"
+                                >Case</label
+                            >
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="issued_accessories_summary" class="form-label"
+                        >Other / All Accessories (Summary)</label
                     >
                     <input
                         type="text"
-                        id="issued_accessories"
+                        id="issued_accessories_summary"
                         v-model="form.issued_accessories"
                         class="form-control"
+                        placeholder="e.g. Charger, USB-C Cable"
                     />
                 </div>
             </form>
+        </template>
+        <template #footer>
+            <button
+                type="button"
+                class="btn btn-secondary"
+                data-bs-dismiss="modal"
+            >
+                Cancel
+            </button>
+            <button
+                type="submit"
+                class="btn btn-primary"
+                :disabled="form.processing"
+            >
+                <span
+                    v-if="form.processing"
+                    class="spinner-border spinner-border-sm me-1"
+                ></span>
+                Issue
+            </button>
         </template>
     </Modals>
 </template>

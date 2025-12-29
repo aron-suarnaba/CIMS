@@ -11,7 +11,7 @@ class PhoneTransaction extends Model
     protected $table = 'phone_transactions';
 
     protected $fillable = [
-        'phone_id',
+        'serial_num',
         'issued_to',
         'department',
         'date_issued',
@@ -27,6 +27,6 @@ class PhoneTransaction extends Model
 
     public function phone()
     {
-        return $this->belongsTo(Phone::class);
+        return $this->belongsTo(Phone::class, 'serial_num', 'serial_num');
     }
 }

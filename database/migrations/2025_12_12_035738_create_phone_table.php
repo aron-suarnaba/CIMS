@@ -26,9 +26,14 @@ return new class extends Migration {
 
         Schema::create('phone_transactions', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('phone_id')->constrained('phones')->onDelete('cascade');
 
+            $table->string('serial_num');
             // Issuance Info
+            $table->foreign('serial_num')
+                  ->references('serial_num')
+                  ->on('phones')
+                  ->cascade('cascade')
+                  ->onUpdate('cascade');
             $table->string('issued_to');
             $table->string('department');
             $table->date('date_issued');
