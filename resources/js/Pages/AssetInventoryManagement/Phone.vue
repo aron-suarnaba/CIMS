@@ -2,7 +2,7 @@
 import HomeLayout from '@/Layouts/HomeLayout.vue';
 import PhoneCard from '@/Components/PhoneCard.vue';
 import BackButton from '@/Components/BackButton.vue';
-import { defineOptions, defineProps, ref } from 'vue';
+import { defineOptions, defineProps, ref, watch } from 'vue';
 import { router } from '@inertiajs/vue3';
 
 defineOptions({ layout: HomeLayout });
@@ -13,6 +13,15 @@ const props = defineProps({
         required: true,
     },
 });
+
+const gotoPage = (url) => {
+    if (!url) return;
+
+    router.get(url, {}, {
+        preserveState: true, // Keeps your search/filter values in the URL
+        preserveScroll: true, // Prevents jumping to the top of the page
+    });
+};
 
 import iPhoneImage from '/public/img/phone/iphone.png';
 import OppoImage from '/public/img/phone/oppo.png';
@@ -244,6 +253,34 @@ const getPhoneImagePath = (phone) => {
                     <p class="text-muted text-center">
                         No phone records found.
                     </p>
+                </div>
+            </div>
+
+            <div class="row justify-content-end align-items-center">
+                <div class="col-sm-12 col-xl-4 col-lg-4">
+                    <div class="text-muted">
+                        {{ props.phones?.from || 0 }} -
+                        {{ props.phones?.to || 0 }} of
+                        {{ props.phones?.total || 0 }} phones
+                    </div>
+                    <nav aria-label="Phone pagination">
+                        <ul class="pagination mb-0">
+                            <li v-for="(link, index) in props.phones.links"
+                            :key="index"
+                            class="page-item"
+                            :class="{ 'active': link.active, 'disabled': !link.url }"
+                            >
+                                <button 
+                                class="page-link"
+                                @click.prevent="gotoPage(link.url)"
+                                v-html="link.label"
+                                :disabled="!link.url"
+                                >
+
+                                </button>
+                            </li>
+                        </ul>
+                    </nav>
                 </div>
             </div>
         </div>

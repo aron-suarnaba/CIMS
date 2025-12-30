@@ -15,7 +15,7 @@ const props = defineProps({
     },
     phone_transaction: {
         type: Object,
-        required: false,
+        required: true,
     },
 });
 
@@ -322,14 +322,14 @@ const submit = () => {
                                                 class="badge text-dark ms-2 border"
                                                 :class="
                                                     props.phone
-                                                        .issuedAcknowledgementIT
+                                                        .it_ack_issued
                                                         ? 'bg-success'
                                                         : 'bg-danger text-white'
                                                 "
                                                 >IT:
                                                 {{
                                                     props.phone
-                                                        .issuedAcknowledgementIT
+                                                        .it_ack_issued
                                                         ? 'Yes'
                                                         : 'No'
                                                 }}</span
@@ -338,14 +338,14 @@ const submit = () => {
                                                 class="badge text-dark ms-2 border"
                                                 :class="
                                                     props.phone
-                                                        .issuedAcknowledgementIT
+                                                        .it_ack_issued
                                                         ? 'bg-success'
                                                         : 'bg-danger text-white'
                                                 "
                                                 >Purchasing:
                                                 {{
                                                     props.phone
-                                                        .issuedAcknowledgementPurchasing
+                                                        .purch_ack_issued
                                                         ? 'Yes'
                                                         : 'No'
                                                 }}</span
@@ -437,7 +437,7 @@ const submit = () => {
         header-class="bg-primary text-white bg-gradient"
     >
         <template #body>
-            <form @submit.prevent="submit">
+            <form @submit.prevent="submit" id="issueForm">
                 <div class="mb-3">
                     <label for="issued_to" class="form-label">Issued To</label>
                     <input
@@ -580,6 +580,7 @@ const submit = () => {
             <button
                 type="submit"
                 class="btn btn-primary"
+                form="issueForm"
                 :disabled="form.processing"
             >
                 <span

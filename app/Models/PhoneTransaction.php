@@ -18,10 +18,12 @@ class PhoneTransaction extends Model
         'issued_by',
         'issued_accessories',
         'it_ack_issued',
+        'purch_ack_issued',
         'date_returned',
         'returned_to',
         'returned_accessories',
         'it_ack_returned',
+        'purch_ack_returned',
         'remarks'
     ];
 

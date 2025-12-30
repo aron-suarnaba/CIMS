@@ -43,8 +43,8 @@ Route::middleware('auth')->group(function () {
         Route::get('/Phone/{phone}', [PhoneController::class, 'show'])
             ->name('phone.show');
 
-        // unsigned
-        Route::post('/Phone/{phone}/issue', [PhoneController::class, 'issuePhone'])
+        // Store Phone Issuance Data
+        Route::post('/Phone/{phone}/issue', [PhoneController::class, 'phoneTransStore'])
             ->name('phone.issue');
 
         // unsigned
@@ -56,7 +56,7 @@ Route::middleware('auth')->group(function () {
             ->name('phone.destroy');
 
         // Your existing transaction store (if used for logging)
-        Route::post('/Phone/Transaction', [PhoneController::class, 'phoneTransStore'])
-            ->name('phone.trans.store');
+        // Route::post('/Phone/Transaction', [PhoneController::class, 'phoneTransStore'])
+        //     ->name('phone.trans.store');
     });
 });

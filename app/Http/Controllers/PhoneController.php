@@ -16,18 +16,18 @@ class PhoneController extends Controller
     {
         $filterBrand = $request->get('brand');
 
-        $phonesQuery = Phone::query();
-
-        if ($filterBrand) {
-            $phonesQuery->where('brand', 'LIKE', '%' . $filterBrand . '%');
-        }
-        $phones = $phonesQuery
+        $phones = Phone::query()
+            ->when($filterBrand, function ($query, $filterBrand) {
+                $query->where('brand', 'LIKE', '%' . $filterBrand . '%');
+            })
+            ->with(['transactions', 'currentTransaction'])
             ->latest()
             ->paginate(15)
             ->withQueryString();
 
         return Inertia::render('AssetInventoryManagement/Phone', [
             'phones' => $phones,
+            'filters' => $request->only(['brand']),
         ]);
     }
 
@@ -61,22 +61,34 @@ class PhoneController extends Controller
         return redirect()->route('phone.create')->with('message', 'Phone registered successfully.');
     }
 
-    public function phoneTransStore(PhoneTransaction $phoneTransaction, Phone $phone, Request $request)
+    public function phoneTransStore(Request $request, Phone $phone)
     {
-            $validated = $request->validate([
-            'brand' => 'required|string',
-            'model' => 'required|string',
-            'serial_num' => 'required|string|unique:phones,serial_num',
-            'imei_one' => 'required|string|unique:phones,imei_one',
-            'imei_two' => 'nullable|string',
-            'ram' => 'required|string',
-            'rom' => 'required|string',
+        // 1. Validate Transaction Data
+        $validated = $request->validate([
+            'issued_to' => 'required|string|max:255',
+            'department' => 'required|string|max:255',
+            'date_issued' => 'required|date',
+            'issued_by' => 'nullable|string|max:255',
+            'issued_accessories' => 'nullable|string',
+            'it_ack_issued' => 'required|boolean',
+            'purch_ack_issued' => 'required|boolean', // Ensure this exists in your DB or handle it
         ]);
 
+        // 2. Add the foreign key (serial_num or phone_id)
+        $validated['serial_num'] = $phone->serial_num;
+        $validated['issued_by'] = auth()->user()->name ?? 'System Admin';
 
+        // 3. Create the Transaction
         PhoneTransaction::create($validated);
 
-        return redirect()->route('phone.show')->with('message', 'Phone Issued successfully.');
+        // 4. Update the Phone Status
+        $phone->update([
+            'status' => 'issued'
+            // If you want to track acks on the phone table specifically:
+            // 'it_ack_issued' => $validated['it_ack_issued'] 
+        ]);
+
+        return redirect()->back()->with('message', 'Phone issued successfully.');
     }
 
     /**
