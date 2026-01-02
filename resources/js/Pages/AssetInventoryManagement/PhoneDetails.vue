@@ -324,15 +324,13 @@ const submit = () => {
                                             <span
                                                 class="badge text-dark ms-2 border text-white"
                                                 :class="
-                                                    props.phone_transaction
-                                                        .it_ack_issued
+                                                    props.phone_transaction?.it_ack_issued
                                                         ? 'bg-success'
                                                         : 'bg-danger'
                                                 "
                                                 >IT:
                                                 {{
-                                                    props.phone_transaction
-                                                        .it_ack_issued
+                                                    props.phone_transaction?.it_ack_issued
                                                         ? 'Yes'
                                                         : 'No'
                                                 }}</span
@@ -340,15 +338,13 @@ const submit = () => {
                                             <span
                                                 class="badge text-dark ms-2 border text-white"
                                                 :class="
-                                                    props.phone_transaction
-                                                        .it_ack_issued
+                                                    props.phone_transaction?.purch_ack_issued
                                                         ? 'bg-success'
                                                         : 'bg-danger'
                                                 "
                                                 >Purchasing:
                                                 {{
-                                                    props.phone_transaction
-                                                        .purch_ack_issued
+                                                    props.phone_transaction?.purch_ack_issued
                                                         ? 'Yes'
                                                         : 'No'
                                                 }}</span

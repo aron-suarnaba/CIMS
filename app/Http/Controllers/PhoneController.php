@@ -22,7 +22,7 @@ class PhoneController extends Controller
             })
             ->with('currentTransaction')
             ->latest()
-            ->paginate(15)
+            ->paginate(12)
             ->withQueryString();
 
         return Inertia::render('AssetInventoryManagement/Phone', [

@@ -211,9 +211,9 @@ const getPhoneImagePath = (phone) => {
                 </div>
             </div>
 
-            <div class="row justify-content-start mb-3 mt-5">
+            <div class="row justify-content-start mb-3 mt-5 px-5">
                 <div
-                    class="col-6 col-sm-4 col-md-2 d-flex justify-content-center mb-3"
+                    class="col-6 col-sm-4 col-md-2 d-flex justify-content-center mb-5"
                     v-for="phone in props.phones.data"
                     :key="phone.id"
                 >
@@ -256,15 +256,15 @@ const getPhoneImagePath = (phone) => {
                 </div>
             </div>
 
-            <div class="row justify-content-end align-items-center">
+            <div class="row justify-content-end align-items-center mb-4">
                 <div class="col-sm-12 col-xl-4 col-lg-4">
-                    <div class="text-muted">
+                    <div class="text-muted d-flex justify-content-center align-items-center mb-2">
                         {{ props.phones?.from || 0 }} -
                         {{ props.phones?.to || 0 }} of
                         {{ props.phones?.total || 0 }} phones
                     </div>
                     <nav aria-label="Phone pagination">
-                        <ul class="pagination mb-0">
+                        <ul class="pagination mb-0 d-flex gap-2 justify-content-center align-items-center">
                             <li v-for="(link, index) in props.phones.links"
                             :key="index"
                             class="page-item"
