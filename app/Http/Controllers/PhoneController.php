@@ -92,7 +92,7 @@ class PhoneController extends Controller
             // 'it_ack_issued' => $validated['it_ack_issued'] 
         ]);
 
-        return redirect()->back()->with('message', 'Phone issued successfully.');
+        return redirect()->back()->with('success', 'The device has been issued successfully to ' . $validated['issued_to']);
     }
 
     /**

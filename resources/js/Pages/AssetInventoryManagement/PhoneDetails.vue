@@ -5,6 +5,7 @@ import BackButton from '@/Components/BackButton.vue';
 import Modals from '@/Components/Modals.vue';
 import { useForm } from '@inertiajs/vue3';
 import Breadcrumb from '@/Components/Breadcrumb.vue';
+import Swal from 'sweetalert2';
 
 defineOptions({ layout: HomeLayout });
 
@@ -111,6 +112,13 @@ const submit = () => {
             if (closeButton){
                 closeButton.click();
             }
+
+            // const modalElement = document.getElementById('IssuePhoneModal');
+
+            // const modalInstance =  bootstrap.Modal.getInstance(modalElement);
+            // if(modalInstance){
+            //     modalInstance.hide();
+            // }
         },
     });
 };
