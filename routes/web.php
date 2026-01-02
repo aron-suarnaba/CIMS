@@ -44,11 +44,11 @@ Route::middleware('auth')->group(function () {
             ->name('phone.show');
 
         // Store Phone Issuance Data
-        Route::post('/Phone/{phone}/issue', [PhoneController::class, 'phoneTransStore'])
+        Route::post('/Phone/{phone}/issue', [PhoneController::class, 'issue'])
             ->name('phone.issue');
 
         // unsigned
-        Route::post('/Phone/{phone}/return', [PhoneController::class, 'returnPhone'])
+        Route::post('/Phone/{phone}/return', [PhoneController::class, 'return'])
             ->name('phone.return');
 
         // unsigned

@@ -65,7 +65,7 @@ class PhoneController extends Controller
     /**
      * This is where the data of smartphone issuance store the data from the modals.
      */
-    public function phoneTransStore(Request $request, Phone $phone)
+    public function issue(Request $request, Phone $phone)
     {
         // 1. Validate Transaction Data
         $validated = $request->validate([
@@ -94,6 +94,37 @@ class PhoneController extends Controller
 
         return redirect()->back()->with('success', 'The device has been issued successfully to ' . $validated['issued_to']);
     }
+    public function return(Request $request, Phone $phone)
+    {
+        // 1. Validate Return Data
+        $validated = $request->validate([
+            'returned_to' => 'required|string|max:255',
+            'date_returned' => 'required|date',
+            'returned_accessories' => 'nullable|string',
+            'it_ack_returned' => 'required|boolean',
+            'purch_ack_returned' => 'required|boolean',
+            'remarks' => 'nullable|string|max:255',
+        ]);
+
+        // 2. Find the LATEST transaction for this phone that hasn't been returned yet
+        $transaction = PhoneTransaction::where('serial_num', $phone->serial_num)
+            ->whereNull('date_returned')
+            ->latest()
+            ->first();
+
+        if ($transaction) {
+            // 3. Update that specific row with return details
+            $transaction->update($validated);
+        } else {
+            // Optional: Handle case where no active issuance exists
+            return redirect()->back()->withErrors(['error' => 'No active issuance found for this device.']);
+        }
+
+        // 4. Update the Phone Status to available (or returned)
+        $phone->update(['status' => 'returned']);
+
+        return redirect()->back()->with('success', 'The device has been returned successfully.');
+    }
 
     /**
      * Display the specified resource.
@@ -104,7 +135,7 @@ class PhoneController extends Controller
 
         return Inertia::render('AssetInventoryManagement/PhoneDetails', [
             'phone' => $phone,
-            'phone_transaction' => $phone->currentTransaction,
+            'phone_transaction' => $phone->transactions()->latest()->first(),
         ]);
     }
 
