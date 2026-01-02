@@ -14,8 +14,9 @@ const props = defineProps({
         required: true,
     },
     phone_transaction: {
-        type: Object,
+        type: [Object, null],
         required: true,
+        default: null,
     },
 });
 
@@ -313,38 +314,40 @@ const submit = () => {
                                         <div
                                             class="vr d-none d-md-block mx-2"
                                         ></div>
-                                        <div class="d-flex align-items-center">
-                                            <i
+                                        <div class="d-flex align-items-center flex-wrap">
+                                            <div class="g-1">
+                                                <i
                                                 class="bi bi-check-circle-fill text-success me-2"
                                             ></i>
                                             <strong>Acknowledgement:</strong>
+                                            </div>
                                             <span
-                                                class="badge text-dark ms-2 border"
+                                                class="badge text-dark ms-2 border text-white"
                                                 :class="
-                                                    props.phone
+                                                    props.phone_transaction
                                                         .it_ack_issued
                                                         ? 'bg-success'
-                                                        : 'bg-danger text-white'
+                                                        : 'bg-danger'
                                                 "
                                                 >IT:
                                                 {{
-                                                    props.phone
+                                                    props.phone_transaction
                                                         .it_ack_issued
                                                         ? 'Yes'
                                                         : 'No'
                                                 }}</span
                                             >
                                             <span
-                                                class="badge text-dark ms-2 border"
+                                                class="badge text-dark ms-2 border text-white"
                                                 :class="
-                                                    props.phone
+                                                    props.phone_transaction
                                                         .it_ack_issued
                                                         ? 'bg-success'
-                                                        : 'bg-danger text-white'
+                                                        : 'bg-danger'
                                                 "
                                                 >Purchasing:
                                                 {{
-                                                    props.phone
+                                                    props.phone_transaction
                                                         .purch_ack_issued
                                                         ? 'Yes'
                                                         : 'No'

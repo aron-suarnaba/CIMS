@@ -10,7 +10,7 @@ use Inertia\Inertia;
 class PhoneController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Display a listing of the smartphone device in the Phone.vue
      */
     public function index(Request $request)
     {
@@ -20,7 +20,7 @@ class PhoneController extends Controller
             ->when($filterBrand, function ($query, $filterBrand) {
                 $query->where('brand', 'LIKE', '%' . $filterBrand . '%');
             })
-            ->with(['transactions', 'currentTransaction'])
+            ->with('currentTransaction')
             ->latest()
             ->paginate(15)
             ->withQueryString();
@@ -32,7 +32,7 @@ class PhoneController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Show the form for creating a new smartphone device.
      */
     public function create()
     {
@@ -40,7 +40,7 @@ class PhoneController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Function store is where the data stored or validate from the creation of smartphone device.
      */
     public function store(Request $request)
     {
@@ -61,6 +61,10 @@ class PhoneController extends Controller
         return redirect()->route('phone.create')->with('message', 'Phone registered successfully.');
     }
 
+
+    /**
+     * This is where the data of smartphone issuance store the data from the modals.
+     */
     public function phoneTransStore(Request $request, Phone $phone)
     {
         // 1. Validate Transaction Data
@@ -84,7 +88,7 @@ class PhoneController extends Controller
         // 4. Update the Phone Status
         $phone->update([
             'status' => 'issued'
-            // If you want to track acks on the phone table specifically:
+            // If you want to track acks on the phone table specifically:   
             // 'it_ack_issued' => $validated['it_ack_issued'] 
         ]);
 
@@ -94,11 +98,13 @@ class PhoneController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Phone $phone, PhoneTransaction $phoneTransaction)
+    public function show(Phone $phone)
     {
+        $phone->load(['currentTransaction', 'transactions']);
+
         return Inertia::render('AssetInventoryManagement/PhoneDetails', [
             'phone' => $phone,
-            'phone_transaction' => $phoneTransaction,
+            'phone_transaction' => $phone->currentTransaction,
         ]);
     }
 

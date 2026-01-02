@@ -2,8 +2,8 @@
 import HomeLayout from '@/Layouts/HomeLayout.vue';
 import PhoneCard from '@/Components/PhoneCard.vue';
 import BackButton from '@/Components/BackButton.vue';
-import { defineOptions, defineProps, ref, watch } from 'vue';
 import { router } from '@inertiajs/vue3';
+import { ref } from 'vue';
 
 defineOptions({ layout: HomeLayout });
 
