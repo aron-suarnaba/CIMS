@@ -102,10 +102,15 @@ watch(selectedAcc, (newVal) => {
 });
 
 const submit = () => {
-    form.post(route('phone.issue', props.phone.id), {
+    form.post(route('phone.issue', props.phone.serial_num), {
         onSuccess: () => {
             form.reset();
             selectedAcc.value = [];
+
+            const closeButton = document.querySelector('#IssuePhoneModal [data-bs-dismiss="modal"]');
+            if (closeButton){
+                closeButton.click();
+            }
         },
     });
 };
