@@ -45,6 +45,8 @@ return new class extends Migration {
             // Return Info (Starts as Null)
             $table->date('date_returned')->nullable();
             $table->string('returned_to')->nullable();
+            $table->string('returned_by')->nullable();
+            $table->string('returnee_department')->nullable();
             $table->text('returned_accessories')->nullable();
             $table->boolean('it_ack_returned')->default(false);
             $table->boolean('purch_ack_returned')->default(false);

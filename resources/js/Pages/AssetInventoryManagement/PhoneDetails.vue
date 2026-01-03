@@ -258,245 +258,344 @@ const returnSubmit = () => {
                 <div class="col-sm-12 col-xl-8 col-lg-7">
                     <div class="card mb-4 border-0 shadow-sm">
                         <div
-                            class=" card-header bg-primary d-flex justify-content-between align-items-center
-                        text-white">
-                        <h5 class="fw-bold mb-0">
-                            Current / Last Issuance
-                        </h5>
-                        <i class="bi bi-send-check fs-4"></i>
-                    </div>
-                    <div class="card-body">
-                        <div class="row g-3" v-if="
-                            props.phone?.status === 'issued' || props.phone.status === 'returned'">
-                            <div class="col-md-6 border-end">
-                                <label class="small text-muted text-uppercase fw-bold">Recipient Info</label>
-                                <p class="fw-bold fs-5 text-dark mb-1">
-                                    {{
-                                        props.phone_transaction
-                                            ?.issued_to || 'Not yet issued'
-                                    }}
-                                </p>
-                                <p class="text-secondary small mb-0">
-                                    <i class="bi bi-building me-1"></i>
-                                    {{
-                                        props.phone_transaction
-                                            ?.department || 'Not yet issued'
-                                    }}
-                                </p>
-                            </div>
-                            <div class="col-md-6 px-md-4">
-                                <label class="small text-muted text-uppercase fw-bold">Issuance Logistics</label>
-                                <p class="mb-1">
-                                    <strong>Date:</strong>
-                                    {{
-                                        formatDate(
+                            class="card-header bg-primary d-flex justify-content-between align-items-center text-white">
+                            <h5 class="fw-bold mb-0">
+                                Current / Last Issuance
+                            </h5>
+                            <i class="bi bi-send-check fs-4"></i>
+                        </div>
+                        <div class="card-body">
+                            <div class="row g-3" v-if="
+                                props.phone?.status === 'issued' ||
+                                props.phone.status === 'returned'
+                            ">
+                                <div class="col-md-6 border-end">
+                                    <label class="small text-muted text-uppercase fw-bold">Recipient Info</label>
+                                    <p class="fw-bold fs-5 text-dark mb-1">
+                                        {{
                                             props.phone_transaction
-                                                ?.date_issued,
-                                        ) || 'Not yet issued'
-                                    }}
-                                </p>
-                                <p class="mb-0">
-                                    <strong>By:</strong>
-                                    {{
-                                        props.phone_transaction
-                                            ?.issued_by || 'Not yet issued'
-                                    }}
-                                </p>
-                            </div>
-                            <div class="col-12 mt-4">
-                                <div class="bg-light d-flex align-items-center flex-wrap gap-4 rounded p-3">
-                                    <div class="d-flex align-items-center">
-                                        <i class="bi bi-headphones text-primary me-2"></i>
-                                        <strong>Accessories:</strong>
-                                        <span class="text-muted ms-2">{{
+                                                ?.issued_to || 'Not yet issued'
+                                        }}
+                                    </p>
+                                    <p class="text-secondary small mb-0">
+                                        <i class="bi bi-building me-1"></i>
+                                        {{
                                             props.phone_transaction
-                                                ?.issued_accessories ||
-                                            'None'
-                                        }}</span>
-                                    </div>
-                                    <div class="vr d-none d-md-block mx-2"></div>
-                                    <div class="d-flex align-items-center flex-wrap">
-                                        <div class="g-1">
-                                            <i class="bi bi-check-lg me-1"></i>
-                                            <strong>Acknowledgement:</strong>
+                                                ?.department || 'Not yet issued'
+                                        }}
+                                    </p>
+                                </div>
+                                <div class="col-md-6 px-md-4">
+                                    <label class="small text-muted text-uppercase fw-bold">Issuance Logistics</label>
+                                    <p class="mb-1">
+                                        <strong>Date:</strong>
+                                        {{
+                                            formatDate(
+                                                props.phone_transaction
+                                                    ?.date_issued,
+                                            ) || 'Not yet issued'
+                                        }}
+                                    </p>
+                                    <p class="mb-0">
+                                        <strong>By:</strong>
+                                        {{
+                                            props.phone_transaction
+                                                ?.issued_by || 'Not yet issued'
+                                        }}
+                                    </p>
+                                </div>
+                                <div class="col-12 mt-4">
+                                    <div class="bg-light d-flex align-items-center flex-wrap gap-4 rounded p-3">
+                                        <div class="d-flex align-items-center">
+                                            <i class="bi bi-headphones text-primary me-2"></i>
+                                            <strong>Accessories:</strong>
+                                            <span class="text-muted ms-2">{{
+                                                props.phone_transaction
+                                                    ?.issued_accessories ||
+                                                'None'
+                                            }}</span>
                                         </div>
-                                        <span class="badge text-dark ms-2 border text-white" :class="props.phone_transaction
-                                            ?.it_ack_issued
-                                            ? 'bg-success'
-                                            : 'bg-danger'
-                                            ">IT:
-                                            {{
-                                                props.phone_transaction
+                                        <div class="vr d-none d-md-block mx-2"></div>
+                                        <div class="d-flex align-items-center flex-wrap">
+                                            <div class="g-1">
+                                                <i class="bi bi-check-lg me-1"></i>
+                                                <strong>Acknowledgement:</strong>
+                                            </div>
+                                            <span class="badge text-dark ms-2 border text-white" :class="props.phone_transaction
+                                                ?.it_ack_issued
+                                                ? 'bg-success'
+                                                : 'bg-danger'
+                                                ">IT:
+                                                {{
+                                                    props.phone_transaction
+                                                        ?.it_ack_issued
+                                                        ? 'Yes'
+                                                        : 'No'
+                                                }}
+                                                <i :class="props.phone_transaction
                                                     ?.it_ack_issued
-                                                    ? 'Yes'
-                                                    : 'No'
-                                            }}
-                                            <i :class="props.phone_transaction
-                                                ?.it_ack_issued
-                                                ? 'bi bi-check-circle-fill'
-                                                : 'bi-x-circle-fill'
-                                                "></i>
-                                        </span>
-                                        <span class="badge text-dark ms-2 border text-white" :class="props.phone_transaction
-                                            ?.purch_ack_issued
-                                            ? 'bg-success'
-                                            : 'bg-danger'
-                                            ">Purchasing:
-                                            {{
+                                                    ? 'bi bi-check-circle-fill'
+                                                    : 'bi-x-circle-fill'
+                                                    "></i>
+                                            </span>
+                                            <span class="badge text-dark ms-2 border text-white" :class="props.phone_transaction
+                                                ?.purch_ack_issued
+                                                ? 'bg-success'
+                                                : 'bg-danger'
+                                                ">Purchasing:
+                                                {{
+                                                    props.phone_transaction
+                                                        ?.purch_ack_issued
+                                                        ? 'Yes'
+                                                        : 'No'
+                                                }}
+                                                <i :class="props.phone_transaction
+                                                    ?.it_ack_issued
+                                                    ? 'bi bi-check-circle-fill'
+                                                    : 'bi-x-circle-fill'
+                                                    "></i>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-body py-5 text-center" v-else>
+                                <span class="fw-bold fs-5 text-muted">The asset is not yet issued.</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Return Details -->
+                    <div class="card mb-4 border-0 shadow-sm">
+                        <div class="card-header bg-warning d-flex justify-content-start align-items-center text-dark">
+                            <i class="bi bi-reply-fill fs-4 me-2"></i>
+                            <h5 class="fw-bold mb-0">Return Details</h5>
+                        </div>
+                        <div class="card-body" v-if="props.phone?.status === 'returned'">
+                            <div class="row g-3">
+                                <div class="col-md-6 border-end">
+                                    <label class="small text-muted text-uppercase fw-bold">Recipient Info</label>
+                                    <p class="fw-bold fs-5 text-dark mb-1">
+                                        {{
+                                            props.phone_transaction
+                                                ?.returned_to ||
+                                            'Not yet issued'
+                                        }}
+                                    </p>
+                                </div>
+                                <div class="col-md-6 px-md-4">
+                                    <label class="small text-muted text-uppercase fw-bold">Issuance Logistics</label>
+                                    <p class="mb-1">
+                                        <strong>Date:</strong>
+                                        {{
+                                            formatDate(
                                                 props.phone_transaction
-                                                    ?.purch_ack_issued
-                                                    ? 'Yes'
-                                                    : 'No'
-                                            }}
-                                            <i :class="props.phone_transaction
-                                                ?.it_ack_issued
-                                                ? 'bi bi-check-circle-fill'
-                                                : 'bi-x-circle-fill'
-                                                "></i>
-                                        </span>
+                                                    ?.date_returned,
+                                            ) || 'Not yet issued'
+                                        }}
+                                    </p>
+                                    <p class="mb-0">
+                                        <strong>By:</strong>
+                                        {{
+                                            props.phone_transaction
+                                                ?.issued_by || 'Not yet issued'
+                                        }}
+                                    </p>
+                                </div>
+                                <div class="col-12 mt-4">
+                                    <div class="bg-light d-flex align-items-center flex-wrap gap-4 rounded p-3">
+                                        <div class="d-flex align-items-center">
+                                            <i class="bi bi-headphones text-primary me-2"></i>
+                                            <strong>Accessories:</strong>
+                                            <span class="text-muted ms-2">{{
+                                                props.phone_transaction
+                                                    ?.returned_accessories ||
+                                                'None'
+                                            }}</span>
+                                        </div>
+                                        <div class="vr d-none d-md-block mx-2"></div>
+                                        <div class="d-flex align-items-center flex-wrap">
+                                            <strong>Acknowledgement:</strong>
+
+                                            <span class="badge ms-2 border text-white" :class="props.phone_transaction
+                                                ?.it_ack_returned
+                                                ? 'bg-success'
+                                                : 'bg-danger'
+                                                ">
+                                                IT:
+                                                {{
+                                                    props.phone_transaction
+                                                        ?.it_ack_returned
+                                                        ? 'Yes'
+                                                        : 'No'
+                                                }}
+                                                <i class="bi ms-1" :class="props.phone_transaction
+                                                    ?.it_ack_returned
+                                                    ? 'bi-check-circle-fill'
+                                                    : 'bi-x-circle-fill'
+                                                    "></i>
+                                            </span>
+
+                                            <span class="badge ms-2 border text-white" :class="props.phone_transaction
+                                                ?.purch_ack_returned
+                                                ? 'bg-success'
+                                                : 'bg-danger'
+                                                ">
+                                                Purchasing:
+                                                {{
+                                                    props.phone_transaction
+                                                        ?.purch_ack_returned
+                                                        ? 'Yes'
+                                                        : 'No'
+                                                }}
+                                                <i class="bi ms-1" :class="props.phone_transaction
+                                                    ?.purch_ack_returned
+                                                    ? 'bi-check-circle-fill'
+                                                    : 'bi-x-circle-fill'
+                                                    "></i>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-12 mt-4">
+                                    <div class="card bg-light border-0 shadow-sm">
+                                        <div class="card-body">
+                                            <h5
+                                                class="card-title fw-bold text-secondary d-flex align-items-center mb-3 me-2">
+                                                <i class="bi bi-sticky me-2"></i>Remarks
+                                            </h5>
+                                            <p class="card-text text-dark d-flex align-items-center">
+                                                {{
+                                                    props.phone_transaction
+                                                        ?.remarks ||
+                                                    'No remarks provided for this issuance.'
+                                                }}
+                                            </p>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="card-body py-5 text-center" v-else>
-                            <span class="fw-bold fs-5 text-muted">The asset is not yet issued.</span>
+                        <div class="card-body bg-light py-5 text-center" v-else-if="props.phone.status === 'issued'">
+                            <span class="fw-bold fs-5 text-dark text-muted mb-1">The asset is currently deploy (not yet
+                                returned).
+                            </span>
+                        </div>
+                        <div class="card-body bg-light py-5 text-center" v-else>
+                            <span class="fw-bold fs-5 text-dark text-muted mb-1">The asset is not yet issued.
+                            </span>
                         </div>
                     </div>
                 </div>
 
-                <!-- Return Details -->
-                <div class="card mb-4 border-0 shadow-sm">
-                    <div class="card-header bg-warning d-flex justify-content-between align-items-center text-dark">
-                        <h5 class="fw-bold mb-0">
-                            Return Details
-                        </h5>
-                        <i class="bi bi-send-check fs-4"></i>
-                    </div>
-                    <div class="card-body" v-if="props.phone?.status === 'returned'">
-                        <div class="row g-3">
-                            <div class="col-md-6 border-end">
-                                <label class="small text-muted text-uppercase fw-bold">Recipient Info</label>
-                                <p class="fw-bold fs-5 text-dark mb-1">
-                                    {{
-                                        props.phone_transaction
-                                            ?.returned_to || 'Not yet issued'
-                                    }}
-                                </p>
+                <!-- Table -->
+                <div class="row g-4 mb-5">
+                    <div class="col-12">
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-header bg-white py-3">
+                                <h5 class="fw-bold mb-0 text-primary">
+                                    <i class="bi bi-clock-history me-2"></i>Asset Transaction History
+                                </h5>
                             </div>
-                            <div class="col-md-6 px-md-4">
-                                <label class="small text-muted text-uppercase fw-bold">Issuance Logistics</label>
-                                <p class="mb-1">
-                                    <strong>Date:</strong>
-                                    {{
-                                        formatDate(
-                                            props.phone_transaction
-                                                ?.date_returned,
-                                        ) || 'Not yet issued'
-                                    }}
-                                </p>
-                                <p class="mb-0">
-                                    <strong>By:</strong>
-                                    {{ props.phone_transaction?.issued_by || 'Not yet issued' }}
-                                </p>
-                            </div>
-                            <div class="col-12 mt-4">
-                                <div class="bg-light d-flex align-items-center flex-wrap gap-4 rounded p-3">
-                                    <div class="d-flex align-items-center">
-                                        <i class="bi bi-headphones text-primary me-2"></i>
-                                        <strong>Accessories:</strong>
-                                        <span class="text-muted ms-2">{{
-                                            props.phone_transaction
-                                                ?.returned_accessories ||
-                                            'None'
-                                        }}</span>
-                                    </div>
-                                    <div class="vr d-none d-md-block mx-2"></div>
-                                    <div class="d-flex align-items-center flex-wrap">
-                                        <strong>Acknowledgement:</strong>
+                            <div class="card-body p-0">
+                                <div class="table-responsive">
+                                    <table class="table table-hover align-middle mb-0">
+                                        <thead class="table-light">
+                                            <tr class="fs-7 text-uppercase text-muted border-top-0">
+                                                <th class="ps-3" scope="col">Date Issued</th>
+                                                <th scope="col">Issued By/To</th>
+                                                <th scope="col">Department</th>
+                                                <th scope="col">Issued Acc.</th>
+                                                <th scope="col">Date Returned</th>
+                                                <th scope="col">Returned To</th>
+                                                <th scope="col" class="pe-3">Returned Acc.</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr class="fs-7" v-if="props.phone_transaction">
+                                                <td class="ps-3 fw-medium text-nowrap">
+                                                    {{ formatDate(props.phone_transaction.date_issued) }}
+                                                </td>
 
-                                        <span class="badge ms-2 border text-white" :class="props.phone_transaction
-                                            ?.it_ack_returned
-                                            ? 'bg-success'
-                                            : 'bg-danger'
-                                            ">
-                                            IT:
-                                            {{
-                                                props.phone_transaction
-                                                    ?.it_ack_returned
-                                                    ? 'Yes'
-                                                    : 'No'
-                                            }}
-                                            <i class="bi ms-1" :class="props.phone_transaction
-                                                ?.it_ack_returned
-                                                ? 'bi-check-circle-fill'
-                                                : 'bi-x-circle-fill'
-                                                "></i>
-                                        </span>
+                                                <td>
+                                                    <div class="fw-bold text-dark">{{ props.phone_transaction.issued_to
+                                                        }}</div>
+                                                    <div class="text-muted small">By: {{
+                                                        props.phone_transaction.issued_by }}</div>
+                                                </td>
 
-                                        <span class="badge ms-2 border text-white" :class="props.phone_transaction
-                                            ?.purch_ack_returned
-                                            ? 'bg-success'
-                                            : 'bg-danger'
-                                            ">
-                                            Purchasing:
-                                            {{
-                                                props.phone_transaction
-                                                    ?.purch_ack_returned
-                                                    ? 'Yes'
-                                                    : 'No'
-                                            }}
-                                            <i class="bi ms-1" :class="props.phone_transaction
-                                                ?.purch_ack_returned
-                                                ? 'bi-check-circle-fill'
-                                                : 'bi-x-circle-fill'
-                                                "></i>
-                                        </span>
-                                    </div>
+                                                <td><span class="badge bg-light text-dark border">{{
+                                                        props.phone_transaction.department }}</span></td>
+
+                                                <td class="small text-wrap" style="max-width: 150px;">
+                                                    {{ props.phone_transaction.issued_accessories || '—' }}
+                                                </td>
+
+                                                <td class="text-nowrap">
+                                                    <span v-if="props.phone_transaction.date_returned"
+                                                        class="text-success">
+                                                        {{ formatDate(props.phone_transaction.date_returned) }}
+                                                    </span>
+                                                    <span v-else class="badge rounded-pill bg-warning text-dark">In
+                                                        Use</span>
+                                                </td>
+
+                                                <td>{{ props.phone_transaction.returned_to || '—' }}</td>
+
+                                                <td class="pe-3 small text-muted">
+                                                    {{ props.phone_transaction.returned_accessories || '—' }}
+                                                </td>
+                                            </tr>
+                                            <tr v-else>
+                                                <td colspan="7" class="text-center py-4 text-muted">No transaction
+                                                    history found.</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
-                            <div class="col-12 mt-4">
-                                
-                            </div>
                         </div>
-                    </div>
-                    <div class="card-body py-5 text-center bg-light" v-else-if="props.phone.status === 'issued'">
-                        <span class="fw-bold fs-5 text-dark mb-1 text-muted">The asset is currently deploy (not yet returned).
-                        </span>
-                    </div>                    
-                    <div class="card-body py-5 text-center bg-light" v-else>
-                        <span class="fw-bold fs-5 text-dark mb-1 text-muted">The asset is not yet issued.
-                        </span>
                     </div>
                 </div>
             </div>
+
+
         </div>
-    </div>
     </div>
 
     <!-- Modal -->
     <Modals id="IssuePhoneModal" title="Issue Phone Asset" header-class="bg-primary text-white bg-gradient">
         <template #body>
             <form @submit.prevent="submit" id="issueForm">
-                <div class="mb-3">
-                    <label for="issued_to" class="form-label">Issued To</label>
-                    <input type="text" id="issued_to" v-model="form.issued_to" class="form-control" required />
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="issued_to" class="form-label">Issued To</label>
+                        <input type="text" id="issued_to" v-model="form.issued_to" class="form-control" required />
+                    </div>
+                    <div class="col-md-6">
+                        <label for="issued_by" class="form-label">Issued By</label>
+                        <input type="text" id="issued_by" v-model="form.issued_by" class="form-control" required />
+                    </div>
                 </div>
-                <div class="mb-3">
-                    <label for="department" class="form-label">Department</label>
-                    <input type="text" id="department" v-model="form.department" class="form-control" required />
-                </div>
-                <div class="mb-3">
-                    <label for="date_issued" class="form-label">Date Issued</label>
-                    <input type="date" id="date_issued" v-model="form.date_issued" class="form-control" required />
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="department" class="form-label">Department</label>
+                        <input type="text" id="department" v-model="form.department" class="form-control" required />
+                    </div>
+                    <div class="col-md-6">
+                        <label for="date_issued" class="form-label">Date Issued</label>
+                        <input type="date" id="date_issued" v-model="form.date_issued" class="form-control" required />
+                    </div>
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label">Acknowledgement</label>
-                    <div class="d-flex justify-content-around align-items-center g-2 rounded border p-2">
+                    <label class="form-label text-muted small fw-bold">Acknowledgement</label>
+                    <div class="d-flex justify-content-around gap-4 rounded border p-2">
                         <div class="form-check">
                             <input type="checkbox" v-model="form.it_ack_issued" id="ITAcknowledgement"
                                 class="form-check-input" />
-                            <label for="ITAcknowledgement" class="form-check-label">IT</label>
+                            <label for="ITAcknowledgement" class="form-check-label">IT Dept</label>
                         </div>
                         <div class="form-check">
                             <input type="checkbox" v-model="form.purch_ack_issued" id="PurchAcknowledgement"
@@ -507,8 +606,8 @@ const returnSubmit = () => {
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label">Select Accessories</label>
-                    <div class="d-flex justify-content-around align-items-center rounded border p-2">
+                    <label class="form-label text-muted small fw-bold">Select Accessories</label>
+                    <div class="d-flex justify-content-between rounded border p-2 gap-2">
                         <div class="form-check">
                             <input class="form-check-input" type="checkbox" value="Charger" v-model="selectedAcc"
                                 id="chargerCheckInput" />
@@ -529,18 +628,17 @@ const returnSubmit = () => {
 
                 <div class="mb-3">
                     <label for="issued_accessories_summary" class="form-label">Other / All Accessories (Summary)</label>
-                    <input type="text" id="issued_accessories_summary" v-model="form.issued_accessories"
-                        class="form-control" placeholder="e.g. Charger, USB-C Cable" />
+                    <textarea id="issued_accessories_summary" v-model="form.issued_accessories" class="form-control"
+                        rows="2" placeholder="e.g. Charger, USB-C Cable"></textarea>
                 </div>
             </form>
         </template>
+
         <template #footer>
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                Cancel
-            </button>
-            <button type="submit" class="btn btn-primary" form="issueForm" :disabled="form.processing">
+            <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-primary px-4" form="issueForm" :disabled="form.processing">
                 <span v-if="form.processing" class="spinner-border spinner-border-sm me-1"></span>
-                Issue
+                Issue Asset
             </button>
         </template>
     </Modals>
@@ -601,6 +699,12 @@ const returnSubmit = () => {
                         (Summary)</label>
                     <input type="text" id="returned_accessories_summary" v-model="returnform.returned_accessories"
                         class="form-control" placeholder="e.g. Charger, USB-C Cable" />
+                </div>
+
+                <div class="mb-3">
+                    <label for="remarksTextarea" class="form-label">Remarks</label>
+                    <textarea v-model="returnform.remarks" id="remarksTextarea" class="form-control"
+                        rows="3"></textarea>
                 </div>
             </form>
         </template>

@@ -15,19 +15,39 @@ class PhoneController extends Controller
     public function index(Request $request)
     {
         $filterBrand = $request->get('brand');
+        $sort = $request->get('sort', 'date_modified'); // Default to date_modified
 
-        $phones = Phone::query()
+        $query = Phone::query()
             ->when($filterBrand, function ($query, $filterBrand) {
                 $query->where('brand', 'LIKE', '%' . $filterBrand . '%');
             })
-            ->with('currentTransaction')
-            ->latest()
-            ->paginate(12)
-            ->withQueryString();
+            ->with('currentTransaction');
+
+        // Handle Sorting Logic
+        switch ($sort) {
+            case 'name':
+                $query->orderBy('brand', 'asc')->orderBy('model', 'asc');
+                break;
+
+            case 'availability':
+                $query->orderByRaw("CASE 
+                WHEN status = 'available' THEN 1 
+                WHEN status = 'issued' THEN 2 
+                WHEN status = 'returned' THEN 3 
+                ELSE 4 END");
+                break;
+
+            case 'date_modified':
+            default:
+                $query->latest('updated_at');
+                break;
+        }
+
+        $phones = $query->paginate(12)->withQueryString();
 
         return Inertia::render('AssetInventoryManagement/Phone', [
             'phones' => $phones,
-            'filters' => $request->only(['brand']),
+            'filters' => $request->only(['brand', 'sort']),
         ]);
     }
 
@@ -80,7 +100,7 @@ class PhoneController extends Controller
 
         // 2. Add the foreign key (serial_num or phone_id)
         $validated['serial_num'] = $phone->serial_num;
-        $validated['issued_by'] = auth()->user()->name ?? 'System Admin';
+        // $validated['issued_by'] = auth()->user()->name ?? 'System Admin';
 
         // 3. Create the Transaction
         PhoneTransaction::create($validated);
@@ -88,8 +108,6 @@ class PhoneController extends Controller
         // 4. Update the Phone Status
         $phone->update([
             'status' => 'issued'
-            // If you want to track acks on the phone table specifically:   
-            // 'it_ack_issued' => $validated['it_ack_issued'] 
         ]);
 
         return redirect()->back()->with('success', 'The device has been issued successfully to ' . $validated['issued_to']);
@@ -99,6 +117,7 @@ class PhoneController extends Controller
         // 1. Validate Return Data
         $validated = $request->validate([
             'returned_to' => 'required|string|max:255',
+            'department' => 'required|string|max:255',
             'date_returned' => 'required|date',
             'returned_accessories' => 'nullable|string',
             'it_ack_returned' => 'required|boolean',

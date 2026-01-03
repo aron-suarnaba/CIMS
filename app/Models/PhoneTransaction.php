@@ -21,6 +21,8 @@ class PhoneTransaction extends Model
         'purch_ack_issued',
         'date_returned',
         'returned_to',
+        'returned_by',
+        'returnee_department',
         'returned_accessories',
         'it_ack_returned',
         'purch_ack_returned',

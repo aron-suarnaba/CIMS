@@ -17,46 +17,45 @@ const props = defineProps({
 const gotoPage = (url) => {
     if (!url) return;
 
-    router.get(url, {}, {
-        preserveState: true, // Keeps your search/filter values in the URL
-        preserveScroll: true, // Prevents jumping to the top of the page
-    });
+    router.get(
+        url,
+        {},
+        {
+            preserveState: true, // Keeps your search/filter values in the URL
+            preserveScroll: true, // Prevents jumping to the top of the page
+        },
+    );
 };
-
-import iPhoneImage from '/public/img/phone/iphone.png';
-import OppoImage from '/public/img/phone/oppo.png';
-import RedmiImage from '/public/img/phone/redmi.png';
-import SamsungImage from '/public/img/phone/samsung.png';
-import VivoImage from '/public/img/phone/vivo.png';
-import RealmeImage from '/public/img/phone/realme.png';
-import XiaomiImage from '/public/img/phone/xiaomi.png';
-import HonorImage from '/public/img/phone/honor.png';
-import TechnoImage from '/public/img/phone/techno.png';
-import DefaultImage from '/public/img/phone/default.png';
 
 const filterBrand = ref(
     new URLSearchParams(window.location.search).get('brand') || '',
 );
-const availableBrands = [
-    'All Brands',
-    'Apple',
-    'Oppo',
-    'Redmi',
-    'Samsung',
-    'Realme',
-    'Vivo',
+const currentSort = ref(
+    new URLSearchParams(window.location.search).get('sort') || 'date_modified',
+);
+
+const sortOption = [
+    { label: 'Name', value: 'name' },
+    { label: 'Date Modified', value: 'date_modified' },
+    { label: 'Availability', value: 'availability' },
 ];
-const applyFilter = (brand) => {
-    filterBrand.value = brand === 'All Brands' ? '' : brand;
+
+const applyFilter = (brand = filterBrand.value, sort = currentSort.value) => {
+    // Ensure 'All Brands' matches what is in your template
+    filterBrand.value = (brand === 'All Brands' || brand === 'All brand') ? '' : brand;
+    currentSort.value = sort;
 
     router.get(
         route('phone.index'),
-        { brand: filterBrand.value },
+        {
+            brand: filterBrand.value,
+            sort: currentSort.value,
+        },
         {
             preserveState: true,
             preserveScroll: true,
             replace: true,
-        },
+        }
     );
 };
 const AssetInventoryManagementIndex = route('AssetAndInventoryManagement');
@@ -77,37 +76,36 @@ const gotoHome = () => {
 };
 
 const getPhoneImagePath = (phone) => {
-    const brand = phone.brand ? phone.brand.toLowerCase() : '';
+    // Default fallback
+    const defaultPath = '/img/phone/default.png';
+    if (!phone || !phone.brand) return defaultPath;
 
-    if (brand.includes('iphone') || brand.includes('apple')) {
-        return iPhoneImage;
-    }
-    if (brand.includes('oppo')) {
-        return OppoImage;
-    }
-    if (brand.includes('redmi')) {
-        return RedmiImage;
-    }
-    if (brand.includes('samsung')) {
-        return SamsungImage;
-    }
-    if (brand.includes('xiaomi')) {
-        return XiaomiImage;
-    }
-    if (brand.includes('realme')) {
-        return RealmeImage;
-    }
-    if (brand.includes('honor')) {
-        return HonorImage;
-    }
-    if (brand.includes('techno')) {
-        return TechnoImage;
-    }
-    if (brand.includes('vivo')) {
-        return VivoImage;
+    const brand = phone.brand.toLowerCase();
+
+    // Define your supported brands
+    const supportedBrands = [
+        'iphone',
+        'apple',
+        'oppo',
+        'redmi',
+        'samsung',
+        'vivo',
+        'realme',
+        'xiaomi',
+        'honor',
+        'techno',
+    ];
+
+    // Find if the brand string contains any of our supported keywords
+    const matched = supportedBrands.find((b) => brand.includes(b));
+
+    if (matched) {
+        // Handle the 'apple' keyword mapping to 'iphone.png'
+        const fileName = matched === 'apple' ? 'iphone' : matched;
+        return `/img/phone/${fileName}.png`;
     }
 
-    return DefaultImage;
+    return defaultPath;
 };
 </script>
 
@@ -121,22 +119,12 @@ const getPhoneImagePath = (phone) => {
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-end">
                         <li class="breadcrumb-item">
-                            <a
-                                :href="Home"
-                                @click.prevent="gotoHome"
-                                class="text-underline"
-                                >Home</a
-                            >
+                            <a :href="Home" @click.prevent="gotoHome" class="text-underline">Home</a>
                         </li>
                         <li class="breadcrumb-item">
-                            <a
-                                :href="AssetInventoryManagementIndex"
-                                @click.prevent="
-                                    gotoAssetInventoryManagementIndex
-                                "
-                                class="text-underline"
-                                >Asset & Inventory Management</a
-                            >
+                            <a :href="AssetInventoryManagementIndex" @click.prevent="
+                                gotoAssetInventoryManagementIndex
+                            " class="text-underline">Asset & Inventory Management</a>
                         </li>
                         <li class="breadcrumb-item active" aria-current="page">
                             Smartphone
@@ -150,60 +138,35 @@ const getPhoneImagePath = (phone) => {
         <div class="container">
             <div class="row mb-5">
                 <div class="col-sm-12 col-md-4">
-                    <BackButton
-                        @click.prevent="
-                            router.get(route('AssetAndInventoryManagement'))
-                        "
-                    />
+                    <BackButton @click.prevent="
+                        router.get(route('AssetAndInventoryManagement'))
+                        " />
                 </div>
                 <div class="col-sm-12 col-md-4">
                     <div class="input-group">
-                        <label for="AssetSearchInput" class="input-group-text"
-                            ><i class="bi bi-search"></i
-                        ></label>
-                        <input
-                            id="AssetSearchInput"
-                            type="text"
-                            class="form-control"
-                            placeholder="Search"
-                            autofocus="false"
-                        />
+                        <label for="AssetSearchInput" class="input-group-text"><i class="bi bi-search"></i></label>
+                        <input id="AssetSearchInput" type="text" class="form-control" placeholder="Search"
+                            autofocus="false" />
                     </div>
                 </div>
-                <div
-                    class="col-sm-12 col-md-4 d-flex justify-content-end gap-2"
-                >
-                    <button
-                        type="button"
-                        class="btn btn-success bg-gradient"
-                        @click.prevent="gotoAddPhone"
-                    >
+                <div class="col-sm-12 col-md-4 d-flex justify-content-end gap-2">
+                    <button type="button" class="btn btn-success bg-gradient" @click.prevent="gotoAddPhone">
                         <i class="bi bi-plus-lg"></i>
                         Add a phone
                     </button>
                     <div class="dropdown">
-                        <button
-                            type="button"
-                            class="btn btn-secondary dropdown-toggle"
-                            data-bs-toggle="dropdown"
-                            aria-expanded="false"
-                        >
+                        <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown"
+                            aria-expanded="false">
                             <i class="bi bi-funnel"></i>
                         </button>
                         <ul class="dropdown-menu">
-                            <li v-for="brand in availableBrands" :key="brand">
-                                <a
-                                    href="#"
-                                    class="dropdown-item"
-                                    @click.prevent="applyFilter(brand)"
-                                    :class="{
-                                        active:
-                                            brand === filterBrand ||
-                                            (brand === 'All Brands' &&
-                                                !filterBrand),
-                                    }"
-                                >
-                                    {{ brand }}
+                            <li v-for="option in sortOption" :key="option.value">
+                                <a href="#" class="dropdown-item" @click.prevent="
+                                    applyFilter(filterBrand, option.value)
+                                    " :class="{
+                                        active: currentSort === option.value,
+                                    }">
+                                    Sort by: {{ option.label }}
                                 </a>
                             </li>
                         </ul>
@@ -212,44 +175,30 @@ const getPhoneImagePath = (phone) => {
             </div>
 
             <div class="row justify-content-start mb-3 mt-5 px-5">
-                <div
-                    class="col-6 col-sm-4 col-md-2 d-flex justify-content-center mb-5"
-                    v-for="phone in props.phones.data"
-                    :key="phone.id"
-                >
-                    <PhoneCard
-                        @click.prevent="gotoPhoneDetails(phone.serial_num)"
-                    >
-                        <img
-                            :src="getPhoneImagePath(phone)"
-                            class="img-fluid"
-                            style="height: 8rem"
-                            :alt="phone.model"
-                        />
+                <div class="col-6 col-sm-4 col-md-2 d-flex justify-content-center mb-5"
+                    v-for="phone in props.phones.data" :key="phone.id">
+                    <PhoneCard @click.prevent="gotoPhoneDetails(phone.serial_num)">
+                        <img :src="getPhoneImagePath(phone)" class="img-fluid" style="height: 8rem"
+                            :alt="phone.model" />
                         <h4 class="card-title formal-font my-2">
                             {{ phone.model }}
                         </h4>
                         <h6 class="card-subtitle text-body-secondary mb-1">
                             {{ phone.issued_to }}
                         </h6>
-                        <span
-                            :class="{
-                                'badge bg-success':
-                                    phone.status === 'available',
-                                'badge bg-primary': phone.status === 'issued',
-                                'badge bg-warning text-dark':
-                                    phone.status === 'returned',
-                            }"
-                        >
+                        <span :class="{
+                            'badge bg-success':
+                                phone.status === 'available',
+                            'badge bg-primary': phone.status === 'issued',
+                            'badge bg-warning text-dark':
+                                phone.status === 'returned',
+                        }">
                             {{ phone.status }}
                         </span>
                     </PhoneCard>
                 </div>
 
-                <div
-                    v-if="props.phones.data && props.phones.data.length === 0"
-                    class="col-12"
-                >
+                <div v-if="props.phones.data && props.phones.data.length === 0" class="col-12">
                     <p class="text-muted text-center">
                         No phone records found.
                     </p>
@@ -264,20 +213,13 @@ const getPhoneImagePath = (phone) => {
                         {{ props.phones?.total || 0 }} phones
                     </div>
                     <nav aria-label="Phone pagination">
-                        <ul class="pagination mb-0 d-flex gap-2 justify-content-center align-items-center">
-                            <li v-for="(link, index) in props.phones.links"
-                            :key="index"
-                            class="page-item"
-                            :class="{ 'active': link.active, 'disabled': !link.url }"
-                            >
-                                <button 
-                                class="page-link"
-                                @click.prevent="gotoPage(link.url)"
-                                v-html="link.label"
-                                :disabled="!link.url"
-                                >
-
-                                </button>
+                        <ul class="pagination d-flex justify-content-center align-items-center mb-0 gap-2">
+                            <li v-for="(link, index) in props.phones.links" :key="index" class="page-item" :class="{
+                                active: link.active,
+                                disabled: !link.url,
+                            }">
+                                <button class="page-link" @click.prevent="gotoPage(link.url)" v-html="link.label"
+                                    :disabled="!link.url"></button>
                             </li>
                         </ul>
                     </nav>
