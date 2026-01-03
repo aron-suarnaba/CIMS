@@ -6,7 +6,7 @@ import Modals from '@/Components/Modals.vue';
 import { useForm } from '@inertiajs/vue3';
 import Breadcrumb from '@/Components/Breadcrumb.vue';
 
-import { ref, watch } from 'vue';
+import { ref, watch, computed } from 'vue';
 
 defineOptions({ layout: HomeLayout });
 
@@ -73,8 +73,45 @@ const formatDate = (dateString, locale = 'en-US') => {
     }).format(date);
 };
 
+//Declaring selected accessories for issue and return
 const selectedAcc = ref([]);
 const selectedReturnAcc = ref([]);
+
+// Everything about the history table variable declaration
+const historySearch = ref('');
+const currentPage = ref(1);
+const itemsPerPage = 10;
+
+const filteredHistory = computed(() => {
+    if (!props.phone.transactions) return [];
+    const searchTerm = historySearch.value.toLowerCase();
+
+    return props.phone.transactions.filter(tx => {
+        return (
+            (tx.issued_to?.toLowerCase() || '').includes(searchTerm) ||
+            (tx.issued_by?.toLowerCase() || '').includes(searchTerm) ||
+            (tx.returned_by?.toLowerCase() || '').includes(searchTerm) ||
+            (tx.department?.toLowerCase() || '').includes(searchTerm)
+        );
+    });
+});
+
+// 2. Then, we paginate the filtered results
+const paginatedHistory = computed(() => {
+    const start = (currentPage.value - 1) * itemsPerPage;
+    const end = start + itemsPerPage;
+    return filteredHistory.value.slice(start, end);
+});
+
+// 3. Calculate total pages
+const totalPages = computed(() => {
+    return Math.ceil(filteredHistory.value.length / itemsPerPage);
+});
+
+// Reset to page 1 when searching
+watch(historySearch, () => {
+    currentPage.value = 1;
+});
 
 const form = useForm({
     issued_by: '',
@@ -217,19 +254,19 @@ const returnSubmit = () => {
                                     <span class="text-muted">Serial Number</span>
                                     <span class="fw-bold">{{
                                         props.phone.serial_num
-                                        }}</span>
+                                    }}</span>
                                 </li>
                                 <li class="list-group-item d-flex justify-content-between">
                                     <span class="text-muted">IMEI 1</span>
                                     <span class="font-monospace small">{{
                                         props.phone.imei_one || 'N/A'
-                                        }}</span>
+                                    }}</span>
                                 </li>
                                 <li class="list-group-item d-flex justify-content-between">
                                     <span class="text-muted">IMEI 2</span>
                                     <span class="font-monospace small">{{
                                         props.phone.imei_two || 'N/A'
-                                        }}</span>
+                                    }}</span>
                                 </li>
                                 <li class="list-group-item d-flex justify-content-between">
                                     <span class="text-muted">RAM / ROM</span>
@@ -241,7 +278,7 @@ const returnSubmit = () => {
                                     <span>{{
                                         formatDate(props.phone.created_at) ||
                                         'N/A'
-                                        }}</span>
+                                    }}</span>
                                 </li>
                             </ul>
                         </div>
@@ -512,9 +549,26 @@ const returnSubmit = () => {
                     <div class="col-12">
                         <div class="card border-0 shadow-sm">
                             <div class="card-header bg-white py-3">
-                                <h5 class="fw-bold mb-0 text-primary">
-                                    <i class="bi bi-clock-history me-2"></i>Asset Transaction History
-                                </h5>
+                                <div class="row d-flex justify-content-between align-items-center">
+                                    <div class="col-sm-12 col-md-8">
+                                        <h5 class="fw-bold mb-0 text-primary">
+                                            <i class="bi bi-clock-history me-2"></i>Asset Transaction History
+                                        </h5>
+
+                                    </div>
+                                    <div class="col-sm-12 col-md-4">
+                                        <div class="search-box">
+                                            <div class="input-group input-group-sm">
+                                                <span class="input-group-text bg-light border-end-0">
+                                                    <i class="bi bi-search text-muted"></i>
+                                                </span>
+                                                <input type="text" v-model="historySearch"
+                                                    class="form-control bg-light border-start-0"
+                                                    placeholder="Search history..." />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                             <div class="card-body p-0">
                                 <div class="table-responsive">
@@ -526,38 +580,38 @@ const returnSubmit = () => {
                                                 <th scope="col">Issued By</th>
                                                 <th scope="col">Issued Acc.</th>
                                                 <th scope="col">Date Returned</th>
-                                                <th scope="col">Returned To</th>
                                                 <th scope="col">Returned By</th>
+                                                <th scope="col">Returned To</th>
                                                 <th scope="col" class="pe-3">Returned Acc.</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr class="fs-7" v-if="props.phone_transaction">
+                                            <tr class="fs-7" v-for="tx in paginatedHistory" :key="tx.id">
                                                 <td class="ps-3 fw-medium text-nowrap mb-0">
-                                                    {{ formatDate(props.phone_transaction.date_issued) }}
+                                                    {{ formatDate(tx.date_issued) }}
                                                 </td>
 
                                                 <td>
-                                                    <div class="fw-bold text-dark">{{ props.phone_transaction.issued_to
-                                                    }}</div>
+                                                    <div class="fw-bold text-dark">{{ tx.issued_to
+                                                        }}</div>
                                                     <div class="text-muted small ps-2">{{
-                                                        props.phone_transaction.department }}</div>
+                                                        tx.department }}</div>
 
                                                 </td>
 
                                                 <td>
                                                     <div class="fw-bold text-dark">{{
-                                                        props.phone_transaction.issued_by }}</div>
+                                                        tx.issued_by }}</div>
                                                 </td>
 
                                                 <td class="small text-wrap" style="max-width: 150px;">
-                                                    {{ props.phone_transaction.issued_accessories || '—' }}
+                                                    {{ tx.issued_accessories || '—' }}
                                                 </td>
 
                                                 <td class="text-nowrap">
-                                                    <span v-if="props.phone_transaction.date_returned"
+                                                    <span v-if="tx.date_returned"
                                                         class="ps-2 fw-medium text-nowrap mb-0">
-                                                        {{ formatDate(props.phone_transaction.date_returned) }}
+                                                        {{ formatDate(tx.date_returned) }}
                                                     </span>
                                                     <span v-else class="badge rounded-pill bg-warning text-dark">In
                                                         Use</span>
@@ -565,26 +619,55 @@ const returnSubmit = () => {
 
                                                 <td>
                                                     <div class="fw-bold text-dark">
-                                                        {{ props.phone_transaction.returned_to || '—' }}
+                                                        {{ tx.returned_by || '—' }}
                                                     </div>
                                                     <div class="text-muted small ps-2">{{
-                                                        props.phone_transaction.department }}</div>
+                                                        tx.returnee_department }}</div>
                                                 </td>
-                                                <td><div class="fw-bold text-dark">{{
-                                                    props.phone_transaction.returnee_department }}</div>
-                                                    
+                                                <td>
+                                                    <div class="fw-bold text-dark">{{
+                                                        tx.returned_to }}</div>
+
                                                 </td>
 
                                                 <td class="pe-3 small text-muted text-wrap" style="max-width: 150px;">
-                                                    {{ props.phone_transaction.returned_accessories || '—' }}
+                                                    {{ tx.returned_accessories || '—' }}
                                                 </td>
                                             </tr>
-                                            <tr v-else>
-                                                <td colspan="7" class="text-center py-4 text-muted">No transaction
-                                                    history found.</td>
+                                            <tr v-if="filteredHistory.length === 0">
+                                                <td colspan="8" class="text-center py-4 text-muted">No transaction
+                                                    {{ historySearch ? 'No matches found for "' + historySearch + '"' :
+                                                        'No transaction history found.' }}
+                                                </td>
                                             </tr>
                                         </tbody>
                                     </table>
+                                </div>
+                            </div>
+                            <div class="card-footer bg-white border-top-0 py-3" v-if="totalPages > 1">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div class="text-muted small">
+                                        Showing {{ (currentPage - 1) * itemsPerPage + 1 }} to
+                                        {{ Math.min(currentPage * itemsPerPage, filteredHistory.length) }}
+                                        of {{ filteredHistory.length }} entries
+                                    </div>
+                                    <nav>
+                                        <ul class="pagination pagination-sm mb-0">
+                                            <li class="page-item" :class="{ disabled: currentPage === 1 }">
+                                                <button class="page-link" @click="currentPage--">Previous</button>
+                                            </li>
+
+                                            <li v-for="page in totalPages" :key="page" class="page-item"
+                                                :class="{ active: currentPage === page }">
+                                                <button class="page-link" @click="currentPage = page">{{ page
+                                                    }}</button>
+                                            </li>
+
+                                            <li class="page-item" :class="{ disabled: currentPage === totalPages }">
+                                                <button class="page-link" @click="currentPage++">Next</button>
+                                            </li>
+                                        </ul>
+                                    </nav>
                                 </div>
                             </div>
                         </div>

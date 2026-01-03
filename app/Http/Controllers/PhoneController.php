@@ -100,7 +100,6 @@ class PhoneController extends Controller
 
         // 2. Add the foreign key (serial_num or phone_id)
         $validated['serial_num'] = $phone->serial_num;
-        // $validated['issued_by'] = auth()->user()->name ?? 'System Admin';
 
         // 3. Create the Transaction
         PhoneTransaction::create($validated);
@@ -114,7 +113,6 @@ class PhoneController extends Controller
     }
     public function return(Request $request, Phone $phone)
     {
-        // 1. Validate Return Data
         $validated = $request->validate([
             'returned_to' => 'required|string|max:255',
             'returned_by' => 'required|string|max:255',
@@ -126,24 +124,23 @@ class PhoneController extends Controller
             'remarks' => 'nullable|string|max:255',
         ]);
 
-        // 2. Find the LATEST transaction for this phone that hasn't been returned yet
         $transaction = PhoneTransaction::where('serial_num', $phone->serial_num)
             ->whereNull('date_returned')
             ->latest()
             ->first();
 
         if ($transaction) {
-            // 3. Update that specific row with return details
+
+            $phone->update(['status' => 'available']);
+
             $transaction->update($validated);
-        } else {
-            // Optional: Handle case where no active issuance exists
-            return redirect()->back()->withErrors(['error' => 'No active issuance found for this device.']);
-        }
 
-        // 4. Update the Phone Status to available (or returned)
-        $phone->update(['status' => 'returned']);
+            return redirect()->back()->with('success', 'The device has been returned successfully.');
 
-        return redirect()->back()->with('success', 'The device has been returned successfully.');
+        } 
+
+        return redirect()->back()->withErrors(['error' => 'No active issuance found for this device.']);
+
     }
 
     /**
