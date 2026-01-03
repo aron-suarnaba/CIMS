@@ -87,9 +87,9 @@ const form = useForm({
 });
 
 const returnform = useForm({
-    // return_by: '',
+    returned_by: '',
     returned_to: '',
-    // department: '',
+    returnee_department: '',
     date_returned: new Date().toISOString().substr(0, 10),
     returned_accessories: '',
     it_ack_returned: false,
@@ -217,19 +217,19 @@ const returnSubmit = () => {
                                     <span class="text-muted">Serial Number</span>
                                     <span class="fw-bold">{{
                                         props.phone.serial_num
-                                    }}</span>
+                                        }}</span>
                                 </li>
                                 <li class="list-group-item d-flex justify-content-between">
                                     <span class="text-muted">IMEI 1</span>
                                     <span class="font-monospace small">{{
                                         props.phone.imei_one || 'N/A'
-                                    }}</span>
+                                        }}</span>
                                 </li>
                                 <li class="list-group-item d-flex justify-content-between">
                                     <span class="text-muted">IMEI 2</span>
                                     <span class="font-monospace small">{{
                                         props.phone.imei_two || 'N/A'
-                                    }}</span>
+                                        }}</span>
                                 </li>
                                 <li class="list-group-item d-flex justify-content-between">
                                     <span class="text-muted">RAM / ROM</span>
@@ -241,7 +241,7 @@ const returnSubmit = () => {
                                     <span>{{
                                         formatDate(props.phone.created_at) ||
                                         'N/A'
-                                    }}</span>
+                                        }}</span>
                                 </li>
                             </ul>
                         </div>
@@ -257,12 +257,11 @@ const returnSubmit = () => {
                 <!-- Issuance Card -->
                 <div class="col-sm-12 col-xl-8 col-lg-7">
                     <div class="card mb-4 border-0 shadow-sm">
-                        <div
-                            class="card-header bg-primary d-flex justify-content-between align-items-center text-white">
+                        <div class="card-header bg-primary d-flex justify-content-start align-items-center text-white">
+                            <i class="bi bi-send-check fs-4 me-3"></i>
                             <h5 class="fw-bold mb-0">
-                                Current / Last Issuance
+                                Current Issuance
                             </h5>
-                            <i class="bi bi-send-check fs-4"></i>
                         </div>
                         <div class="card-body">
                             <div class="row g-3" v-if="
@@ -279,6 +278,7 @@ const returnSubmit = () => {
                                     </p>
                                     <p class="text-secondary small mb-0">
                                         <i class="bi bi-building me-1"></i>
+                                        <span class="fw-bold">Department: </span>
                                         {{
                                             props.phone_transaction
                                                 ?.department || 'Not yet issued'
@@ -373,17 +373,35 @@ const returnSubmit = () => {
                         </div>
                         <div class="card-body" v-if="props.phone?.status === 'returned'">
                             <div class="row g-3">
-                                <div class="col-md-6 border-end">
+                                <div class="col-md-4 border-end">
                                     <label class="small text-muted text-uppercase fw-bold">Recipient Info</label>
                                     <p class="fw-bold fs-5 text-dark mb-1">
                                         {{
                                             props.phone_transaction
-                                                ?.returned_to ||
-                                            'Not yet issued'
+                                                ?.returned_by ||
+                                            'Not yet returned'
+                                        }}
+                                    </p>
+                                    <p class="text-secondary small mb-0">
+                                        <i class="bi bi-building me-1"></i>
+                                        <span class="fw-bold">Department: </span>
+                                        {{
+                                            props.phone_transaction
+                                                ?.returnee_department || 'Not yet returned'
                                         }}
                                     </p>
                                 </div>
-                                <div class="col-md-6 px-md-4">
+                                <div class="col-md-4 border-end">
+                                    <label class="small text-muted text-uppercase fw-bold">Return To:</label>
+                                    <p class="fw-bold fs-5 text-dark mb-1">
+                                        {{
+                                            props.phone_transaction
+                                                ?.returned_to ||
+                                            'Not yet returned'
+                                        }}
+                                    </p>
+                                </div>
+                                <div class="col-md-4 px-md-4">
                                     <label class="small text-muted text-uppercase fw-bold">Issuance Logistics</label>
                                     <p class="mb-1">
                                         <strong>Date:</strong>
@@ -391,17 +409,18 @@ const returnSubmit = () => {
                                             formatDate(
                                                 props.phone_transaction
                                                     ?.date_returned,
-                                            ) || 'Not yet issued'
+                                            ) || 'Not yet returned'
                                         }}
                                     </p>
                                     <p class="mb-0">
                                         <strong>By:</strong>
                                         {{
                                             props.phone_transaction
-                                                ?.issued_by || 'Not yet issued'
+                                                ?.issued_by || 'Not yet returned'
                                         }}
                                     </p>
                                 </div>
+
                                 <div class="col-12 mt-4">
                                     <div class="bg-light d-flex align-items-center flex-wrap gap-4 rounded p-3">
                                         <div class="d-flex align-items-center">
@@ -503,29 +522,33 @@ const returnSubmit = () => {
                                         <thead class="table-light">
                                             <tr class="fs-7 text-uppercase text-muted border-top-0">
                                                 <th class="ps-3" scope="col">Date Issued</th>
-                                                <th scope="col">Issued By/To</th>
-                                                <th scope="col">Department</th>
+                                                <th scope="col">Issued To</th>
+                                                <th scope="col">Issued By</th>
                                                 <th scope="col">Issued Acc.</th>
                                                 <th scope="col">Date Returned</th>
                                                 <th scope="col">Returned To</th>
+                                                <th scope="col">Returned By</th>
                                                 <th scope="col" class="pe-3">Returned Acc.</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             <tr class="fs-7" v-if="props.phone_transaction">
-                                                <td class="ps-3 fw-medium text-nowrap">
+                                                <td class="ps-3 fw-medium text-nowrap mb-0">
                                                     {{ formatDate(props.phone_transaction.date_issued) }}
                                                 </td>
 
                                                 <td>
                                                     <div class="fw-bold text-dark">{{ props.phone_transaction.issued_to
-                                                        }}</div>
-                                                    <div class="text-muted small">By: {{
-                                                        props.phone_transaction.issued_by }}</div>
+                                                    }}</div>
+                                                    <div class="text-muted small ps-2">{{
+                                                        props.phone_transaction.department }}</div>
+
                                                 </td>
 
-                                                <td><span class="badge bg-light text-dark border">{{
-                                                        props.phone_transaction.department }}</span></td>
+                                                <td>
+                                                    <div class="fw-bold text-dark">{{
+                                                        props.phone_transaction.issued_by }}</div>
+                                                </td>
 
                                                 <td class="small text-wrap" style="max-width: 150px;">
                                                     {{ props.phone_transaction.issued_accessories || '—' }}
@@ -533,16 +556,26 @@ const returnSubmit = () => {
 
                                                 <td class="text-nowrap">
                                                     <span v-if="props.phone_transaction.date_returned"
-                                                        class="text-success">
+                                                        class="ps-2 fw-medium text-nowrap mb-0">
                                                         {{ formatDate(props.phone_transaction.date_returned) }}
                                                     </span>
                                                     <span v-else class="badge rounded-pill bg-warning text-dark">In
                                                         Use</span>
                                                 </td>
 
-                                                <td>{{ props.phone_transaction.returned_to || '—' }}</td>
+                                                <td>
+                                                    <div class="fw-bold text-dark">
+                                                        {{ props.phone_transaction.returned_to || '—' }}
+                                                    </div>
+                                                    <div class="text-muted small ps-2">{{
+                                                        props.phone_transaction.department }}</div>
+                                                </td>
+                                                <td><div class="fw-bold text-dark">{{
+                                                    props.phone_transaction.returnee_department }}</div>
+                                                    
+                                                </td>
 
-                                                <td class="pe-3 small text-muted">
+                                                <td class="pe-3 small text-muted text-wrap" style="max-width: 150px;">
                                                     {{ props.phone_transaction.returned_accessories || '—' }}
                                                 </td>
                                             </tr>
@@ -643,18 +676,32 @@ const returnSubmit = () => {
         </template>
     </Modals>
 
+    <!-- Return Modal -->
     <Modals id="ReturnPhoneModal" title="Return Phone Asset" header-class="bg-warning text-white bg-gradient">
         <template #body>
             <form @submit.prevent="returnSubmit" id="returnForm">
-                <div class="mb-3">
-                    <label for="returned_to" class="form-label">Returned To</label>
-                    <input type="text" id="returned_to" v-model="returnform.returned_to" class="form-control"
-                        required />
+                <div class="row mb-3">
+                    <div class="col-sm-12 col-md-6">
+                        <label for="returned_to" class="form-label">Returned To</label>
+                        <input type="text" class="form-control" id="returned_to" v-model="returnform.returned_to">
+                    </div>
+                    <div class="col-sm-12 col-md-6">
+                        <label for="date_returned" class="form-label">Date Returned</label>
+                        <input type="date" id="date_returned" v-model="returnform.date_returned" class="form-control"
+                            required />
+                    </div>
                 </div>
-                <div class="mb-3">
-                    <label for="date_returned" class="form-label">Date Returned</label>
-                    <input type="date" id="date_returned" v-model="returnform.date_returned" class="form-control"
-                        required />
+                <div class="row mb-3 d-flex justify-content-center">
+                    <div class="col-sm-12 col-md-6">
+                        <label for="returned_by" class="form-label">Returned By</label>
+                        <input type="text" id="returned_by" v-model="returnform.returned_by" class="form-control"
+                            required />
+                    </div>
+                    <div class="col-sm-12 col-md-6">
+                        <label for="returnee_department" class="form-label">Department</label>
+                        <input type="text" id="returnee_department" v-model="returnform.returnee_department"
+                            class="form-control" required />
+                    </div>
                 </div>
 
                 <div class="mb-3">

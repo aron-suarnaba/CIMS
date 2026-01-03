@@ -31,7 +31,7 @@ const filterBrand = ref(
     new URLSearchParams(window.location.search).get('brand') || '',
 );
 const currentSort = ref(
-    new URLSearchParams(window.location.search).get('sort') || 'date_modified',
+    new URLSearchParams(window.location.search).get('sort') || 'availability',
 );
 
 const sortOption = [

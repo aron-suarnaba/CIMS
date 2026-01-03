@@ -117,7 +117,8 @@ class PhoneController extends Controller
         // 1. Validate Return Data
         $validated = $request->validate([
             'returned_to' => 'required|string|max:255',
-            'department' => 'required|string|max:255',
+            'returned_by' => 'required|string|max:255',
+            'returnee_department' => 'required|string|max:255',
             'date_returned' => 'required|date',
             'returned_accessories' => 'nullable|string',
             'it_ack_returned' => 'required|boolean',
