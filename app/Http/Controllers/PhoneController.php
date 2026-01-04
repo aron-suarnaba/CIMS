@@ -137,7 +137,7 @@ class PhoneController extends Controller
 
             return redirect()->back()->with('success', 'The device has been returned successfully.');
 
-        } 
+        }
 
         return redirect()->back()->withErrors(['error' => 'No active issuance found for this device.']);
 
@@ -177,6 +177,11 @@ class PhoneController extends Controller
      */
     public function destroy(Phone $phone)
     {
-        //
+        try {
+            $phone->delete();
+            return redirect()->back()->with('success', 'Asset record and all related history have been deleted');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Failed to delete asset.');
+        }
     }
 }

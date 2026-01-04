@@ -5,7 +5,7 @@ import BackButton from '@/Components/BackButton.vue';
 import Modals from '@/Components/Modals.vue';
 import { useForm } from '@inertiajs/vue3';
 import Breadcrumb from '@/Components/Breadcrumb.vue';
-
+import Swal from 'sweetalert2';
 import { ref, watch, computed } from 'vue';
 
 defineOptions({ layout: HomeLayout });
@@ -22,6 +22,7 @@ const props = defineProps({
     },
 });
 
+// Function for breadcrumb
 const myBreadcrumb = [
     { label: 'Home', url: route('dashboard') },
     { label: 'Inventory', url: route('AssetAndInventoryManagement') },
@@ -29,14 +30,13 @@ const myBreadcrumb = [
     { label: 'Smartphone Asset Details' },
 ];
 
+// Function for the phone image path
 const getPhoneImagePath = (phone) => {
-    // Default fallback
     const defaultPath = '/img/phone/default.png';
     if (!phone || !phone.brand) return defaultPath;
 
     const brand = phone.brand.toLowerCase();
 
-    // Define your supported brands
     const supportedBrands = [
         'iphone',
         'apple',
@@ -62,6 +62,7 @@ const getPhoneImagePath = (phone) => {
     return defaultPath;
 };
 
+// Function for date formatting
 const formatDate = (dateString, locale = 'en-US') => {
     if (!dateString) return '';
     const date = new Date(dateString);
@@ -72,6 +73,36 @@ const formatDate = (dateString, locale = 'en-US') => {
         day: 'numeric',
     }).format(date);
 };
+
+const deleteItem = (serial_num) => {
+    Swal.fire({
+        title: 'Confirm Delete Asset?',
+        text: "All the data including the table history, issuance, return information, etc., will be deleted.",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Yes, delete it!',
+
+    }).then((result) => {
+        if (result.isConfirmed) {
+            router.delete(route('phone.destroy', serial_num), {
+                onBefore: () => {
+                    Swal.fire({
+                        title: 'Processing...',
+                        allowOutsideClick: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        },
+                    });
+                },
+                onError: () => {
+                    Swal.close();
+                },
+            })
+        }
+    });
+}
 
 //Declaring selected accessories for issue and return
 const selectedAcc = ref([]);
@@ -96,23 +127,22 @@ const filteredHistory = computed(() => {
     });
 });
 
-// 2. Then, we paginate the filtered results
 const paginatedHistory = computed(() => {
     const start = (currentPage.value - 1) * itemsPerPage;
     const end = start + itemsPerPage;
     return filteredHistory.value.slice(start, end);
 });
 
-// 3. Calculate total pages
 const totalPages = computed(() => {
     return Math.ceil(filteredHistory.value.length / itemsPerPage);
 });
 
-// Reset to page 1 when searching
 watch(historySearch, () => {
     currentPage.value = 1;
 });
 
+// Forms
+// Form for Issuance
 const form = useForm({
     issued_by: '',
     issued_to: '',
@@ -123,6 +153,7 @@ const form = useForm({
     purch_ack_issued: false,
 });
 
+// Form for return
 const returnform = useForm({
     returned_by: '',
     returned_to: '',
@@ -134,6 +165,8 @@ const returnform = useForm({
     remarks: '',
 });
 
+// Listeners
+
 watch(selectedAcc, (newVal) => {
     form.issued_accessories = newVal.join(', ');
 });
@@ -141,6 +174,7 @@ watch(selectedReturnAcc, (newVal) => {
     returnform.returned_accessories = newVal.join(', ');
 });
 
+//Submission
 const submit = () => {
     form.post(route('phone.issue', props.phone.serial_num), {
         onSuccess: () => {
@@ -283,7 +317,8 @@ const returnSubmit = () => {
                             </ul>
                         </div>
                         <div class="card-footer border-0 bg-transparent pb-3 text-center">
-                            <button class="btn btn-outline-danger btn-sm w-100">
+                            <button class="btn btn-outline-danger btn-sm w-100"
+                                @click.prevent="deleteItem(props.phone.serial_num)">
                                 <i class="bi bi-trash me-1"></i> Delete Asset
                                 Record
                             </button>
@@ -679,7 +714,7 @@ const returnSubmit = () => {
         </div>
     </div>
 
-    <!-- Modal -->
+    <!-- Issuance Modal -->
     <Modals id="IssuePhoneModal" title="Issue Phone Asset" header-class="bg-primary text-white bg-gradient">
         <template #body>
             <form @submit.prevent="submit" id="issueForm">

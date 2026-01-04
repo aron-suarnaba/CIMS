@@ -52,8 +52,8 @@ Route::middleware('auth')->group(function () {
             ->name('phone.return');
 
         // unsigned
-        // Route::delete('/Phone/{phone}', [PhoneController::class, 'destroy'])
-        //     ->name('phone.destroy');
+        Route::delete('/Phone/{phone:serial_num}', [PhoneController::class, 'destroy'])
+            ->name('phone.destroy');
 
         // Your existing transaction store (if used for logging)
         // Route::post('/Phone/Transaction', [PhoneController::class, 'phoneTransStore'])
