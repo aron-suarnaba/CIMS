@@ -66,7 +66,7 @@ const AssetInventoryManagement = ref(route('AssetAndInventoryManagement'));
                                 </p>
                             </a>
                         </li>
-                        <li class="nav-item">
+                        <!-- <li class="nav-item">
                             <a href="#" class="nav-link">
                                 <i class="bi bi-router-fill"></i>
                                 <p>Network Monitoring & Management</p>
@@ -113,7 +113,7 @@ const AssetInventoryManagement = ref(route('AssetAndInventoryManagement'));
                                 <i class="bi bi-person-circle"></i>
                                 <p>User & Access Management</p>
                             </a>
-                        </li>
+                        </li> -->
                     </ul>
                 </nav>
             </div>

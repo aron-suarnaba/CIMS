@@ -63,7 +63,7 @@ const goToPhoneIndex = () => {
                 <div class="col-sm-12 col-md-4"></div>
             </div>
             <div class="row mb-3 mt-5">
-                <div class="col-sm-12 col-md-2">
+                <!-- <div class="col-sm-12 col-md-2">
                     <InfoBox boxClass="text-bg-success">
                         <template #header>
                             <i class="bi bi-pc-display"></i>
@@ -78,7 +78,7 @@ const goToPhoneIndex = () => {
                         </template>
                         <template #content> Printer </template>
                     </InfoBox>
-                </div>
+                </div> -->
                 <div class="col-sm-12 col-md-2">
                     <InfoBox
                         boxClass="text-bg-primary"
@@ -90,7 +90,7 @@ const goToPhoneIndex = () => {
                         <template #content> Smartphone </template>
                     </InfoBox>
                 </div>
-                <div class="col-sm-12 col-md-2">
+                <!-- <div class="col-sm-12 col-md-2">
                     <InfoBox boxClass="text-bg-info">
                         <template #header>
                             <i class="bi bi-windows"></i>
@@ -105,7 +105,7 @@ const goToPhoneIndex = () => {
                         </template>
                         <template #content> Others </template>
                     </InfoBox>
-                </div>
+                </div> -->
             </div>
         </div>
     </div>

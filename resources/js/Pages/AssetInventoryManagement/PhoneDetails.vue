@@ -32,7 +32,7 @@ const myBreadcrumb = [
 
 // Function for the phone image path
 const getPhoneImagePath = (phone) => {
-    const defaultPath = '/img/phone/default.png';
+    const defaultPath = '../../img/phone/default.png';
     if (!phone || !phone.brand) return defaultPath;
 
     const brand = phone.brand.toLowerCase();
@@ -56,7 +56,7 @@ const getPhoneImagePath = (phone) => {
     if (matched) {
         // Handle the 'apple' keyword mapping to 'iphone.png'
         const fileName = matched === 'apple' ? 'iphone' : matched;
-        return `/img/phone/${fileName}.png`;
+        return `../../img/phone/${fileName}.png`;
     }
 
     return defaultPath;
@@ -77,13 +77,12 @@ const formatDate = (dateString, locale = 'en-US') => {
 const deleteItem = (serial_num) => {
     Swal.fire({
         title: 'Confirm Delete Asset?',
-        text: "All the data including the table history, issuance, return information, etc., will be deleted.",
+        text: 'All the data including the table history, issuance, return information, etc., will be deleted.',
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#d33',
         cancelButtonColor: '#6c757d',
         confirmButtonText: 'Yes, delete it!',
-
     }).then((result) => {
         if (result.isConfirmed) {
             router.delete(route('phone.destroy', serial_num), {
@@ -99,10 +98,10 @@ const deleteItem = (serial_num) => {
                 onError: () => {
                     Swal.close();
                 },
-            })
+            });
         }
     });
-}
+};
 
 //Declaring selected accessories for issue and return
 const selectedAcc = ref([]);
@@ -117,7 +116,7 @@ const filteredHistory = computed(() => {
     if (!props.phone.transactions) return [];
     const searchTerm = historySearch.value.toLowerCase();
 
-    return props.phone.transactions.filter(tx => {
+    return props.phone.transactions.filter((tx) => {
         return (
             (tx.issued_to?.toLowerCase() || '').includes(searchTerm) ||
             (tx.issued_by?.toLowerCase() || '').includes(searchTerm) ||
@@ -288,19 +287,19 @@ const returnSubmit = () => {
                                     <span class="text-muted">Serial Number</span>
                                     <span class="fw-bold">{{
                                         props.phone.serial_num
-                                    }}</span>
+                                        }}</span>
                                 </li>
                                 <li class="list-group-item d-flex justify-content-between">
                                     <span class="text-muted">IMEI 1</span>
                                     <span class="font-monospace small">{{
                                         props.phone.imei_one || 'N/A'
-                                    }}</span>
+                                        }}</span>
                                 </li>
                                 <li class="list-group-item d-flex justify-content-between">
                                     <span class="text-muted">IMEI 2</span>
                                     <span class="font-monospace small">{{
                                         props.phone.imei_two || 'N/A'
-                                    }}</span>
+                                        }}</span>
                                 </li>
                                 <li class="list-group-item d-flex justify-content-between">
                                     <span class="text-muted">RAM / ROM</span>
@@ -312,13 +311,14 @@ const returnSubmit = () => {
                                     <span>{{
                                         formatDate(props.phone.created_at) ||
                                         'N/A'
-                                    }}</span>
+                                        }}</span>
                                 </li>
                             </ul>
                         </div>
                         <div class="card-footer border-0 bg-transparent pb-3 text-center">
-                            <button class="btn btn-outline-danger btn-sm w-100"
-                                @click.prevent="deleteItem(props.phone.serial_num)">
+                            <button class="btn btn-outline-danger btn-sm w-100" @click.prevent="
+                                deleteItem(props.phone.serial_num)
+                                ">
                                 <i class="bi bi-trash me-1"></i> Delete Asset
                                 Record
                             </button>
@@ -331,9 +331,7 @@ const returnSubmit = () => {
                     <div class="card mb-4 border-0 shadow-sm">
                         <div class="card-header bg-primary d-flex justify-content-start align-items-center text-white">
                             <i class="bi bi-send-check fs-4 me-3"></i>
-                            <h5 class="fw-bold mb-0">
-                                Current Issuance
-                            </h5>
+                            <h5 class="fw-bold mb-0">Current Issuance</h5>
                         </div>
                         <div class="card-body">
                             <div class="row g-3" v-if="
@@ -350,7 +348,8 @@ const returnSubmit = () => {
                                     </p>
                                     <p class="text-secondary small mb-0">
                                         <i class="bi bi-building me-1"></i>
-                                        <span class="fw-bold">Department: </span>
+                                        <span class="fw-bold">Department:
+                                        </span>
                                         {{
                                             props.phone_transaction
                                                 ?.department || 'Not yet issued'
@@ -394,9 +393,9 @@ const returnSubmit = () => {
                                                 <strong>Acknowledgement:</strong>
                                             </div>
                                             <span class="badge text-dark ms-2 border text-white" :class="props.phone_transaction
-                                                ?.it_ack_issued
-                                                ? 'bg-success'
-                                                : 'bg-danger'
+                                                    ?.it_ack_issued
+                                                    ? 'bg-success'
+                                                    : 'bg-danger'
                                                 ">IT:
                                                 {{
                                                     props.phone_transaction
@@ -405,15 +404,15 @@ const returnSubmit = () => {
                                                         : 'No'
                                                 }}
                                                 <i :class="props.phone_transaction
-                                                    ?.it_ack_issued
-                                                    ? 'bi bi-check-circle-fill'
-                                                    : 'bi-x-circle-fill'
+                                                        ?.it_ack_issued
+                                                        ? 'bi bi-check-circle-fill'
+                                                        : 'bi-x-circle-fill'
                                                     "></i>
                                             </span>
                                             <span class="badge text-dark ms-2 border text-white" :class="props.phone_transaction
-                                                ?.purch_ack_issued
-                                                ? 'bg-success'
-                                                : 'bg-danger'
+                                                    ?.purch_ack_issued
+                                                    ? 'bg-success'
+                                                    : 'bg-danger'
                                                 ">Purchasing:
                                                 {{
                                                     props.phone_transaction
@@ -422,9 +421,9 @@ const returnSubmit = () => {
                                                         : 'No'
                                                 }}
                                                 <i :class="props.phone_transaction
-                                                    ?.it_ack_issued
-                                                    ? 'bi bi-check-circle-fill'
-                                                    : 'bi-x-circle-fill'
+                                                        ?.it_ack_issued
+                                                        ? 'bi bi-check-circle-fill'
+                                                        : 'bi-x-circle-fill'
                                                     "></i>
                                             </span>
                                         </div>
@@ -456,10 +455,12 @@ const returnSubmit = () => {
                                     </p>
                                     <p class="text-secondary small mb-0">
                                         <i class="bi bi-building me-1"></i>
-                                        <span class="fw-bold">Department: </span>
+                                        <span class="fw-bold">Department:
+                                        </span>
                                         {{
                                             props.phone_transaction
-                                                ?.returnee_department || 'Not yet returned'
+                                                ?.returnee_department ||
+                                            'Not yet returned'
                                         }}
                                     </p>
                                 </div>
@@ -488,7 +489,8 @@ const returnSubmit = () => {
                                         <strong>By:</strong>
                                         {{
                                             props.phone_transaction
-                                                ?.issued_by || 'Not yet returned'
+                                                ?.issued_by ||
+                                            'Not yet returned'
                                         }}
                                     </p>
                                 </div>
@@ -509,9 +511,9 @@ const returnSubmit = () => {
                                             <strong>Acknowledgement:</strong>
 
                                             <span class="badge ms-2 border text-white" :class="props.phone_transaction
-                                                ?.it_ack_returned
-                                                ? 'bg-success'
-                                                : 'bg-danger'
+                                                    ?.it_ack_returned
+                                                    ? 'bg-success'
+                                                    : 'bg-danger'
                                                 ">
                                                 IT:
                                                 {{
@@ -521,16 +523,16 @@ const returnSubmit = () => {
                                                         : 'No'
                                                 }}
                                                 <i class="bi ms-1" :class="props.phone_transaction
-                                                    ?.it_ack_returned
-                                                    ? 'bi-check-circle-fill'
-                                                    : 'bi-x-circle-fill'
+                                                        ?.it_ack_returned
+                                                        ? 'bi-check-circle-fill'
+                                                        : 'bi-x-circle-fill'
                                                     "></i>
                                             </span>
 
                                             <span class="badge ms-2 border text-white" :class="props.phone_transaction
-                                                ?.purch_ack_returned
-                                                ? 'bg-success'
-                                                : 'bg-danger'
+                                                    ?.purch_ack_returned
+                                                    ? 'bg-success'
+                                                    : 'bg-danger'
                                                 ">
                                                 Purchasing:
                                                 {{
@@ -540,9 +542,9 @@ const returnSubmit = () => {
                                                         : 'No'
                                                 }}
                                                 <i class="bi ms-1" :class="props.phone_transaction
-                                                    ?.purch_ack_returned
-                                                    ? 'bi-check-circle-fill'
-                                                    : 'bi-x-circle-fill'
+                                                        ?.purch_ack_returned
+                                                        ? 'bi-check-circle-fill'
+                                                        : 'bi-x-circle-fill'
                                                     "></i>
                                             </span>
                                         </div>
@@ -585,13 +587,12 @@ const returnSubmit = () => {
                         <div class="card border-0 shadow-sm">
                             <div class="card-header bg-white py-3">
                                 <div class="row d-flex justify-content-between align-items-center">
-                                    <div class="col-sm-12 col-md-8">
-                                        <h5 class="fw-bold mb-0 text-primary">
+                                    <div class="col-sm-12 col-md-8 mt-2">
+                                        <h5 class="fw-bold text-primary mb-0">
                                             <i class="bi bi-clock-history me-2"></i>Asset Transaction History
                                         </h5>
-
                                     </div>
-                                    <div class="col-sm-12 col-md-4">
+                                    <div class="col-sm-12 col-md-4 my-2">
                                         <div class="search-box">
                                             <div class="input-group input-group-sm">
                                                 <span class="input-group-text bg-light border-end-0">
@@ -607,46 +608,65 @@ const returnSubmit = () => {
                             </div>
                             <div class="card-body p-0">
                                 <div class="table-responsive">
-                                    <table class="table table-hover align-middle mb-0">
+                                    <table class="table-hover mb-0 table align-middle">
                                         <thead class="table-light">
                                             <tr class="fs-7 text-uppercase text-muted border-top-0">
-                                                <th class="ps-3" scope="col">Date Issued</th>
+                                                <th class="ps-3" scope="col">
+                                                    Date Issued
+                                                </th>
                                                 <th scope="col">Issued To</th>
                                                 <th scope="col">Issued By</th>
                                                 <th scope="col">Issued Acc.</th>
-                                                <th scope="col">Date Returned</th>
+                                                <th scope="col">
+                                                    Date Returned
+                                                </th>
                                                 <th scope="col">Returned By</th>
                                                 <th scope="col">Returned To</th>
-                                                <th scope="col" class="pe-3">Returned Acc.</th>
+                                                <th scope="col" class="pe-3">
+                                                    Returned Acc.
+                                                </th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             <tr class="fs-7" v-for="tx in paginatedHistory" :key="tx.id">
-                                                <td class="ps-3 fw-medium text-nowrap mb-0">
-                                                    {{ formatDate(tx.date_issued) }}
+                                                <td class="fw-medium mb-0 text-nowrap ps-3">
+                                                    {{
+                                                        formatDate(
+                                                            tx.date_issued,
+                                                        )
+                                                    }}
                                                 </td>
 
                                                 <td>
-                                                    <div class="fw-bold text-dark">{{ tx.issued_to
-                                                        }}</div>
-                                                    <div class="text-muted small ps-2">{{
-                                                        tx.department }}</div>
-
+                                                    <div class="fw-bold text-dark">
+                                                        {{ tx.issued_to }}
+                                                    </div>
+                                                    <div class="text-muted small ps-2">
+                                                        {{ tx.department }}
+                                                    </div>
                                                 </td>
 
                                                 <td>
-                                                    <div class="fw-bold text-dark">{{
-                                                        tx.issued_by }}</div>
+                                                    <div class="fw-bold text-dark">
+                                                        {{ tx.issued_by }}
+                                                    </div>
                                                 </td>
 
-                                                <td class="small text-wrap" style="max-width: 150px;">
-                                                    {{ tx.issued_accessories || '—' }}
+                                                <td class="small text-wrap" style="max-width: 150px">
+                                                    {{
+                                                        tx.issued_accessories ||
+                                                        '—'
+                                                    }}
                                                 </td>
 
                                                 <td class="text-nowrap">
                                                     <span v-if="tx.date_returned"
-                                                        class="ps-2 fw-medium text-nowrap mb-0">
-                                                        {{ formatDate(tx.date_returned) }}
+                                                        class="fw-medium mb-0 text-nowrap ps-2">
+                                                        {{
+                                                            formatDate(
+                                                                tx.date_returned,
+                                                            )
+                                                        }}
                                                     </span>
                                                     <span v-else class="badge rounded-pill bg-warning text-dark">In
                                                         Use</span>
@@ -654,52 +674,91 @@ const returnSubmit = () => {
 
                                                 <td>
                                                     <div class="fw-bold text-dark">
-                                                        {{ tx.returned_by || '—' }}
+                                                        {{
+                                                            tx.returned_by ||
+                                                            '—'
+                                                        }}
                                                     </div>
-                                                    <div class="text-muted small ps-2">{{
-                                                        tx.returnee_department }}</div>
+                                                    <div class="text-muted small ps-2">
+                                                        {{
+                                                            tx.returnee_department
+                                                        }}
+                                                    </div>
                                                 </td>
                                                 <td>
-                                                    <div class="fw-bold text-dark">{{
-                                                        tx.returned_to }}</div>
-
+                                                    <div class="fw-bold text-dark">
+                                                        {{ tx.returned_to }}
+                                                    </div>
                                                 </td>
 
-                                                <td class="pe-3 small text-muted text-wrap" style="max-width: 150px;">
-                                                    {{ tx.returned_accessories || '—' }}
+                                                <td class="small text-muted text-wrap pe-3" style="max-width: 150px">
+                                                    {{
+                                                        tx.returned_accessories ||
+                                                        '—'
+                                                    }}
                                                 </td>
                                             </tr>
-                                            <tr v-if="filteredHistory.length === 0">
-                                                <td colspan="8" class="text-center py-4 text-muted">No transaction
-                                                    {{ historySearch ? 'No matches found for "' + historySearch + '"' :
-                                                        'No transaction history found.' }}
+                                            <tr v-if="
+                                                filteredHistory.length === 0
+                                            ">
+                                                <td colspan="8" class="text-muted py-4 text-center">
+                                                    No transaction
+                                                    {{
+                                                        historySearch
+                                                            ? 'No matches found for "' +
+                                                            historySearch +
+                                                            '"'
+                                                            : 'No transaction history found.'
+                                                    }}
                                                 </td>
                                             </tr>
                                         </tbody>
                                     </table>
                                 </div>
                             </div>
-                            <div class="card-footer bg-white border-top-0 py-3" v-if="totalPages > 1">
+                            <div class="card-footer border-top-0 bg-white py-3" v-if="totalPages > 1">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div class="text-muted small">
-                                        Showing {{ (currentPage - 1) * itemsPerPage + 1 }} to
-                                        {{ Math.min(currentPage * itemsPerPage, filteredHistory.length) }}
+                                        Showing
+                                        {{
+                                            (currentPage - 1) * itemsPerPage + 1
+                                        }}
+                                        to
+                                        {{
+                                            Math.min(
+                                                currentPage * itemsPerPage,
+                                                filteredHistory.length,
+                                            )
+                                        }}
                                         of {{ filteredHistory.length }} entries
                                     </div>
                                     <nav>
                                         <ul class="pagination pagination-sm mb-0">
-                                            <li class="page-item" :class="{ disabled: currentPage === 1 }">
-                                                <button class="page-link" @click="currentPage--">Previous</button>
+                                            <li class="page-item" :class="{
+                                                disabled: currentPage === 1,
+                                            }">
+                                                <button class="page-link" @click="currentPage--">
+                                                    Previous
+                                                </button>
                                             </li>
 
-                                            <li v-for="page in totalPages" :key="page" class="page-item"
-                                                :class="{ active: currentPage === page }">
-                                                <button class="page-link" @click="currentPage = page">{{ page
-                                                    }}</button>
+                                            <li v-for="page in totalPages" :key="page" class="page-item" :class="{
+                                                active:
+                                                    currentPage === page,
+                                            }">
+                                                <button class="page-link" @click="currentPage = page">
+                                                    {{ page }}
+                                                </button>
                                             </li>
 
-                                            <li class="page-item" :class="{ disabled: currentPage === totalPages }">
-                                                <button class="page-link" @click="currentPage++">Next</button>
+                                            <li class="page-item" :class="{
+                                                disabled:
+                                                    currentPage ===
+                                                    totalPages,
+                                            }">
+                                                <button class="page-link" @click="currentPage++">
+                                                    Next
+                                                </button>
                                             </li>
                                         </ul>
                                     </nav>
@@ -709,8 +768,6 @@ const returnSubmit = () => {
                     </div>
                 </div>
             </div>
-
-
         </div>
     </div>
 
@@ -758,7 +815,7 @@ const returnSubmit = () => {
 
                 <div class="mb-3">
                     <label class="form-label text-muted small fw-bold">Select Accessories</label>
-                    <div class="d-flex justify-content-between rounded border p-2 gap-2">
+                    <div class="d-flex justify-content-between gap-2 rounded border p-2">
                         <div class="form-check">
                             <input class="form-check-input" type="checkbox" value="Charger" v-model="selectedAcc"
                                 id="chargerCheckInput" />
@@ -786,7 +843,9 @@ const returnSubmit = () => {
         </template>
 
         <template #footer>
-            <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-light" data-bs-dismiss="modal">
+                Cancel
+            </button>
             <button type="submit" class="btn btn-primary px-4" form="issueForm" :disabled="form.processing">
                 <span v-if="form.processing" class="spinner-border spinner-border-sm me-1"></span>
                 Issue Asset
@@ -801,7 +860,7 @@ const returnSubmit = () => {
                 <div class="row mb-3">
                     <div class="col-sm-12 col-md-6">
                         <label for="returned_to" class="form-label">Returned To</label>
-                        <input type="text" class="form-control" id="returned_to" v-model="returnform.returned_to">
+                        <input type="text" class="form-control" id="returned_to" v-model="returnform.returned_to" />
                     </div>
                     <div class="col-sm-12 col-md-6">
                         <label for="date_returned" class="form-label">Date Returned</label>
@@ -809,7 +868,7 @@ const returnSubmit = () => {
                             required />
                     </div>
                 </div>
-                <div class="row mb-3 d-flex justify-content-center">
+                <div class="row d-flex justify-content-center mb-3">
                     <div class="col-sm-12 col-md-6">
                         <label for="returned_by" class="form-label">Returned By</label>
                         <input type="text" id="returned_by" v-model="returnform.returned_by" class="form-control"
