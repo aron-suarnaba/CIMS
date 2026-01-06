@@ -13,7 +13,7 @@ const props = defineProps({
             <slot name="header" />
         </span>
         <div class="info-box-content">
-            <span class="info-box-text">
+            <span class="info-box-text text-wrap d-flex justify-content-center align-items-center flex-wrap">
                 <slot name="content" />
             </span>
         </div>

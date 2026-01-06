@@ -7,14 +7,18 @@ import Breadcrumb from '@/Components/Breadcrumb.vue';
 
 
 defineOptions({ layout: HomeLayout });
-const phoneIndex = route('phone.index');
-const goToPhoneIndex = () => {
-    router.get(phoneIndex);
-};
 
 const myBreadcrumb = [
     { label : 'Home', url : route('dashboard') },
     { label : 'Asset & Inventory' }
+];
+
+const navigateTo = (url) => {
+    if (url) router.get(url);
+}
+
+const navCard = [
+    { label : 'SmartPhone', url : route('phone.index'), color : 'bg-primary text-white', icon : 'bi bi-phone' },
 ];
 </script>
 <template>
@@ -26,12 +30,12 @@ const myBreadcrumb = [
     <div class="app-content">
         <div class="container">
             <div class="row mb-5">
-                <div class="col-sm-12 col-md-4">
+                <div class="col-sm-12 col-md-4 mb-3">
                     <BackButton
                         @click.prevent="router.get(route('dashboard'))"
                     />
                 </div>
-                <div class="col-sm-12 col-md-4">
+                <div class="col-sm-12 col-md-4 mb-3">
                     <div class="input-group">
                         <label for="AssetSearchInput" class="input-group-text"
                             ><i class="bi bi-search"></i
@@ -45,7 +49,6 @@ const myBreadcrumb = [
                         />
                     </div>
                 </div>
-                <div class="col-sm-12 col-md-4"></div>
             </div>
             <div class="row mb-3 mt-5">
                 <!-- <div class="col-sm-12 col-md-2">
@@ -64,15 +67,15 @@ const myBreadcrumb = [
                         <template #content> Printer </template>
                     </InfoBox>
                 </div> -->
-                <div class="col-sm-12 col-md-2">
+                <div class="col-sm-12 col-md-2" v-for="option in navCard" :key="option.label">
                     <InfoBox
-                        boxClass="text-bg-primary"
-                        @click.prevent="goToPhoneIndex"
+                        :boxClass="option.color"
+                        @click.prevent="navigateTo(option.url)"
                     >
                         <template #header>
-                            <i class="bi bi-phone"></i>
+                            <i :class="option.icon"></i>
                         </template>
-                        <template #content> Smartphone </template>
+                        <template #content> {{ option.label }} </template>
                     </InfoBox>
                 </div>
                 <!-- <div class="col-sm-12 col-md-2">
