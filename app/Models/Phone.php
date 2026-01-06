@@ -34,6 +34,8 @@ class Phone extends Model
         'imei_two',
         'ram',
         'rom',
+        'sim_no',
+        'cashout',
         'purchase_date',
         'status',
     ];

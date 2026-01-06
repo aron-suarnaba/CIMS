@@ -110,13 +110,15 @@ class PhoneController extends Controller
             'imei_two' => 'nullable|string',
             'ram' => 'required|string',
             'rom' => 'required|string',
+            'sim_no' => 'nullable|string',
+            'cashout' => 'required|boolean',
         ]);
 
         $validated['status'] = 'available';
 
         Phone::create($validated);
 
-        return redirect()->route('phone.create')->with('message', 'Phone registered successfully.');
+        return redirect()->back()->with('success', 'Phone registered successfully.');
     }
 
 

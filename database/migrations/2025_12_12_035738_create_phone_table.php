@@ -20,6 +20,8 @@ return new class extends Migration {
             $table->string('ram');
             $table->string('rom');
             $table->string('purchase_date')->nullable();
+            $table->string('sim_no')->nullable();
+            $table->boolean('cashout');
             $table->string('status')->default('available'); // available, issued, maintenance
             $table->timestamps();
         });

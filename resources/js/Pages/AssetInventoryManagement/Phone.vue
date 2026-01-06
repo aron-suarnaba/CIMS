@@ -29,8 +29,8 @@ const gotoPage = (url) => {
 };
 
 const myBreadcrumb = [
-    { label: 'Home', url : route('dashboard') },
-    { label: 'Inventory', url : route('AssetAndInventoryManagement') },
+    { label: 'Home', url: route('dashboard') },
+    { label: 'Inventory', url: route('AssetAndInventoryManagement') },
     { label: 'Smartphone Asset Details' },
 ];
 
@@ -74,7 +74,6 @@ const gotoPhoneDetails = (phoneSerialNumber) => {
     router.get(route('phone.show', { phone: phoneSerialNumber }));
 };
 
-
 const getPhoneImagePath = (phone) => {
     // Default fallback
     const defaultPath = '../img/phone/default.png';
@@ -112,21 +111,20 @@ const getPhoneImagePath = (phone) => {
 <template>
     <div class="app-content-header">
         <div class="container">
-
             <Breadcrumb :breadcrumbs="myBreadcrumb" />
         </div>
     </div>
     <div class="app-content">
         <div class="container">
-            <div class="row mb-5">
-                <div class="col-sm-12 col-md-4">
+            <div class="row mb-3 d-flex flex-wrap justify-content-center g-2">
+                <div class="col-sm-12 col-md-4 mb-2">
                     <BackButton
                         @click.prevent="
                             router.get(route('AssetAndInventoryManagement'))
                         "
                     />
                 </div>
-                <div class="col-sm-12 col-md-4">
+                <div class="col-sm-12 col-md-4 mb-2">
                     <div class="input-group">
                         <label for="AssetSearchInput" class="input-group-text"
                             ><i class="bi bi-search"></i
@@ -134,14 +132,14 @@ const getPhoneImagePath = (phone) => {
                         <input
                             id="AssetSearchInput"
                             type="text"
-                            class="form-control"
+                            class="form-control w-25"
                             placeholder="Search"
                             autofocus="false"
                         />
                     </div>
                 </div>
                 <div
-                    class="col-sm-12 col-md-4 d-flex justify-content-end gap-2"
+                    class="col-sm-12 col-md-4 d-flex justify-content-end gap-2 mb-2"
                 >
                     <button
                         type="button"
@@ -185,7 +183,7 @@ const getPhoneImagePath = (phone) => {
 
             <div class="row justify-content-start mb-3 mt-5 px-5">
                 <div
-                    class="col-6 col-sm-4 col-md-2 d-flex justify-content-center mb-5"
+                    class="col-sm-12 col-md-2 col-xl-2 d-flex justify-content-center mb-5"
                     v-for="phone in props.phones.data"
                     :key="phone.id"
                 >
@@ -195,15 +193,12 @@ const getPhoneImagePath = (phone) => {
                         <img
                             :src="getPhoneImagePath(phone)"
                             class="img-fluid"
-                            style="height: 8rem"
+                            style="max-height: 8rem;"
                             :alt="phone.model"
                         />
-                        <h4 class="card-title formal-font my-2">
+                        <h4 class="card-title formal-font my-2 text-wrap">
                             {{ phone.model }}
                         </h4>
-                        <h6 class="card-subtitle text-body-secondary mb-1">
-                            {{ phone.issued_to }}
-                        </h6>
                         <span
                             :class="{
                                 'badge bg-success':
