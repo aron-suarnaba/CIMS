@@ -1,5 +1,6 @@
 <script setup>
 import { ref } from 'vue';
+import { Link } from '@inertiajs/vue3';
 
 const title = ref('CIMS');
 import logo from '/public/img/logo.png';
@@ -49,10 +50,10 @@ const AssetInventoryManagement = ref(route('AssetAndInventoryManagement'));
                         id="navigation"
                     >
                         <li class="nav-item">
-                            <a href="#" class="nav-link">
+                            <Link :href="route('dashboard')" class="nav-link">
                                 <i class="nav-icon bi bi-speedometer"></i>
                                 <p>Dashboard</p>
-                            </a>
+                            </Link>
                         </li>
                         <li class="nav-item">
                             <a
