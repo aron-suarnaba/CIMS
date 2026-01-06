@@ -31,7 +31,7 @@ const gotoPage = (url) => {
 const myBreadcrumb = [
     { label: 'Home', url: route('dashboard') },
     { label: 'Inventory', url: route('AssetAndInventoryManagement') },
-    { label: 'Smartphone Asset Details' },
+    { label: 'Smartphone Asset' },
 ];
 
 const filterBrand = ref(

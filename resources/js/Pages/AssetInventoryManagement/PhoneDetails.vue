@@ -216,7 +216,7 @@ const returnSubmit = () => {
 <template>
     <div class="app-content-header border-bottom bg-white py-3">
         <!-- Breadcrumb -->
-        <div class="container-fluid">
+        <div class="container">
             <Breadcrumb :breadcrumbs="myBreadcrumb" />
         </div>
     </div>

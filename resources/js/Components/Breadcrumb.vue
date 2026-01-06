@@ -21,7 +21,7 @@ const displayedTitle = computed(() => {
 </script>
 <template>
     <div
-        class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-2"
+        class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-2 mb-2"
     >
         <div class="d-flex gap-2">
             <h5 class="fw-bold text-secondary mb-0">{{ displayedTitle }}</h5>

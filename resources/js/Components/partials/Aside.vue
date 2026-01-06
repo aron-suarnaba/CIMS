@@ -8,7 +8,7 @@ const AssetInventoryManagement = ref(route('AssetAndInventoryManagement'));
 
 <template>
     <aside
-        class="app-sidebar bg-secondary-subtle clickable-card shadow"
+        class="app-sidebar bg-secondary-subtle shadow"
         data-bs-theme="light"
     >
         <div class="sidebar-brand">

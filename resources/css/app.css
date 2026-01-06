@@ -8,10 +8,11 @@
     cursor: pointer;
     transition: transform 0.2s;
 }
+.clickable-card:hover{
+    transform: translate(2px, -4px);
+    box-shadow: -3px 3px 10px rgba( 0, 0, 0, 0.3);
+}
 .formal-font {
     font-family: 'open-sans' ,'Roboto', 'sans-serif';
     font-weight: 700;
-}
-.hover-card {
-    transform: translate(2px, 3px);
 }

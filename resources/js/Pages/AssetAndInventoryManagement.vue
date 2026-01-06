@@ -3,38 +3,24 @@ import HomeLayout from '@/Layouts/HomeLayout.vue';
 import InfoBox from '@/Components/InfoBox.vue';
 import { router } from '@inertiajs/vue3';
 import BackButton from '@/Components/BackButton.vue';
+import Breadcrumb from '@/Components/Breadcrumb.vue';
+
 
 defineOptions({ layout: HomeLayout });
 const phoneIndex = route('phone.index');
-const gotoHome = () => {
-    router.get(route('dashboard'));
-};
 const goToPhoneIndex = () => {
     router.get(phoneIndex);
 };
+
+const myBreadcrumb = [
+    { label : 'Home', url : route('dashboard') },
+    { label : 'Asset & Inventory' }
+];
 </script>
 <template>
     <div class="app-content-header">
         <div class="container">
-            <div class="row my-4">
-                <div class="col-sm-6">
-                    <h1 class="h3 mb-0">Asset & Inventory Management</h1>
-                </div>
-                <div class="col-sm-6">
-                    <ol class="breadcrumb float-sm-end">
-                        <li class="breadcrumb-item">
-                            <a
-                                :href="gotoHome"
-                                class="text-underline text-primary"
-                                >Home</a
-                            >
-                        </li>
-                        <li class="breadcrumb-item active" aria-current="page">
-                            Asset & Inventory Management
-                        </li>
-                    </ol>
-                </div>
-            </div>
+            <Breadcrumb :breadcrumbs="myBreadcrumb" />
         </div>
     </div>
     <div class="app-content">
