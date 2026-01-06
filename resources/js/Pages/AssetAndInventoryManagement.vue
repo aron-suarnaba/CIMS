@@ -1,7 +1,6 @@
 <script setup>
 import HomeLayout from '@/Layouts/HomeLayout.vue';
 import InfoBox from '@/Components/InfoBox.vue';
-import { defineOptions } from 'vue';
 import { router } from '@inertiajs/vue3';
 import BackButton from '@/Components/BackButton.vue';
 

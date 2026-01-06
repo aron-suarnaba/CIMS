@@ -2,6 +2,7 @@
 import HomeLayout from '@/Layouts/HomeLayout.vue';
 import PhoneCard from '@/Components/PhoneCard.vue';
 import BackButton from '@/Components/BackButton.vue';
+import Breadcrumb from '@/Components/Breadcrumb.vue';
 import { router } from '@inertiajs/vue3';
 import { ref } from 'vue';
 
@@ -26,6 +27,12 @@ const gotoPage = (url) => {
         },
     );
 };
+
+const myBreadcrumb = [
+    { label: 'Home', url : route('dashboard') },
+    { label: 'Inventory', url : route('AssetAndInventoryManagement') },
+    { label: 'Smartphone Asset Details' },
+];
 
 const filterBrand = ref(
     new URLSearchParams(window.location.search).get('brand') || '',
@@ -59,8 +66,6 @@ const applyFilter = (brand = filterBrand.value, sort = currentSort.value) => {
         },
     );
 };
-const AssetInventoryManagementIndex = route('AssetAndInventoryManagement');
-const Home = route('dashboard');
 const gotoAddPhone = () => {
     router.get(route('phone.create'));
 };
@@ -69,12 +74,6 @@ const gotoPhoneDetails = (phoneSerialNumber) => {
     router.get(route('phone.show', { phone: phoneSerialNumber }));
 };
 
-const gotoAssetInventoryManagementIndex = () => {
-    router.get(AssetInventoryManagementIndex);
-};
-const gotoHome = () => {
-    router.get(Home);
-};
 
 const getPhoneImagePath = (phone) => {
     // Default fallback
@@ -113,36 +112,8 @@ const getPhoneImagePath = (phone) => {
 <template>
     <div class="app-content-header">
         <div class="container">
-            <div class="row my-4">
-                <div class="col-sm-6">
-                    <h1 class="h3 mb-0">Smartphone</h1>
-                </div>
-                <div class="col-sm-6">
-                    <ol class="breadcrumb float-sm-end">
-                        <li class="breadcrumb-item">
-                            <a
-                                :href="Home"
-                                @click.prevent="gotoHome"
-                                class="text-underline"
-                                >Home</a
-                            >
-                        </li>
-                        <li class="breadcrumb-item">
-                            <a
-                                :href="AssetInventoryManagementIndex"
-                                @click.prevent="
-                                    gotoAssetInventoryManagementIndex
-                                "
-                                class="text-underline"
-                                >Asset & Inventory Management</a
-                            >
-                        </li>
-                        <li class="breadcrumb-item active" aria-current="page">
-                            Smartphone
-                        </li>
-                    </ol>
-                </div>
-            </div>
+
+            <Breadcrumb :breadcrumbs="myBreadcrumb" />
         </div>
     </div>
     <div class="app-content">
