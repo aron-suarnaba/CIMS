@@ -1,6 +1,6 @@
 <script setup>
 import HomeLayout from '@/Layouts/HomeLayout.vue';
-import PhoneCard from '@/Components/PhoneCard.vue';
+import ListCard from '@/Components/ListCard.vue';
 import BackButton from '@/Components/BackButton.vue';
 import Breadcrumb from '@/Components/Breadcrumb.vue';
 import { router } from '@inertiajs/vue3';
@@ -22,8 +22,8 @@ const gotoPage = (url) => {
         url,
         {},
         {
-            preserveState: true, // Keeps your search/filter values in the URL
-            preserveScroll: true, // Prevents jumping to the top of the page
+            preserveState: true,
+            preserveScroll: true,
         },
     );
 };
@@ -31,7 +31,7 @@ const gotoPage = (url) => {
 const myBreadcrumb = [
     { label: 'Home', url: route('dashboard') },
     { label: 'Inventory', url: route('AssetAndInventoryManagement') },
-    { label: 'Smartphone Asset' },
+    { label: 'Computer Asset' },
 ];
 
 const filterBrand = ref(
@@ -48,7 +48,6 @@ const sortOption = [
 ];
 
 const applyFilter = (brand = filterBrand.value, sort = currentSort.value) => {
-    // Ensure 'All Brands' matches what is in your template
     filterBrand.value =
         brand === 'All Brands' || brand === 'All brand' ? '' : brand;
     currentSort.value = sort;
@@ -187,7 +186,7 @@ const getPhoneImagePath = (phone) => {
                     v-for="phone in props.phones.data"
                     :key="phone.id"
                 >
-                    <PhoneCard
+                    <ListCard
                         @click.prevent="gotoPhoneDetails(phone.serial_num)"
                     >
                         <img
@@ -210,7 +209,7 @@ const getPhoneImagePath = (phone) => {
                         >
                             {{ phone.status }}
                         </span>
-                    </PhoneCard>
+                    </ListCard>
                 </div>
 
                 <div
