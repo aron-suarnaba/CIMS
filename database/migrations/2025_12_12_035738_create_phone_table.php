@@ -34,7 +34,7 @@ return new class extends Migration {
             $table->foreign('serial_num')
                   ->references('serial_num')
                   ->on('phones')
-                  ->cascade('cascade')
+                  ->onDelete('cascade')
                   ->onUpdate('cascade');
             $table->string('issued_to');
             $table->string('department');

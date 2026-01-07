@@ -1,6 +1,5 @@
 <script setup>
 import HomeLayout from '@/Layouts/HomeLayout.vue';
-import { defineOptions } from 'vue';
 import { router, useForm } from '@inertiajs/vue3';
 import BackButton from '@/Components/BackButton.vue';
 import Breadcrumb from '@/Components/Breadcrumb.vue';

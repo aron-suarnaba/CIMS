@@ -95,6 +95,13 @@ const deleteItem = (serial_num) => {
                         },
                     });
                 },
+                onSuccess: () => {
+                    Swal.fire({
+                        title: 'Deleted!',
+                        text: 'The asset record has been deleted.',
+                        icon: 'success',
+                    });
+                },
                 onError: () => {
                     Swal.close();
                 },

@@ -1,7 +1,6 @@
 <script setup>
 import HomeLayout from '@/Layouts/HomeLayout.vue';
 import Breadcrumb from '@/Components/Breadcrumb.vue';
-import { defineOptions } from 'vue'; // Explicit import is safer
 
 defineOptions({ layout: HomeLayout });
 

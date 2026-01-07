@@ -217,11 +217,9 @@ class PhoneController extends Controller
      */
     public function destroy(Phone $phone)
     {
-
         try {
-            // $phone->delete();
-            $phone = \DB::table('phone')->where('serial_num', )->delete();
-            return redirect()->back()->with('success', 'Asset record and all related history have been deleted');
+            $phone->delete();
+            return redirect()->route('phone.index')->with('success', 'Asset record and all related history have been deleted');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Failed to delete asset.');
         }
