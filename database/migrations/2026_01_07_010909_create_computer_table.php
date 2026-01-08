@@ -1,72 +1,139 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
+namespace App\Http\Controllers;
 
-return new class extends Migration {
-    /**
-     * Run the migrations.
-     */
-    public function up(): void
+use App\Models\Computers;
+use App\Models\ComputerTransaction;
+use Illuminate\Http\Request;
+use Inertia\Inertia;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\DB;
+
+class ComputersController extends Controller
+{
+    public function index(Request $request)
     {
-        Schema::create('computers', function (Blueprint $table) {
-            $table->id();
-            $table->string('host_name')->unique();
-            $table->string('serial_number')->unique()->nullable();
-            $table->string('manufacturer');
-            $table->string('model');
+        $filterBrand = $request->get('brand'); // UI filter label remains 'brand'
+        $sort = $request->get('sort', 'date_modified');
 
-            // Technical Specs
-            $table->string('os_version')->nullable()->default('windows');
-            $table->string('cpu')->nullable();
-            $table->integer('ram_gb')->nullable();
-            $table->integer('storage_gb')->nullable();
-            $table->string('mac_address')->nullable();
-            $table->string('ip_address')->nullable();
+        $perPage = 12;
+        $page = $request->integer('page', 1);
+        $offset = ($page - 1) * $perPage;
 
-            // Financial
-            $table->date('purchase_date')->nullable();
-            $table->string('vendor')->nullable();
-            $table->string('po_number')->nullable();
-            $table->date('warranty_expiry')->nullable();
+        $query = Computers::query()
+            ->when($filterBrand, function ($query, $filterBrand) {
+                // Fixed: Search against 'manufacturer' or 'host_name'
+                $query->where('manufacturer', 'LIKE', '%' . $filterBrand . '%')
+                      ->orWhere('host_name', 'LIKE', '%' . $filterBrand . '%');
+            })
+            ->with('transactions'); // Matches model function name
 
-            // Current State Only
-            $table->enum('status', ['In Use', 'In Storage', 'In Repair', 'Retired', 'Broken'])->default('In Storage');
-            $table->text('remarks')->nullable();
-            $table->timestamps();
-            $table->softDeletes();
-        });
+        /** Sorting - Fixed column names to match migration */
+        switch ($sort) {
+            case 'name':
+                $query->orderBy('manufacturer', 'asc') // Changed from brand
+                      ->orderBy('model', 'asc');
+                break;
 
-        Schema::create('computer_transactions', function (Blueprint $table) {
-            $table->id();
-            $table->string('host_name');
-            $table->foreign('host_name')
-            ->references('host_name')
-            ->on('computers')
-            ->onUpdate('cascade')
-            ->onDelete('cascade');
+            case 'availability':
+                $query->orderByRaw("
+                    CASE
+                        WHEN status = 'In Storage' THEN 1
+                        WHEN status = 'In Use' THEN 2
+                        WHEN status = 'In Repair' THEN 3
+                        ELSE 4
+                    END
+                ");
+                break;
 
-            // Assignment (Issuance)
-            $table->string('assigned_user');
-            $table->string('department');
-            $table->date('date_issued');
+            case 'date_modified':
+            default:
+                $query->orderBy('updated_at', 'desc');
+                break;
+        }
 
-            // Pullout (Return)
-            $table->date('pullout_date')->nullable();
-            $table->string('pullout_reason')->nullable();
-            $table->string('returned_to')->nullable();
+        $total = (clone $query)->count();
 
-            $table->timestamps();
-        });
+        // SQL Server–safe pagination
+        $ids = DB::table(DB::raw("(
+            SELECT id,
+                   ROW_NUMBER() OVER (ORDER BY updated_at DESC) AS row_num
+            FROM computers
+            WHERE deleted_at IS NULL
+        ) AS t"))
+            ->whereBetween('row_num', [$offset + 1, $offset + $perPage])
+            ->pluck('id');
+
+        $computers = $query->whereIn('id', $ids)->get();
+
+        $paginated = new LengthAwarePaginator(
+            $computers, $total, $perPage, $page,
+            ['path' => $request->url(), 'query' => $request->query()]
+        );
+
+        return Inertia::render('AssetInventoryManagement/Computer', [
+            'computers' => $paginated,
+            'filters' => $request->only(['brand', 'sort']),
+        ]);
     }
 
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
+    public function store(Request $request)
     {
-        Schema::dropIfExists('computer_transactions');
-        Schema::dropIfExists('computers');
+        $validated = $request->validate([
+            'manufacturer'   => 'required|string', // Changed from brand
+            'model'          => 'required|string',
+            'serial_number'  => 'required|string|unique:computers,serial_number', // Fixed name
+            'cpu'            => 'required|string', // Changed from processor
+            'ram_gb'         => 'required|integer', // Changed from ram
+            'storage_gb'     => 'required|integer', // Changed from storage
+            'os_version'     => 'nullable|string', // Changed from os
+            'host_name'      => 'required|string|unique:computers,host_name',
+        ]);
+
+        $validated['status'] = 'In Storage';
+
+        Computers::create($validated);
+
+        return redirect()->back()->with('success', 'Computer registered successfully.');
     }
-};
+
+    public function issue(Request $request, Computers $computer)
+    {
+        $validated = $request->validate([
+            'assigned_user' => 'required|string|max:255', // Changed from issued_to
+            'department'    => 'required|string|max:255',
+            'date_issued'   => 'required|date',
+        ]);
+
+        // Link via host_name as per your foreign key migration
+        $validated['host_name'] = $computer->host_name;
+
+        ComputerTransaction::create($validated);
+
+        $computer->update(['status' => 'In Use']);
+
+        return redirect()->back()->with('success', 'Asset issued to ' . $validated['assigned_user']);
+    }
+
+    public function return(Request $request, Computers $computer)
+    {
+        $validated = $request->validate([
+            'returned_to'    => 'required|string|max:255',
+            'pullout_date'   => 'required|date', // Changed from date_returned
+            'pullout_reason' => 'required|string|max:255', // Changed from remarks
+        ]);
+
+        $transaction = ComputerTransaction::where('host_name', $computer->host_name)
+            ->whereNull('pullout_date')
+            ->latest()
+            ->first();
+
+        if ($transaction) {
+            $computer->update(['status' => 'In Storage']);
+            $transaction->update($validated);
+            return redirect()->back()->with('success', 'Asset returned successfully.');
+        }
+
+        return redirect()->back()->withErrors(['error' => 'No active issuance found.']);
+    }
+}

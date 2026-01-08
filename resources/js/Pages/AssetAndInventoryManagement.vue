@@ -10,7 +10,6 @@ defineOptions({ layout: HomeLayout });
 
 const myBreadcrumb = [
     { label : 'Home', url : route('dashboard') },
-    { label : 'Asset & Inventory' }
 ];
 
 const navigateTo = (url) => {
@@ -18,7 +17,8 @@ const navigateTo = (url) => {
 }
 
 const navCard = [
-    { label : 'SmartPhone', url : route('phone.index'), color : 'bg-primary text-white', icon : 'bi bi-phone' },
+    { label : 'Company Phone', url : route('phone.index'), color : 'bg-primary bg-gradient text-white', icon : 'bi bi-phone' },
+    { label : 'Computer', url : route('computer.index'), color : 'bg-info bg-gradient text-white', icon : 'bi bi-pc-display' },
 ];
 </script>
 <template>

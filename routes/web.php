@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ComputersController;
 use App\Http\Controllers\PhoneController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
@@ -28,35 +29,29 @@ Route::middleware('auth')->group(function () {
             return Inertia::render('AssetAndInventoryManagement');
         })->name('AssetAndInventoryManagement');
 
-        // Main Index
-        Route::get('/Phone', [PhoneController::class, 'index'])
-            ->name('phone.index');
+        // Phone Routes
+        Route::prefix('phone')->group(function () {
+            Route::get('/', [PhoneController::class, 'index'])->name('phone.index');
+            Route::get('/create', [PhoneController::class, 'create'])->name('phone.create');
+            Route::post('/', [PhoneController::class, 'store'])->name('phone.store');
+            Route::get('/{phone}', [PhoneController::class, 'show'])->name('phone.show');
 
-        // Create & Store Phone (The Asset itself)
-        Route::get('/Phone/AddPhone', [PhoneController::class, 'create'])
-            ->name('phone.create');
-
-        Route::post('/Phone/AddPhone', [PhoneController::class, 'store'])
-            ->name('phone.store');
-
-        // Show Single Phone Detail
-        Route::get('/Phone/{phone}', [PhoneController::class, 'show'])
-            ->name('phone.show');
-
-        // Store Phone Issuance Data
-        Route::post('/Phone/{phone}/issue', [PhoneController::class, 'issue'])
-            ->name('phone.issue');
-
-        // unsigned
-        Route::post('/Phone/{phone}/return', [PhoneController::class, 'return'])
-            ->name('phone.return');
-
-        // unsigned
-        Route::delete('/Phone/{phone:serial_num}', [PhoneController::class, 'destroy'])
-            ->name('phone.destroy');
+            // Asset Actions
+            Route::post('/{phone}/issue', [PhoneController::class, 'issue'])->name('phone.issue');
+            Route::post('/{phone}/return', [PhoneController::class, 'return'])->name('phone.return');
+            Route::delete('/{phone:serial_num}', [PhoneController::class, 'destroy'])->name('phone.destroy');
+        });
 
         // Your existing transaction store (if used for logging)
         // Route::post('/Phone/Transaction', [PhoneController::class, 'phoneTransStore'])
         //     ->name('phone.trans.store');
+
+        Route::prefix('Computer')->group(function(){
+
+            Route::get('/', [ComputersController::class, 'index'])
+                ->name('computer.index');
+
+        });
     });
+
 });

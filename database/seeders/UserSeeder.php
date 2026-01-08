@@ -15,9 +15,8 @@ class UserSeeder extends Seeder
     {
         // Define key roles for easy reference
         $usersToSeed = [
-            // 1. System Administrator (IT)
             [
-                'employee_id' => 'SYS001', // <-- ADDED
+                'employee_id' => 'SYS001',
                 'first_name' => 'System',
                 'last_name' => 'Admin',
                 'department' => 'IT',
@@ -25,34 +24,49 @@ class UserSeeder extends Seeder
                 'email' => 'admin@example.com',
                 'password' => 'password',
             ],
-            // 2. IT User
             [
-                'employee_id' => 'IT105', // <-- ADDED
-                'first_name' => 'Alice',
-                'last_name' => 'Smith',
-                'department' => 'IT',
-                'position' => 'IT Support Specialist',
-                'email' => 'alice.smith@example.com',
-                'password' => 'password',
-            ],
-            // 3. Purchasing User
-            [
-                'employee_id' => 'PUR201', // <-- ADDED
-                'first_name' => 'Carol',
-                'last_name' => 'White',
-                'department' => 'Purchasing',
-                'position' => 'Procurement Officer',
-                'email' => 'carol.white@example.com',
-                'password' => 'password',
-            ],
-            // 4. Supervisor (New Role)
-            [
-                'employee_id' => 'OPS304', // <-- ADDED
-                'first_name' => 'John',
-                'last_name' => 'Doe',
+                'employee_id' => 'PPR997',
+                'first_name' => 'Arjay',
+                'last_name' => 'Nebres',
                 'department' => 'Information Technology',
                 'position' => 'IT Supervisor',
-                'email' => 'john.doe@example.com',
+                'email' => 'arjay.nebres@printwell.com.ph',
+                'password' => 'password',
+            ],
+            [
+                'employee_id' => 'SYS002',
+                'first_name' => 'Technical',
+                'last_name' => 'Support',
+                'department' => 'Information Technology',
+                'position' => 'IT Specialist',
+                'email' => 'technical.support@printwell.com.ph',
+                'password' => 'password',
+            ],
+            [
+                'employee_id' => 'PPR1187',
+                'first_name' => 'Aron Kyle',
+                'last_name' => 'Suarnaba',
+                'department' => 'Information Technology',
+                'position' => 'System Analyst Programmer',
+                'email' => 'aron.suarnaba@printwell.com.ph',
+                'password' => 'password',
+            ],
+            [
+                'employee_id' => 'PPC1190',
+                'first_name' => 'Mico',
+                'last_name' => 'Limbanganon',
+                'department' => 'Information Technology',
+                'position' => 'IT Specialist',
+                'email' => 'mico.limbanganon@example.com',
+                'password' => 'password',
+            ],
+            [
+                'employee_id' => 'PPC1197',
+                'first_name' => 'Angelique',
+                'last_name' => 'Limbanganon',
+                'department' => 'Information Technology',
+                'position' => 'IT Specialist',
+                'email' => 'angelique.limbanganon.printwell.com.ph',
                 'password' => 'password',
             ],
         ];
