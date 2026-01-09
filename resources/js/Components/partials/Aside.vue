@@ -4,7 +4,6 @@ import { Link } from '@inertiajs/vue3';
 
 const title = ref('CIMS');
 import logo from '/public/img/logo.png';
-const AssetInventoryManagement = ref(route('AssetAndInventoryManagement'));
 </script>
 
 <template>
@@ -56,16 +55,15 @@ const AssetInventoryManagement = ref(route('AssetAndInventoryManagement'));
                             </Link>
                         </li>
                         <li class="nav-item">
-                            <a
-                                v-bind:href="AssetInventoryManagement"
+                            <Link
+                                :href="route('AssetAndInventoryManagement')"
                                 class="nav-link"
                             >
                                 <i class="bi bi-pc-display"></i>
                                 <p>
                                     Assets & Inventory Management
-                                    <i class="bi bi-chevron-left right"></i>
                                 </p>
-                            </a>
+                            </Link>
                         </li>
                         <!-- <li class="nav-item">
                             <a href="#" class="nav-link">

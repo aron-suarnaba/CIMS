@@ -146,13 +146,10 @@ watch(historySearch, () => {
 // Forms
 // Form for Issuance
 const issueform = useForm({
-    issued_by: '',
-    issued_to: '',
+    assigned_user: '',
     department: '',
     date_issued: new Date().toISOString().substr(0, 10),
-    issued_accessories: '',
-    it_ack_issued: false,
-    purch_ack_issued: false,
+    remarks: '',
 });
 
 // Form for return
@@ -161,9 +158,6 @@ const returnform = useForm({
     returned_to: '',
     returnee_department: '',
     date_returned: new Date().toISOString().substr(0, 10),
-    returned_accessories: '',
-    it_ack_returned: false,
-    purch_ack_returned: false,
     remarks: '',
 });
 
@@ -230,8 +224,7 @@ const returnSubmit = () => {
                             <div class="btn-group shadow-sm">
                                 <button v-if="
                                     props.computer.status === 'In Storage' ||
-                                    props.computer.status === 'In Repair' ||
-                                    props.computer.status === 'Retired'
+                                    props.computer.status === 'In Repair'
                                 " class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#IssueComputerModal">
                                     <i class="bi bi-person-plus me-1"></i> Deploy
                                     Workstation
@@ -271,8 +264,7 @@ const returnSubmit = () => {
                                         'badge bg-danger': props.computer.status === 'Pullout',
                                         'badge bg-dark': props.computer.status === 'Retired',
                                     },
-                                ]">
-                                    Status: {{ props.computer.status }}
+                                ]"> {{ props.computer.status }}
                                 </span>
                             </div>
 
@@ -328,7 +320,12 @@ const returnSubmit = () => {
                                 <li class="list-group-item d-flex justify-content-between">
                                     <span class="text-muted">Warranty</span>
                                     <span>{{ formatDate(props.computer.warranty_expiry) || 'N/A' }}
-                                          {{ props.computer.warranty_expiry >=  today ? '(The warranty is expired)' : '' }}
+                                        {{ props.computer.warranty_expiry >= today ? '(The warranty is expired)' : '' }}
+                                    </span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between gap-2 align-items-center">
+                                    <span class="text-muted">Remarks</span>
+                                    <span class="p-2 container-fluid">{{ props.computer.remarks || 'N/A' }}
                                     </span>
                                 </li>
                             </ul>
@@ -354,6 +351,7 @@ const returnSubmit = () => {
                         <div class="card-body">
                             <div class="row g-3" v-if="
                                 props.computer?.status === 'In Repair' ||
+                                props.computer?.status === 'In Use' ||
                                 props.computer?.status === 'In Storage' ||
                                 props.computer?.status === 'Pull Out'
                             ">
@@ -462,14 +460,15 @@ const returnSubmit = () => {
                             <i class="bi bi-reply-fill fs-4 me-2"></i>
                             <h5 class="fw-bold mb-0">Pullout Details</h5>
                         </div>
-                        <div class="card-body" v-if="props.computer?.status === 'returned'">
+                        <div class="card-body"
+                            v-if="props.computer?.status === 'In Use' || props.computer?.status === 'In Storage' || props.computer?.status === 'In Repair' || props.computer?.status === 'Retired'">
                             <div class="row g-3">
                                 <div class="col-md-4 border-end">
                                     <label class="small text-muted text-uppercase fw-bold">Recipient Info</label>
                                     <p class="fw-bold fs-5 text-dark mb-1">
                                         {{
                                             props.computer_transaction
-                                                ?.returned_by ||
+                                                ?.assigned_user ||
                                             'Not yet returned'
                                         }}
                                     </p>
@@ -479,21 +478,12 @@ const returnSubmit = () => {
                                         </span>
                                         {{
                                             props.computer_transaction
-                                                ?.returnee_department ||
+                                                ?.department ||
                                             'Not yet returned'
                                         }}
                                     </p>
                                 </div>
-                                <div class="col-md-4 border-end">
-                                    <label class="small text-muted text-uppercase fw-bold">Return To:</label>
-                                    <p class="fw-bold fs-5 text-dark mb-1">
-                                        {{
-                                            props.computer_transaction
-                                                ?.returned_to ||
-                                            'Not yet returned'
-                                        }}
-                                    </p>
-                                </div>
+
                                 <div class="col-md-4 px-md-4">
                                     <label class="small text-muted text-uppercase fw-bold">Issuance Logistics</label>
                                     <p class="mb-1">
@@ -501,16 +491,8 @@ const returnSubmit = () => {
                                         {{
                                             formatDate(
                                                 props.computer_transaction
-                                                    ?.date_returned,
+                                                    ?.pullout_date,
                                             ) || 'Not yet returned'
-                                        }}
-                                    </p>
-                                    <p class="mb-0">
-                                        <strong>By:</strong>
-                                        {{
-                                            props.phone_transaction
-                                                ?.issued_by ||
-                                            'Not yet returned'
                                         }}
                                     </p>
                                 </div>
@@ -521,13 +503,13 @@ const returnSubmit = () => {
                                         <div class="card-body">
                                             <h5
                                                 class="card-title fw-bold text-secondary d-flex align-items-center mb-3 me-2">
-                                                <i class="bi bi-sticky me-2"></i>Remarks
+                                                <i class="bi bi-sticky me-2"></i>Reason
                                             </h5>
                                             <p class="card-text text-dark d-flex align-items-center">
                                                 {{
                                                     props.computer_transaction
-                                                        ?.remarks ||
-                                                    'No remarks provided for this issuance.'
+                                                        ?.pullout_reason ||
+                                                    'No reason provided for this pullout.'
                                                 }}
                                             </p>
                                         </div>
@@ -546,6 +528,7 @@ const returnSubmit = () => {
                         </div>
                     </div>
 
+                    <!-- Table History -->
                     <div class="card border-0 shadow-sm">
                         <div class="card-header bg-white py-3">
                             <div class="row d-flex justify-content-between align-items-center">
@@ -576,17 +559,14 @@ const returnSubmit = () => {
                                             <th class="ps-3" scope="col">
                                                 Date Issued
                                             </th>
-                                            <th scope="col">Issued To</th>
-                                            <th scope="col">Issued By</th>
-                                            <th scope="col">Issued Acc.</th>
+                                            <th scope="col">Deploy To</th>
+                                            <th scope="col">Department</th>
+                                            <th scope="col">Deployment Date</th>
                                             <th scope="col">
-                                                Date Returned
+                                                Date Pullout
                                             </th>
-                                            <th scope="col">Returned By</th>
-                                            <th scope="col">Returned To</th>
-                                            <th scope="col" class="pe-3">
-                                                Returned Acc.
-                                            </th>
+                                            <th scope="col">Reason</th>
+
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -601,8 +581,11 @@ const returnSubmit = () => {
 
                                             <td>
                                                 <div class="fw-bold text-dark">
-                                                    {{ tx.issued_to }}
+                                                    {{ tx.assigned_user }}
                                                 </div>
+                                            </td>
+
+                                            <td>
                                                 <div class="text-muted small ps-2">
                                                     {{ tx.department }}
                                                 </div>
@@ -610,54 +593,18 @@ const returnSubmit = () => {
 
                                             <td>
                                                 <div class="fw-bold text-dark">
-                                                    {{ tx.issued_by }}
+                                                    {{ tx.pullout_date }}
                                                 </div>
                                             </td>
 
-                                            <td class="small text-wrap" style="max-width: 150px">
+                                            <td class="small text-wrap">
                                                 {{
                                                     tx.issued_accessories ||
                                                     '—'
                                                 }}
                                             </td>
 
-                                            <td class="text-nowrap">
-                                                <span v-if="tx.date_returned" class="fw-medium mb-0 text-nowrap ps-2">
-                                                    {{
-                                                        formatDate(
-                                                            tx.date_returned,
-                                                        )
-                                                    }}
-                                                </span>
-                                                <span v-else class="badge rounded-pill bg-warning text-dark">In
-                                                    Use</span>
-                                            </td>
 
-                                            <td>
-                                                <div class="fw-bold text-dark">
-                                                    {{
-                                                        tx.returned_by ||
-                                                        '—'
-                                                    }}
-                                                </div>
-                                                <div class="text-muted small ps-2">
-                                                    {{
-                                                        tx.returnee_department
-                                                    }}
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <div class="fw-bold text-dark">
-                                                    {{ tx.returned_to }}
-                                                </div>
-                                            </td>
-
-                                            <td class="small text-muted text-wrap pe-3" style="max-width: 150px">
-                                                {{
-                                                    tx.returned_accessories ||
-                                                    '—'
-                                                }}
-                                            </td>
                                         </tr>
                                         <tr v-if="
                                             filteredHistory.length === 0
@@ -728,85 +675,40 @@ const returnSubmit = () => {
                     </div>
                 </div>
 
-                <!-- Table -->
-                <!-- <div class="row g-4 mb-5">
-                    <div class="col-12">
 
-                    </div>
-                </div> -->
             </div>
         </div>
     </div>
 
     <!-- Issuance Modal -->
-    <Modals id="IssueComputerModal" title="Issue Computer Asset" header-class="bg-primary text-white bg-gradient">
+    <Modals id="IssueComputerModal" title="Deploy Workstation" header-class="bg-primary text-white bg-gradient">
         <template #body>
-            <issueform @submit.prevent="submit" id="issueForm">
+            <form @submit.prevent="submit" id="issueForm">
                 <div class="row mb-3">
                     <div class="col-md-6">
                         <label for="issued_to" class="form-label">Issued To</label>
-                        <input type="text" id="issued_to" v-model="form.issued_to" class="form-control" required />
+                        <input type="text" id="issued_to" v-model="issueform.assigned_user" class="form-control"
+                            required />
                     </div>
-                    <div class="col-md-6">
-                        <label for="issued_by" class="form-label">Issued By</label>
-                        <input type="text" id="issued_by" v-model="form.issued_by" class="form-control" required />
-                    </div>
-                </div>
-
-                <div class="row mb-3">
                     <div class="col-md-6">
                         <label for="department" class="form-label">Department</label>
-                        <input type="text" id="department" v-model="form.department" class="form-control" required />
-                    </div>
-                    <div class="col-md-6">
-                        <label for="date_issued" class="form-label">Date Issued</label>
-                        <input type="date" id="date_issued" v-model="form.date_issued" class="form-control" required />
+                        <input type="text" id="department" v-model="issueform.department" class="form-control"
+                            required />
                     </div>
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label text-muted small fw-bold">Acknowledgement</label>
-                    <div class="d-flex justify-content-around gap-4 rounded border p-2">
-                        <div class="form-check">
-                            <input type="checkbox" v-model="form.it_ack_issued" id="ITAcknowledgement"
-                                class="form-check-input" />
-                            <label for="ITAcknowledgement" class="form-check-label">IT Dept</label>
-                        </div>
-                        <div class="form-check">
-                            <input type="checkbox" v-model="form.purch_ack_issued" id="PurchAcknowledgement"
-                                class="form-check-input" />
-                            <label for="PurchAcknowledgement" class="form-check-label">Purchasing</label>
-                        </div>
-                    </div>
+                    <label for="date_issued" class="form-label">Date Issued</label>
+                    <input type="date" id="date_issued" v-model="issueform.date_issued" class="form-control" required />
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label text-muted small fw-bold">Select Accessories</label>
-                    <div class="d-flex justify-content-between gap-2 rounded border p-2">
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="Charger" v-model="selectedAcc"
-                                id="chargerCheckInput" />
-                            <label class="form-check-label" for="chargerCheckInput">Charger</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="Headphones" v-model="selectedAcc"
-                                id="headphonesCheckInput" />
-                            <label class="form-check-label" for="headphonesCheckInput">Headphones</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="Case" v-model="selectedAcc"
-                                id="caseCheckInput" />
-                            <label class="form-check-label" for="caseCheckInput">Case</label>
-                        </div>
-                    </div>
+                    <label for="deployment_remarks" class="form-label">Remarks</label>
+                    <textarea v-model="issueform.remarks" id="deployment_remarks" class="form-control"
+                        rows="3"></textarea>
                 </div>
 
-                <div class="mb-3">
-                    <label for="issued_accessories_summary" class="form-label">Other / All Accessories (Summary)</label>
-                    <textarea id="issued_accessories_summary" v-model="form.issued_accessories" class="form-control"
-                        rows="2" placeholder="e.g. Charger, USB-C Cable"></textarea>
-                </div>
-            </issueform>
+            </form>
         </template>
 
         <template #footer>
