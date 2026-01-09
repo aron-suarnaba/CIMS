@@ -1,14 +1,14 @@
 <script setup>
 import { ref } from 'vue';
+import { Link } from '@inertiajs/vue3';
 
 const title = ref('CIMS');
 import logo from '/public/img/logo.png';
-const AssetInventoryManagement = ref(route('AssetAndInventoryManagement'));
 </script>
 
 <template>
     <aside
-        class="app-sidebar bg-secondary-subtle clickable-card shadow"
+        class="app-sidebar bg-secondary-subtle shadow"
         data-bs-theme="light"
     >
         <div class="sidebar-brand">
@@ -49,24 +49,23 @@ const AssetInventoryManagement = ref(route('AssetAndInventoryManagement'));
                         id="navigation"
                     >
                         <li class="nav-item">
-                            <a href="#" class="nav-link">
+                            <Link :href="route('dashboard')" class="nav-link">
                                 <i class="nav-icon bi bi-speedometer"></i>
                                 <p>Dashboard</p>
-                            </a>
+                            </Link>
                         </li>
                         <li class="nav-item">
-                            <a
-                                v-bind:href="AssetInventoryManagement"
+                            <Link
+                                :href="route('AssetAndInventoryManagement')"
                                 class="nav-link"
                             >
                                 <i class="bi bi-pc-display"></i>
                                 <p>
                                     Assets & Inventory Management
-                                    <i class="bi bi-chevron-left right"></i>
                                 </p>
-                            </a>
+                            </Link>
                         </li>
-                        <li class="nav-item">
+                        <!-- <li class="nav-item">
                             <a href="#" class="nav-link">
                                 <i class="bi bi-router-fill"></i>
                                 <p>Network Monitoring & Management</p>
@@ -113,7 +112,7 @@ const AssetInventoryManagement = ref(route('AssetAndInventoryManagement'));
                                 <i class="bi bi-person-circle"></i>
                                 <p>User & Access Management</p>
                             </a>
-                        </li>
+                        </li> -->
                     </ul>
                 </nav>
             </div>

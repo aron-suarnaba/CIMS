@@ -1,18 +1,22 @@
 <script setup>
 import { ref } from 'vue';
+import { Link } from '@inertiajs/vue3';
 
-const logo = ref('./img/logo.png');
-const HomePath = ref(route('welcome'));
-const LoginPath = ref(route('login'));
+// Use absolute paths for images in Laravel public folder
+const logo = ref('./img/logo.png'); 
+
+// Note: You don't actually need to wrap these in ref() 
+// unless you plan on changing the strings dynamically.
+const HomePath = route('welcome');
+const LoginPath = route('login');
 </script>
+
 <template>
     <div class="app-header">
         <div class="container-fluid">
-            <header
-                class="d-flex justify-content-center mb-4 flex-wrap px-5 pt-4"
-            >
-                <a
-                    href="/"
+            <header class="d-flex justify-content-center mb-4 flex-wrap px-5 pt-4">
+                <Link
+                    :href="HomePath"
                     class="d-flex align-items-center mb-md-0 me-md-auto link-body-emphasis text-decoration-none mb-3"
                 >
                     <img
@@ -22,31 +26,23 @@ const LoginPath = ref(route('login'));
                         class="rounded-circle me-2 shadow"
                     />
                     <span class="fs-4">CIMS</span>
-                </a>
+                </Link>
+
                 <ul class="nav nav-pills">
                     <li class="nav-item">
-                        <a
-                            v-bind:href="HomePath"
+                        <Link
+                            :href="HomePath"
                             class="nav-link active"
                             aria-current="page"
-                            >Home</a
-                        >
+                        >Home</Link>
                     </li>
                     <li class="nav-item">
-                        <a v-bind:href="LoginPath" class="nav-link">Login</a>
+                        <Link :href="LoginPath" class="nav-link">Login</Link>
                     </li>
-                    <li class="nav-item">
-                        <a href="#" class="nav-link">Features</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="#" class="nav-link">Pricing</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="#" class="nav-link">FAQs</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="#" class="nav-link">About</a>
-                    </li>
+                    <li class="nav-item"><a href="#" class="nav-link">Features</a></li>
+                    <li class="nav-item"><a href="#" class="nav-link">Pricing</a></li>
+                    <li class="nav-item"><a href="#" class="nav-link">FAQs</a></li>
+                    <li class="nav-item"><a href="#" class="nav-link">About</a></li>
                 </ul>
             </header>
         </div>
