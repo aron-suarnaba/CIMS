@@ -50,7 +50,7 @@ Route::middleware('auth')->group(function () {
 
             Route::get('/', [ComputersController::class, 'index'])
                 ->name('computer.index');
-
+            Route::get('/{computer}', [ComputersController::class, 'show'])->name('computer.show');
         });
     });
 

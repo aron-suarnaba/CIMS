@@ -71,7 +71,7 @@ const gotoAddComputer = () => {
 };
 
 const gotoComputerDetails = (host_name) => {
-    router.get(route('computer.show', { phone: host_name }));
+    router.get(route('computer.show', { computer: host_name }));
 };
 
 const getComputerImagePath = (computers) => {
@@ -118,14 +118,14 @@ const getComputerImagePath = (computers) => {
                 <div class="col-sm-12 col-md-4 mb-2">
                     <div class="input-group">
                         <label for="AssetSearchInput" class="input-group-text"><i class="bi bi-search"></i></label>
-                        <input id="AssetSearchInput" type="text" class="form-control w-25" placeholder="Search"
+                        <input id="AssetSearchInput" type="text" class="form-control" placeholder="Search"
                             autofocus="false" />
                     </div>
                 </div>
                 <div class="col-sm-12 col-md-4 d-flex justify-content-end gap-2 mb-2">
                     <button type="button" class="btn btn-success bg-gradient" @click.prevent="gotoAddComputer">
                         <i class="bi bi-plus-lg"></i>
-                        Add a phone
+                        Add Workstation
                     </button>
                     <div class="dropdown">
                         <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown"
@@ -153,19 +153,22 @@ const getComputerImagePath = (computers) => {
                     <ListCard @click.prevent="gotoComputerDetails(computers.host_name)">
                         <img :src="getComputerImagePath(computers)" class="img-fluid" style="max-height: 8rem;"
                             :alt="computers.model" />
+
                         <div class="mb-0 gap-0 mt-2">
                             <h4 class="card-title formal-font text-wrap">
-                            {{ computers.model }}
-                        </h4>
-                        <p class="text-muted">{{ computers.department }}</p>
+                                {{ computers.model }}
+                            </h4>
+
+                            <p class="text-muted fw-bold fs-7">
+                                {{ computers.current_transaction?.department || 'Unassigned' }}
+                            </p>
                         </div>
+
                         <span :class="{
-                            'badge bg-success':
-                                computers.status === 'In Storage',
+                            'badge bg-success': computers.status === 'In Storage',
                             'badge bg-warning text-dark': computers.status === 'In Use',
                             'badge bg-info': computers.status === 'In Repair',
-                            'badge bg-dark':
-                                computers.status === 'Retired',
+                            'badge bg-dark': computers.status === 'Retired',
                         }">
                             {{ computers.status }}
                         </span>
