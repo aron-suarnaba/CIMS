@@ -21,7 +21,7 @@ class PhoneTransactionFactory extends Factory
             'date_returned' => $this->faker->date(),
             'returned_by' => $this->faker->name(),
             'returnee_department' => $this->faker->jobTitle(),
-            'remarks' => 'Brand new unit issued.',
+            'cashout' => true,
             'created_at' => now(),
             'updated_at' => now(),
         ];

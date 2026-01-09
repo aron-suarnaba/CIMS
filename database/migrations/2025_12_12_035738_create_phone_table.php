@@ -21,8 +21,8 @@ return new class extends Migration {
             $table->string('rom');
             $table->string('purchase_date')->nullable();
             $table->string('sim_no')->nullable();
-            $table->boolean('cashout');
-            $table->string('status')->default('available'); // available, issued, maintenance
+            $table->string('status')->default('available');
+            $table->string('remarks')->nullable();
             $table->timestamps();
         });
 
@@ -43,6 +43,7 @@ return new class extends Migration {
             $table->text('issued_accessories')->nullable();
             $table->boolean('it_ack_issued')->default(false);
             $table->boolean('purch_ack_issued')->default(false);
+            $table->boolean('cashout')->default(false);
 
             // Return Info (Starts as Null)
             $table->date('date_returned')->nullable();
@@ -53,7 +54,6 @@ return new class extends Migration {
             $table->boolean('it_ack_returned')->default(false);
             $table->boolean('purch_ack_returned')->default(false);
 
-            $table->string('remarks')->nullable();
             $table->timestamps();
         });
     }

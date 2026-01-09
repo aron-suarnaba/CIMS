@@ -135,25 +135,6 @@ const PhoneBrands = ['Apple', 'Honor', 'Oppo', 'Redmi', 'Realme', 'Samsung', 'Te
                                         <input type="text" id="sim_num" v-model="form.sim_no" class="form-control"
                                             placeholder="Enter Sim Number" />
                                     </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label fw-bold d-block text-center"><i
-                                                class="text-danger me-2">*</i>Cashout Status</label>
-
-                                        <div class="d-flex justify-content-center align-items-center gap-3 pt-2">
-                                            <div class="form-check form-check-inline mb-2">
-                                                <input class="form-check-input" type="radio" id="with_cashout" value="1"
-                                                    v-model="form.cashout">
-                                                <label class="form-check-label" for="with_cashout">With Cashout</label>
-                                            </div>
-
-                                            <div class="form-check form-check-inline">
-                                                <input class="form-check-input" type="radio" id="without_cashout"
-                                                    value="0" v-model="form.cashout">
-                                                <label class="form-check-label" for="without_cashout">Without
-                                                    Cashout</label>
-                                            </div>
-                                        </div>
-                                    </div>
                                 </div>
 
                                 <div class="mt-4 text-center">

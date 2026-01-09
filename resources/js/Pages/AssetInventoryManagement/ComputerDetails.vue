@@ -10,6 +10,8 @@ import { ref, watch, computed } from 'vue';
 
 defineOptions({ layout: HomeLayout });
 
+const today = new Date().toLocaleDateString();
+
 const props = defineProps({
     computer: {
         type: Object,
@@ -143,7 +145,7 @@ watch(historySearch, () => {
 
 // Forms
 // Form for Issuance
-const form = useForm({
+const issueform = useForm({
     issued_by: '',
     issued_to: '',
     department: '',
@@ -229,15 +231,15 @@ const returnSubmit = () => {
                                 <button v-if="
                                     props.computer.status === 'In Storage' ||
                                     props.computer.status === 'In Repair' ||
-                                    props.computer.status === 'returned'
+                                    props.computer.status === 'Retired'
                                 " class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#IssueComputerModal">
-                                    <i class="bi bi-person-plus me-1"></i> Issue
-                                    Asset
+                                    <i class="bi bi-person-plus me-1"></i> Deploy
+                                    Workstation
                                 </button>
                                 <button v-else-if="props.computer.status === 'In Use'" class="btn btn-warning"
                                     data-bs-toggle="modal" data-bs-target="#ReturnComputerModal">
                                     <i class="bi bi-arrow-return-left me-1"></i>
-                                    Process Return
+                                    Pullout Workstation
                                 </button>
                             </div>
                         </div>
@@ -247,7 +249,7 @@ const returnSubmit = () => {
 
             <div class="row g-4">
                 <!-- Asset Details -->
-                <div class="col-sm-12 col-xl-3 col-lg-4">
+                <div class="col-sm-12 col-xl-4 col-lg-5">
                     <div class="card border-0 shadow-sm">
                         <div class="card-header bg-dark py-3 text-white">
                             <h5 class="fw-bold mb-0">Device Specifications</h5>
@@ -263,14 +265,11 @@ const returnSubmit = () => {
                                 <span :class="[
                                     'badge mt-2 px-3 py-2',
                                     {
-                                        'bg-success':
-                                            props.computer.status ===
-                                            'available',
-                                        'bg-primary':
-                                            props.computer.status === 'issued',
-                                        'bg-warning text-dark':
-                                            props.computer.status ===
-                                            'returned',
+                                        'badge bg-success': props.computer.status === 'In Storage',
+                                        'badge bg-warning text-dark': props.computer.status === 'In Use',
+                                        'badge bg-info': props.computer.status === 'In Repair',
+                                        'badge bg-danger': props.computer.status === 'Pullout',
+                                        'badge bg-dark': props.computer.status === 'Retired',
                                     },
                                 ]">
                                     Status: {{ props.computer.status }}
@@ -292,7 +291,7 @@ const returnSubmit = () => {
                                 </li>
                                 <li class="list-group-item d-flex justify-content-between">
                                     <span class="text-muted">OS Version</span>
-                                    <span class="font-monospace small">{{
+                                    <span>{{
                                         props.computer.os_version || 'N/A'
                                         }}</span>
                                 </li>
@@ -310,7 +309,7 @@ const returnSubmit = () => {
                                 </li>
                                 <li class="list-group-item d-flex justify-content-between">
                                     <span class="text-muted">CPU</span>
-                                    <span class="font-monospace small">{{
+                                    <span>{{
                                         props.computer.cpu || 'N/A'
                                         }}</span>
                                 </li>
@@ -326,6 +325,12 @@ const returnSubmit = () => {
                                         'N/A'
                                         }}</span>
                                 </li>
+                                <li class="list-group-item d-flex justify-content-between">
+                                    <span class="text-muted">Warranty</span>
+                                    <span>{{ formatDate(props.computer.warranty_expiry) || 'N/A' }}
+                                          {{ props.computer.warranty_expiry >=  today ? '(The warranty is expired)' : '' }}
+                                    </span>
+                                </li>
                             </ul>
                         </div>
                         <div class="card-footer border-0 bg-transparent pb-3 text-center">
@@ -340,11 +345,11 @@ const returnSubmit = () => {
                 </div>
 
                 <!-- Issuance Card -->
-                <div class="col-sm-12 col-xl-9 col-lg-8">
+                <div class="col-sm-12 col-xl-8 col-lg-7">
                     <div class="card mb-4 border-0 shadow-sm">
                         <div class="card-header bg-primary d-flex justify-content-start align-items-center text-white">
                             <i class="bi bi-send-check fs-4 me-3"></i>
-                            <h5 class="fw-bold mb-0">Current Issuance</h5>
+                            <h5 class="fw-bold mb-0">Deployment Asset</h5>
                         </div>
                         <div class="card-body">
                             <div class="row g-3" v-if="
@@ -455,7 +460,7 @@ const returnSubmit = () => {
                     <div class="card mb-4 border-0 shadow-sm">
                         <div class="card-header bg-warning d-flex justify-content-start align-items-center text-dark">
                             <i class="bi bi-reply-fill fs-4 me-2"></i>
-                            <h5 class="fw-bold mb-0">Return Details</h5>
+                            <h5 class="fw-bold mb-0">Pullout Details</h5>
                         </div>
                         <div class="card-body" v-if="props.computer?.status === 'returned'">
                             <div class="row g-3">
@@ -510,61 +515,7 @@ const returnSubmit = () => {
                                     </p>
                                 </div>
 
-                                <div class="col-12 mt-4">
-                                    <div class="bg-light d-flex align-items-center flex-wrap gap-4 rounded p-3">
-                                        <div class="d-flex align-items-center">
-                                            <i class="bi bi-headphones text-primary me-2"></i>
-                                            <strong>Accessories:</strong>
-                                            <span class="text-muted ms-2">{{
-                                                props.phone_transaction
-                                                    ?.returned_accessories ||
-                                                'None'
-                                            }}</span>
-                                        </div>
-                                        <div class="vr d-none d-md-block mx-2"></div>
-                                        <div class="d-flex align-items-center flex-wrap">
-                                            <strong>Acknowledgement:</strong>
 
-                                            <span class="badge ms-2 border text-white" :class="props.phone_transaction
-                                                    ?.it_ack_returned
-                                                    ? 'bg-success'
-                                                    : 'bg-danger'
-                                                ">
-                                                IT:
-                                                {{
-                                                    props.phone_transaction
-                                                        ?.it_ack_returned
-                                                        ? 'Yes'
-                                                        : 'No'
-                                                }}
-                                                <i class="bi ms-1" :class="props.phone_transaction
-                                                        ?.it_ack_returned
-                                                        ? 'bi-check-circle-fill'
-                                                        : 'bi-x-circle-fill'
-                                                    "></i>
-                                            </span>
-
-                                            <span class="badge ms-2 border text-white" :class="props.phone_transaction
-                                                    ?.purch_ack_returned
-                                                    ? 'bg-success'
-                                                    : 'bg-danger'
-                                                ">
-                                                Purchasing:
-                                                {{
-                                                    props.phone_transaction
-                                                        ?.purch_ack_returned
-                                                        ? 'Yes'
-                                                        : 'No'
-                                                }}
-                                                <i class="bi ms-1" :class="props.phone_transaction
-                                                        ?.purch_ack_returned
-                                                        ? 'bi-check-circle-fill'
-                                                        : 'bi-x-circle-fill'
-                                                    "></i>
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
                                 <div class="col-12 mt-4">
                                     <div class="card bg-light border-0 shadow-sm">
                                         <div class="card-body">
@@ -584,7 +535,7 @@ const returnSubmit = () => {
                                 </div>
                             </div>
                         </div>
-                        <div class="card-body bg-light py-5 text-center" v-else-if="props.phone.status === 'issued'">
+                        <div class="card-body bg-light py-5 text-center" v-else-if="props.computer.status === 'In Use'">
                             <span class="fw-bold fs-5 text-dark text-muted mb-1">The asset is currently deploy (not yet
                                 returned).
                             </span>
@@ -790,7 +741,7 @@ const returnSubmit = () => {
     <!-- Issuance Modal -->
     <Modals id="IssueComputerModal" title="Issue Computer Asset" header-class="bg-primary text-white bg-gradient">
         <template #body>
-            <form @submit.prevent="submit" id="issueForm">
+            <issueform @submit.prevent="submit" id="issueForm">
                 <div class="row mb-3">
                     <div class="col-md-6">
                         <label for="issued_to" class="form-label">Issued To</label>
@@ -855,15 +806,15 @@ const returnSubmit = () => {
                     <textarea id="issued_accessories_summary" v-model="form.issued_accessories" class="form-control"
                         rows="2" placeholder="e.g. Charger, USB-C Cable"></textarea>
                 </div>
-            </form>
+            </issueform>
         </template>
 
         <template #footer>
             <button type="button" class="btn btn-light" data-bs-dismiss="modal">
                 Cancel
             </button>
-            <button type="submit" class="btn btn-primary px-4" form="issueForm" :disabled="form.processing">
-                <span v-if="form.processing" class="spinner-border spinner-border-sm me-1"></span>
+            <button type="submit" class="btn btn-primary px-4" form="issueForm" :disabled="issueform.processing">
+                <span v-if="issueform.processing" class="spinner-border spinner-border-sm me-1"></span>
                 Issue Asset
             </button>
         </template>

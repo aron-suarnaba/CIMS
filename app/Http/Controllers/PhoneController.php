@@ -135,7 +135,9 @@ class PhoneController extends Controller
             'issued_by' => 'nullable|string|max:255',
             'issued_accessories' => 'nullable|string',
             'it_ack_issued' => 'required|boolean',
-            'purch_ack_issued' => 'required|boolean', // Ensure this exists in your DB or handle it
+            'purch_ack_issued' => 'required|boolean',
+            'cashout'=> 'required|boolean',
+            'remarks' => 'nullable|string|max:255',
         ]);
 
         // 2. Add the foreign key (serial_num or phone_id)
@@ -144,13 +146,14 @@ class PhoneController extends Controller
         // 3. Create the Transaction
         PhoneTransaction::create($validated);
 
-        // 4. Update the Phone Status
         $phone->update([
-            'status' => 'issued'
+            'status' => 'issued',
+            'remarks' => $validated['remarks'] ?? $phone->remarks,
         ]);
 
         return redirect()->back()->with('success', 'The device has been issued successfully to ' . $validated['issued_to']);
     }
+
     public function return(Request $request, Phone $phone)
     {
         $validated = $request->validate([
@@ -171,7 +174,10 @@ class PhoneController extends Controller
 
         if ($transaction) {
 
-            $phone->update(['status' => 'available']);
+            $phone->update([
+                'status' => 'available',
+                'remarks' => $validated['remarks'] ?? $phone->remarks,
+            ]);
 
             $transaction->update($validated);
 

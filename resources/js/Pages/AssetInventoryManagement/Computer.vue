@@ -168,6 +168,7 @@ const getComputerImagePath = (computers) => {
                             'badge bg-success': computers.status === 'In Storage',
                             'badge bg-warning text-dark': computers.status === 'In Use',
                             'badge bg-info': computers.status === 'In Repair',
+                            'badge bg-danger': computers.status === 'Pullout',
                             'badge bg-dark': computers.status === 'Retired',
                         }">
                             {{ computers.status }}

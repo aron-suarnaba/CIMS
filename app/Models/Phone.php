@@ -35,9 +35,9 @@ class Phone extends Model
         'ram',
         'rom',
         'sim_no',
-        'cashout',
         'purchase_date',
         'status',
+        'remarks',
     ];
 
     /**
