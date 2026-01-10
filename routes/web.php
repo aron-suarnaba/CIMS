@@ -52,6 +52,7 @@ Route::middleware('auth')->group(function () {
             Route::get('/', [ComputersController::class, 'index'])
                 ->name('computer.index');
             Route::get('/{computer}', [ComputersController::class, 'show'])->name('computer.show');
+            Route::post('/{computer}/issue', [ComputersController::class, 'issue'])->name('computer.issue');
         });
     });
 
@@ -59,5 +60,4 @@ Route::middleware('auth')->group(function () {
         return Inertia::render('NetworkMonitoringManagement');
     })->name('NetworkMonitoringAndManagement');
 
-    Route::get('/fortigate/status', [FortigateController::class, 'getSystemStatus']);
 });

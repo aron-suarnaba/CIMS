@@ -156,6 +156,7 @@ const getComputerImagePath = (computers) => {
 
                         <div class="mb-0 gap-0 mt-2">
                             <h4 class="card-title formal-font text-wrap">
+                                {{ computers.manufacturer }}
                                 {{ computers.model }}
                             </h4>
 

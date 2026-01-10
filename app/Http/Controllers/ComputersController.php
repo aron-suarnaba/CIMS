@@ -127,25 +127,23 @@ class ComputersController extends Controller
     public function issue(Request $request, Computers $computer)
     {
         $validated = $request->validate([
-            'issued_to' => 'required|string|max:255',
+            'assigned_user' => 'required|string|max:255',
             'department' => 'required|string|max:255',
             'date_issued' => 'required|date',
-            'issued_by' => 'nullable|string|max:255',
-            'issued_accessories' => 'nullable|string',
-            'it_ack_issued' => 'required|boolean',
-            'purch_ack_issued' => 'required|boolean',
+            'remarks' => 'nullable|string|max:255',
         ]);
 
-        $validated['serial_num'] = $computer->serial_num;
+        $validated['host_name'] = $computer->host_name;
 
         ComputerTransaction::create($validated);
 
         $computer->update([
-            'status' => 'issued',
+            'status' => 'In Use',
+            'remarks' => $validated['remarks'],
         ]);
 
         return redirect()->back()
-            ->with('success', 'The computer has been issued successfully to ' . $validated['issued_to']);
+            ->with('success', 'The computer has been issued successfully to ' . $validated['assigned_user']);
     }
 
     /**

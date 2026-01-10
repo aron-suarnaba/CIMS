@@ -106,9 +106,6 @@ const deleteItem = (host_name) => {
     });
 };
 
-//Declaring selected accessories for issue and return
-const selectedAcc = ref([]);
-const selectedReturnAcc = ref([]);
 
 // Everything about the history table variable declaration
 const historySearch = ref('');
@@ -161,21 +158,12 @@ const returnform = useForm({
     remarks: '',
 });
 
-// Listeners
-
-watch(selectedAcc, (newVal) => {
-    form.issued_accessories = newVal.join(', ');
-});
-watch(selectedReturnAcc, (newVal) => {
-    returnform.returned_accessories = newVal.join(', ');
-});
 
 //Submission
 const submit = () => {
-    form.post(route('computer.issue', props.computer.host_name), {
+    issueform.post(route('computer.issue', props.computer.host_name), {
         onSuccess: () => {
             form.reset();
-            selectedAcc.value = [];
 
             const closeButton = document.querySelector(
                 '#IssueComputerModal [data-bs-dismiss="modal"]',
@@ -461,7 +449,7 @@ const returnSubmit = () => {
                             <h5 class="fw-bold mb-0">Pullout Details</h5>
                         </div>
                         <div class="card-body"
-                            v-if="props.computer?.status === 'In Use' || props.computer?.status === 'In Storage' || props.computer?.status === 'In Repair' || props.computer?.status === 'Retired'">
+                            v-if="props.computer?.status === 'In Storage' || props.computer?.status === 'In Repair' || props.computer?.status === 'Retired'">
                             <div class="row g-3">
                                 <div class="col-md-4 border-end">
                                     <label class="small text-muted text-uppercase fw-bold">Recipient Info</label>
@@ -683,11 +671,11 @@ const returnSubmit = () => {
     <!-- Issuance Modal -->
     <Modals id="IssueComputerModal" title="Deploy Workstation" header-class="bg-primary text-white bg-gradient">
         <template #body>
-            <form @submit.prevent="submit" id="issueForm">
+            <form @submit.prevent="submit" id="deployComputerForm">
                 <div class="row mb-3">
                     <div class="col-md-6">
-                        <label for="issued_to" class="form-label">Issued To</label>
-                        <input type="text" id="issued_to" v-model="issueform.assigned_user" class="form-control"
+                        <label for="assigned_user" class="form-label">Issued To</label>
+                        <input type="text" id="assigned_user" v-model="issueform.assigned_user" class="form-control"
                             required />
                     </div>
                     <div class="col-md-6">
@@ -715,9 +703,9 @@ const returnSubmit = () => {
             <button type="button" class="btn btn-light" data-bs-dismiss="modal">
                 Cancel
             </button>
-            <button type="submit" class="btn btn-primary px-4" form="issueForm" :disabled="issueform.processing">
+            <button type="submit" class="btn btn-primary px-4" form="deployComputerForm" :disabled="issueform.processing">
                 <span v-if="issueform.processing" class="spinner-border spinner-border-sm me-1"></span>
-                Issue Asset
+                Deploy Workstation
             </button>
         </template>
     </Modals>
