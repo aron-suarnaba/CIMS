@@ -64,4 +64,8 @@ Route::middleware('auth')->group(function () {
         return Inertia::render('NetworkMonitoringManagement');
     })->name('NetworkMonitoringAndManagement');
 
+    Route::prefix('NetworkMonitoringManagement')->group(function(){
+        return Inertia::render('Firewall');
+    })->name('firewall.index');
+
 });
