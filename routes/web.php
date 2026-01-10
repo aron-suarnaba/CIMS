@@ -3,6 +3,7 @@
 use App\Http\Controllers\ComputersController;
 use App\Http\Controllers\PhoneController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\FortigateController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -46,7 +47,7 @@ Route::middleware('auth')->group(function () {
         // Route::post('/Phone/Transaction', [PhoneController::class, 'phoneTransStore'])
         //     ->name('phone.trans.store');
 
-        Route::prefix('Computer')->group(function(){
+        Route::prefix('Computer')->group(function () {
 
             Route::get('/', [ComputersController::class, 'index'])
                 ->name('computer.index');
@@ -54,4 +55,9 @@ Route::middleware('auth')->group(function () {
         });
     });
 
+    Route::get('/NetworkMonitoringAndManagement', function () {
+        return Inertia::render('NetworkMonitoringManagement');
+    })->name('NetworkMonitoringAndManagement');
+
+    Route::get('/fortigate/status', [FortigateController::class, 'getSystemStatus']);
 });

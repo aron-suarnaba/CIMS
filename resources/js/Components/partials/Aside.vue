@@ -65,12 +65,13 @@ import logo from '/public/img/logo.png';
                                 </p>
                             </Link>
                         </li>
-                        <!-- <li class="nav-item">
-                            <a href="#" class="nav-link">
+                        <li class="nav-item">
+                            <Link :href="route('NetworkMonitoringAndManagement')" class="nav-link">
                                 <i class="bi bi-router-fill"></i>
                                 <p>Network Monitoring & Management</p>
-                            </a>
+                            </Link>
                         </li>
+                        <!--
                         <li class="nav-item">
                             <a href="#" class="nav-link">
                                 <i class="bi bi-database-fill"></i>
