@@ -139,7 +139,7 @@ class ComputersController extends Controller
 
         $computer->update([
             'status' => 'In Use',
-            'remarks' => $validated['remarks'],
+            'remarks' => $validated['remarks'] ?? $computer->remarks,
         ]);
 
         return redirect()->back()
@@ -152,23 +152,21 @@ class ComputersController extends Controller
     public function return(Request $request, Computers $computer)
     {
         $validated = $request->validate([
-            'returned_to' => 'required|string|max:255',
-            'returned_by' => 'required|string|max:255',
-            'returnee_department' => 'required|string|max:255',
-            'date_returned' => 'required|date',
-            'returned_accessories' => 'nullable|string',
-            'it_ack_returned' => 'required|boolean',
-            'purch_ack_returned' => 'required|boolean',
+            'pullout_reason' => 'required|string|max:255',
+            'pullout_date' => 'required|date',
             'remarks' => 'nullable|string|max:255',
         ]);
 
-        $transaction = ComputerTransaction::where('serial_num', $computer->serial_num)
-            ->whereNull('date_returned')
+        $transaction = ComputerTransaction::where('host_name', $computer->host_name)
+            ->whereNull('pullout_date')
             ->latest()
             ->first();
 
         if ($transaction) {
-            $computer->update(['status' => 'available']);
+            $computer->update([
+                'status' => $validated['pullout_reason'],
+                'remarks' => $validated['remarks'],
+        ]);
             $transaction->update($validated);
 
             return redirect()->back()->with('success', 'The computer has been returned successfully.');

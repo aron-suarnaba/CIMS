@@ -52,7 +52,11 @@ Route::middleware('auth')->group(function () {
             Route::get('/', [ComputersController::class, 'index'])
                 ->name('computer.index');
             Route::get('/{computer}', [ComputersController::class, 'show'])->name('computer.show');
+
             Route::post('/{computer}/issue', [ComputersController::class, 'issue'])->name('computer.issue');
+            Route::post('/{computer}/return', [ComputersController::class, 'return'])->name('computer.return');
+            Route::delete('/{computer:host_name}', [ComputersController::class, 'destroy'])->name('computer.destroy');
+
         });
     });
 

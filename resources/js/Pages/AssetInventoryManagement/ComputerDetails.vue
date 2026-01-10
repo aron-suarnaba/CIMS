@@ -151,10 +151,8 @@ const issueform = useForm({
 
 // Form for return
 const returnform = useForm({
-    returned_by: '',
-    returned_to: '',
-    returnee_department: '',
-    date_returned: new Date().toISOString().substr(0, 10),
+    pullout_reason: '',
+    pullout_date: new Date().toISOString().substr(0, 10),
     remarks: '',
 });
 
@@ -163,7 +161,7 @@ const returnform = useForm({
 const submit = () => {
     issueform.post(route('computer.issue', props.computer.host_name), {
         onSuccess: () => {
-            form.reset();
+            issueform.reset();
 
             const closeButton = document.querySelector(
                 '#IssueComputerModal [data-bs-dismiss="modal"]',
@@ -178,7 +176,6 @@ const returnSubmit = () => {
     returnform.post(route('computer.return', props.computer.host_name), {
         onSuccess: () => {
             returnform.reset();
-            selectedReturnAcc.value = [];
 
             const closeButton = document.querySelector(
                 '#ReturnComputerModal [data-bs-dismiss="modal"]',
@@ -313,14 +310,14 @@ const returnSubmit = () => {
                                 </li>
                                 <li class="list-group-item d-flex justify-content-between gap-2 align-items-center">
                                     <span class="text-muted">Remarks</span>
-                                    <span class="p-2 container-fluid">{{ props.computer.remarks || 'N/A' }}
+                                    <span class="p-2 container-fluid text-end">{{ props.computer.remarks || 'N/A' }}
                                     </span>
                                 </li>
                             </ul>
                         </div>
                         <div class="card-footer border-0 bg-transparent pb-3 text-center">
                             <button class="btn btn-outline-danger btn-sm w-100" @click.prevent="
-                                deleteItem(props.computer.host_name || props.computer.serial_num || props.computer.serial_number)
+                                deleteItem(props.computer.host_name)
                                 ">
                                 <i class="bi bi-trash me-1"></i> Delete Asset
                                 Record
@@ -544,12 +541,9 @@ const returnSubmit = () => {
                                 <table class="table-hover mb-0 table align-middle">
                                     <thead class="table-light">
                                         <tr class="fs-7 text-uppercase text-muted border-top-0">
-                                            <th class="ps-3" scope="col">
-                                                Date Issued
-                                            </th>
+                                            <th scope="col">Deployment Date</th>
                                             <th scope="col">Deploy To</th>
                                             <th scope="col">Department</th>
-                                            <th scope="col">Deployment Date</th>
                                             <th scope="col">
                                                 Date Pullout
                                             </th>
@@ -581,16 +575,16 @@ const returnSubmit = () => {
 
                                             <td>
                                                 <div class="fw-bold text-dark">
-                                                    {{ tx.pullout_date }}
+                                                    {{ formatDate(tx.pullout_date) }}
                                                 </div>
                                             </td>
 
-                                            <td class="small text-wrap">
-                                                {{
-                                                    tx.issued_accessories ||
-                                                    '—'
-                                                }}
+                                            <td>
+                                                <div class="fw-bold text-dark">
+                                                    {{ tx.pullout_reason }}
+                                                </div>
                                             </td>
+
 
 
                                         </tr>
@@ -703,7 +697,8 @@ const returnSubmit = () => {
             <button type="button" class="btn btn-light" data-bs-dismiss="modal">
                 Cancel
             </button>
-            <button type="submit" class="btn btn-primary px-4" form="deployComputerForm" :disabled="issueform.processing">
+            <button type="submit" class="btn btn-primary px-4" form="deployComputerForm"
+                :disabled="issueform.processing">
                 <span v-if="issueform.processing" class="spinner-border spinner-border-sm me-1"></span>
                 Deploy Workstation
             </button>
@@ -714,73 +709,21 @@ const returnSubmit = () => {
     <Modals id="ReturnComputerModal" title="Return Computer Asset" header-class="bg-warning text-white bg-gradient">
         <template #body>
             <form @submit.prevent="returnSubmit" id="returnForm">
-                <div class="row mb-3">
-                    <div class="col-sm-12 col-md-6">
-                        <label for="returned_to" class="form-label">Returned To</label>
-                        <input type="text" class="form-control" id="returned_to" v-model="returnform.returned_to" />
-                    </div>
-                    <div class="col-sm-12 col-md-6">
-                        <label for="date_returned" class="form-label">Date Returned</label>
-                        <input type="date" id="date_returned" v-model="returnform.date_returned" class="form-control"
-                            required />
-                    </div>
+                <div class="mb-3">
+                    <label for="pullout_reason" class="form-label">Pullout Reason</label>
+                    <select v-model="returnform.pullout_reason" id="pullout_reason" class="form-select">
+                        <option selected disabled>Select an option</option>
+                        <option value="In Repair">For Repair</option>
+                        <option value="In Storage">Dispose to Storage</option>
+                        <option value="Retired">Workstation Retirement</option>
+                    </select>
                 </div>
-                <div class="row d-flex justify-content-center mb-3">
-                    <div class="col-sm-12 col-md-6">
-                        <label for="returned_by" class="form-label">Returned By</label>
-                        <input type="text" id="returned_by" v-model="returnform.returned_by" class="form-control"
-                            required />
-                    </div>
-                    <div class="col-sm-12 col-md-6">
-                        <label for="returnee_department" class="form-label">Department</label>
-                        <input type="text" id="returnee_department" v-model="returnform.returnee_department"
-                            class="form-control" required />
-                    </div>
+                <div class="mb-3">
+                    <label for="date_returned" class="form-label">Date</label>
+                    <input type="date" id="date_returned" v-model="returnform.pullout_date" class="form-control"
+                        required />
                 </div>
 
-                <div class="mb-3">
-                    <label class="form-label">Acknowledgement</label>
-                    <div class="d-flex justify-content-around align-items-center g-2 rounded border p-2">
-                        <div class="form-check">
-                            <input type="checkbox" v-model="returnform.it_ack_returned" id="ITReturnAcknowledgement"
-                                class="form-check-input" />
-                            <label for="ITReturnAcknowledgement" class="form-check-label">IT</label>
-                        </div>
-                        <div class="form-check">
-                            <input type="checkbox" v-model="returnform.purch_ack_returned"
-                                id="PurchReturnAcknowledgement" class="form-check-input" />
-                            <label for="PurchReturnAcknowledgement" class="form-check-label">Purchasing</label>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label">Select Accessories</label>
-                    <div class="d-flex justify-content-around align-items-center rounded border p-2">
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="Charger" v-model="selectedReturnAcc"
-                                id="chargerReturnCheckInput" />
-                            <label class="form-check-label" for="chargerReturnCheckInput">Charger</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="Headphones"
-                                v-model="selectedReturnAcc" id="headphonesReturnCheckInput" />
-                            <label class="form-check-label" for="headphonesReturnCheckInput">Headphones</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="Case" v-model="selectedReturnAcc"
-                                id="caseReturnCheckInput" />
-                            <label class="form-check-label" for="caseReturnCheckInput">Case</label>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="mb-3">
-                    <label for="returned_accessories_summary" class="form-label">Other / All Accessories
-                        (Summary)</label>
-                    <input type="text" id="returned_accessories_summary" v-model="returnform.returned_accessories"
-                        class="form-control" placeholder="e.g. Charger, USB-C Cable" />
-                </div>
 
                 <div class="mb-3">
                     <label for="remarksTextarea" class="form-label">Remarks</label>
