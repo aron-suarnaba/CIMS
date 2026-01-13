@@ -66,7 +66,7 @@ import logo from '/public/img/logo.png';
                             </Link>
                         </li>
                         <li class="nav-item">
-                            <Link :href="route('NetworkMonitoringAndManagement')" class="nav-link">
+                            <Link :href="route('network.index')" class="nav-link">
                                 <i class="bi bi-router-fill"></i>
                                 <p>Network Monitoring & Management</p>
                             </Link>

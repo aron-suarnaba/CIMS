@@ -4,6 +4,7 @@ use App\Http\Controllers\ComputersController;
 use App\Http\Controllers\PhoneController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\FortigateController;
+use App\Http\Controllers\NetworkMonitoringController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -31,7 +32,7 @@ Route::middleware('auth')->group(function () {
         })->name('AssetAndInventoryManagement');
 
         // Phone Routes
-        Route::prefix('phone')->group(function () {
+        Route::prefix('Phone')->group(function () {
             Route::get('/', [PhoneController::class, 'index'])->name('phone.index');
             Route::get('/create', [PhoneController::class, 'create'])->name('phone.create');
             Route::post('/', [PhoneController::class, 'store'])->name('phone.store');
@@ -60,12 +61,12 @@ Route::middleware('auth')->group(function () {
         });
     });
 
-    Route::get('/NetworkMonitoringAndManagement', function () {
-        return Inertia::render('NetworkMonitoringManagement');
-    })->name('NetworkMonitoringAndManagement');
+    Route::get('/NetworkMonitoringAndManagement', [NetworkMonitoringController::class, 'index'])->name('network.index');
 
     Route::prefix('NetworkMonitoringManagement')->group(function(){
-        return Inertia::render('Firewall');
-    })->name('firewall.index');
+        Route::get('/', function(){
+            return Inertia::render('NetworkMonitoringManagement/Firewall');
+        })->name('firewall.index');
+    });
 
 });

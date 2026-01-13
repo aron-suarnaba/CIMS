@@ -9,6 +9,7 @@
     },
     "devDependencies": {
         "@inertiajs/vue3": "^2.0.0",
+        "@laravel/echo-vue": "^2.2.7",
         "@rushstack/eslint-patch": "^1.8.0",
         "@tailwindcss/forms": "^0.5.3",
         "@tailwindcss/vite": "^4.0.0",
@@ -19,11 +20,13 @@
         "concurrently": "^9.0.1",
         "eslint": "^8.57.0",
         "eslint-plugin-vue": "^9.23.0",
+        "laravel-echo": "^2.2.7",
         "laravel-vite-plugin": "^2.0.0",
         "postcss": "^8.4.31",
         "prettier": "^3.3.0",
         "prettier-plugin-organize-imports": "^4.0.0",
         "prettier-plugin-tailwindcss": "^0.6.5",
+        "pusher-js": "^8.4.0",
         "tailwindcss": "^3.2.1",
         "vite": "^7.0.7",
         "vue": "^3.4.0"
@@ -31,10 +34,12 @@
     "dependencies": {
         "@popperjs/core": "^2.11.8",
         "admin-lte": "^4.0.0-rc4",
+        "apexcharts": "^5.3.6",
         "bootstrap": "^5.3.8",
         "bootstrap-icons": "^1.13.1",
         "overlayscrollbars": "^2.13.0",
         "sweetalert2": "^11.26.17",
-        "vue": "^3.5.25"
+        "vue": "^3.5.25",
+        "vue3-apexcharts": "^1.10.0"
     }
 }
