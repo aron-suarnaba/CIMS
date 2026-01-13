@@ -5,6 +5,8 @@ import BackButton from '@/Components/BackButton.vue';
 import Breadcrumb from '@/Components/Breadcrumb.vue';
 import { router } from '@inertiajs/vue3';
 import { ref } from 'vue';
+import Modals from '@/Components/Modals.vue';
+import { useForm } from '@inertiajs/vue3';
 
 defineOptions({ layout: HomeLayout });
 
@@ -66,9 +68,6 @@ const applyFilter = (brand = filterBrand.value, sort = currentSort.value) => {
         },
     );
 };
-const gotoAddComputer = () => {
-    router.get(route('computer.create'));
-};
 
 const gotoComputerDetails = (host_name) => {
     router.get(route('computer.show', { computer: host_name }));
@@ -99,6 +98,23 @@ const getComputerImagePath = (computers) => {
 
     return defaultPath;
 };
+
+const addForm = useForm({
+    host_name: '',
+    serial_number: '',
+    manufacturer: '',
+    model: '',
+    os_version: '',
+    cpu: '',
+    ram_gb: '',
+    storage_gb: '',
+    mac_address: '',
+    ip_address: '',
+    purchase_date: '',
+    po_number: '',
+    warranty_expiry: '',
+    remarks: '',
+});
 </script>
 
 <template>
@@ -123,7 +139,8 @@ const getComputerImagePath = (computers) => {
                     </div>
                 </div>
                 <div class="col-sm-12 col-md-4 d-flex justify-content-end gap-2 mb-2">
-                    <button type="button" class="btn btn-success bg-gradient" @click.prevent="gotoAddComputer">
+                    <button type="button" class="btn btn-success bg-gradient" data-bs-toggle="modal"
+                        data-bs-target="#AddComputerModals">
                         <i class="bi bi-plus-lg"></i>
                         Add Workstation
                     </button>
@@ -202,4 +219,80 @@ const getComputerImagePath = (computers) => {
             </nav>
         </div>
     </div>
+
+    <Modals id="AddComputerModals" title="Add new workstation" header-class="bg-success text-white bg-gradient">
+        <template #body>
+            <form>
+                <div class="row mb-3 d-flex align-items-center">
+                    <div class="col-sm-12 col-md-6">
+                        <label for="modelInput" class="form-label">Model</label>
+                        <input type="text" id="modelInput" v-model="addForm.model" class="form-control" required />
+                    </div>
+                    <div class="col-sm-12 col-md-6">
+                        <label for="manufacturerInput" class="form-label">Manufacturer</label>
+                        <input type="text" id="manufacturerInput" v-model="addForm.manufacturer" class="form-control" required />
+                    </div>
+                </div>
+                <div class="row mb-3 d-flex align-items-center">
+                    <div class="col-sm-12 col-md-6">
+                        <label for="hostNameInput" class="form-label">Host Name</label>
+                        <input type="text" id="hostNameInput" v-model="addForm.host_name" class="form-control" required />
+                    </div>
+                    <div class="col-sm-12 col-md-6">
+                        <label for="serialNumInput" class="form-label">Serial Number</label>
+                        <input type="text" id="serialNumInput" v-model="addForm.serial_number" class="form-control" required />
+                    </div>
+                </div>
+                <div class="row mb-3 d-flex align-items-center">
+                    <div class="col-sm-12 col-md-6">
+                        <label for="osInput" class="form-label">OS Version</label>
+                        <input type="text" id="osInput" v-model="addForm.os_version" class="form-control" required />
+                    </div>
+                    <div class="col-sm-12 col-md-6">
+                        <label for="cpuInput" class="form-label">CPU</label>
+                        <input type="text" id="cpuInput" v-model="addForm.cpu" class="form-control" required />
+                    </div>
+                </div>
+
+                <div class="row mb-3 d-flex align-items-center">
+                    <div class="col-sm-12 col-md-6">
+                        <label for="ramInput" class="form-label">RAM</label>
+                        <input type="text" id="ramInput" v-model="addForm.ram_gb" class="form-control" required />
+                    </div>
+                    <div class="col-sm-12 col-md-6">
+                        <label for="romInput" class="form-label">ROM</label>
+                        <input type="text" id="romInput" v-model="addForm.storage_gb" class="form-control" required />
+                    </div>
+                </div>
+
+                <div class="row mb-3 d-flex align-items-center">
+                    <div class="col-sm-12 col-md-6">
+                        <label for="macInput" class="form-label">Mac Address</label>
+                        <input type="text" id="macInput" v-model="addForm.mac_address" class="form-control" required />
+                    </div>
+                    <div class="col-sm-12 col-md-6">
+                        <label for="ipInput" class="form-label">IP Address</label>
+                        <input type="text" id="ipInput" v-model="addForm.ip_address" class="form-control" required />
+                    </div>
+                </div>
+
+                <div class="row mb-3 d-flex align-items-center">
+                    <div class="col-sm-12 col-md-6">
+                        <label for="purchaseDate" class="form-label">Purchase Date</label>
+                        <input type="date" id="purchaseDate" v-model="addForm.purchase_date" class="form-control" required />
+                    </div>
+                    <div class="col-sm-12 col-md-6">
+                        <label for="warrantyDate" class="form-label">Warranty Expiry</label>
+                        <input type="date" id="warrantyDate" v-model="addForm.warranty_expiry" class="form-control" required />
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="modelInput" class="form-label">Remarks</label>
+                    <textarea id="modelInput" v-model="addForm.remarks" class="form-control" rows="3"></textarea>
+                </div>
+
+            </form>
+        </template>
+    </Modals>
 </template>

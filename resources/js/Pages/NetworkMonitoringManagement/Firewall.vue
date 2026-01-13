@@ -2,6 +2,8 @@
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
 import HomeLayout from '@/Layouts/HomeLayout.vue';
+import { router } from '@inertiajs/vue3';
+import BackButton from '@/Components/BackButton.vue';
 
 defineOptions({
     layout: HomeLayout,
@@ -40,6 +42,11 @@ const myBreadcrumb = [
     </div>
     <div class="app-content">
         <div class="container">
+            <div class="row mb-5">
+                <div class="col-sm-12 col-md-4 mb-2">
+                    <BackButton @click.prevent="router.get(route('network.index'))" />
+                </div>
+            </div>
             <div class="p-6">
                 <div class="card shadow-lg">
                     <div class="card-header bg-primary text-white d-flex justify-content-between">
