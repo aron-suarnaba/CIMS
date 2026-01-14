@@ -9,6 +9,14 @@ use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
+
+    public function index(User $user)
+    {
+        return Inertia::render('UserProfile', [
+            'user' => $user
+        ]);
+    }
+
     public function store(Request $request)
     {
         $credentials = $request->validate([
@@ -23,7 +31,8 @@ class UserController extends Controller
         }
 
         return back()->withErrors([
-            'email' => 'The provided credentials do not match our records.'
+            'email' => 'The provided email do not match our records.',
+            'password' => 'The provided password do not match our records.',
         ])->onlyInput('email');
 
     }

@@ -10,7 +10,7 @@ import Footer from '@/Components/partials/Footer.vue';
 
         <Sidebar />
 
-        <main class="app-main" id="main">
+        <main class="app-main bg-body-tertiary" id="main">
             <slot />
         </main>
 

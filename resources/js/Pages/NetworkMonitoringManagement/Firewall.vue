@@ -21,17 +21,16 @@ const fetchDevices = async () => {
             deviceList.value = response.data.results;
         }
     } catch (error) {
-        console.error("Failed:", error);
+        console.error('Failed:', error);
     }
 };
 
 onMounted(fetchDevices);
 
 const myBreadcrumb = [
-    { label : 'Home', url : route('dashboard') },
-    { label : 'Network' },
+    { label: 'Home', url: route('dashboard') },
+    { label: 'Network' },
 ];
-
 </script>
 
 <template>
@@ -44,17 +43,23 @@ const myBreadcrumb = [
         <div class="container">
             <div class="row mb-5">
                 <div class="col-sm-12 col-md-4 mb-2">
-                    <BackButton @click.prevent="router.get(route('network.index'))" />
+                    <BackButton
+                        @click.prevent="router.get(route('network.index'))"
+                    />
                 </div>
             </div>
             <div class="p-6">
                 <div class="card shadow-lg">
-                    <div class="card-header bg-primary text-white d-flex justify-content-between">
+                    <div
+                        class="card-header bg-primary d-flex justify-content-between text-white"
+                    >
                         <h5 class="mb-0">Network Device Inventory</h5>
-                        <span class="badge bg-light text-dark">{{ deviceList.length }} Devices Found</span>
+                        <span class="badge bg-light text-dark"
+                            >{{ deviceList.length }} Devices Found</span
+                        >
                     </div>
                     <div class="card-body">
-                        <table class="table table-hover">
+                        <table class="table-hover table">
                             <thead>
                                 <tr>
                                     <th>Device / Hostname</th>
@@ -65,17 +70,34 @@ const myBreadcrumb = [
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr v-for="device in deviceList" :key="device.mac">
+                                <tr
+                                    v-for="device in deviceList"
+                                    :key="device.mac"
+                                >
                                     <td>
                                         <i class="bi bi-laptop me-2"></i>
-                                        <strong>{{ device.hostname || device.alias || 'Unnamed Device' }}</strong>
+                                        <strong>{{
+                                            device.hostname ||
+                                            device.alias ||
+                                            'Unnamed Device'
+                                        }}</strong>
                                     </td>
                                     <td>{{ device.ipv4_address }}</td>
-                                    <td><code>{{ device.mac }}</code></td>
-                                    <td>{{ device.hardware_vendor || 'Unknown Vendor' }}</td>
+                                    <td>
+                                        <code>{{ device.mac }}</code>
+                                    </td>
+                                    <td>
+                                        {{
+                                            device.hardware_vendor ||
+                                            'Unknown Vendor'
+                                        }}
+                                    </td>
                                     <td>
                                         <span class="badge bg-info text-dark">
-                                            {{ device.os_name || 'Network Device' }}
+                                            {{
+                                                device.os_name ||
+                                                'Network Device'
+                                            }}
                                         </span>
                                     </td>
                                 </tr>

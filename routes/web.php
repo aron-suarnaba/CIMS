@@ -21,6 +21,8 @@ Route::post('/logout', [UserController::class, 'logout'])->name('logout');
 
 Route::middleware('auth')->group(function () {
 
+    Route::get('/user/{userid}', [UserController::class, 'index'])->name('user.index');
+
     Route::get('/Home', function () {
         return Inertia::render('Home');
     })->name('dashboard');
