@@ -15,7 +15,6 @@ const props = defineProps({
         type: Object,
         required: true,
     },
-
 });
 
 const gotoPage = (url) => {
@@ -81,14 +80,7 @@ const getComputerImagePath = (computers) => {
     const brand = computers.manufacturer.toLowerCase();
 
     // Define your supported brands
-    const supportedBrands = [
-        'dell',
-        'hp',
-        'lenovo',
-        'apple',
-        'asus',
-        'acer',
-    ];
+    const supportedBrands = ['dell', 'hp', 'lenovo', 'apple', 'asus', 'acer'];
 
     const matched = supportedBrands.find((b) => brand.includes(b));
 
@@ -125,37 +117,64 @@ const addForm = useForm({
     </div>
     <div class="app-content">
         <div class="container">
-            <div class="row mb-3 d-flex flex-wrap justify-content-center g-2">
+            <div class="row d-flex justify-content-center g-2 mb-3 flex-wrap">
                 <div class="col-sm-12 col-md-4 mb-2">
-                    <BackButton @click.prevent="
-                        router.get(route('AssetAndInventoryManagement'))
-                        " />
+                    <BackButton
+                        @click.prevent="
+                            router.get(route('AssetAndInventoryManagement'))
+                        "
+                    />
                 </div>
                 <div class="col-sm-12 col-md-4 mb-2">
                     <div class="input-group">
-                        <label for="AssetSearchInput" class="input-group-text"><i class="bi bi-search"></i></label>
-                        <input id="AssetSearchInput" type="text" class="form-control" placeholder="Search"
-                            autofocus="false" />
+                        <label for="AssetSearchInput" class="input-group-text"
+                            ><i class="bi bi-search"></i
+                        ></label>
+                        <input
+                            id="AssetSearchInput"
+                            type="text"
+                            class="form-control"
+                            placeholder="Search"
+                            autofocus="false"
+                        />
                     </div>
                 </div>
-                <div class="col-sm-12 col-md-4 d-flex justify-content-end gap-2 mb-2">
-                    <button type="button" class="btn btn-success bg-gradient" data-bs-toggle="modal"
-                        data-bs-target="#AddComputerModals">
+                <div
+                    class="col-sm-12 col-md-4 d-flex justify-content-end mb-2 gap-2"
+                >
+                    <button
+                        type="button"
+                        class="btn btn-success bg-gradient"
+                        data-bs-toggle="modal"
+                        data-bs-target="#AddComputerModals"
+                    >
                         <i class="bi bi-plus-lg"></i>
                         Add Workstation
                     </button>
                     <div class="dropdown">
-                        <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown"
-                            aria-expanded="false">
+                        <button
+                            type="button"
+                            class="btn btn-secondary dropdown-toggle"
+                            data-bs-toggle="dropdown"
+                            aria-expanded="false"
+                        >
                             <i class="bi bi-funnel"></i>
                         </button>
                         <ul class="dropdown-menu">
-                            <li v-for="option in sortOption" :key="option.value">
-                                <a href="#" class="dropdown-item" @click.prevent="
-                                    applyFilter(filterBrand, option.value)
-                                    " :class="{
+                            <li
+                                v-for="option in sortOption"
+                                :key="option.value"
+                            >
+                                <a
+                                    href="#"
+                                    class="dropdown-item"
+                                    @click.prevent="
+                                        applyFilter(filterBrand, option.value)
+                                    "
+                                    :class="{
                                         active: currentSort === option.value,
-                                    }">
+                                    }"
+                                >
                                     Sort by: {{ option.label }}
                                 </a>
                             </li>
@@ -165,133 +184,268 @@ const addForm = useForm({
             </div>
 
             <div class="row justify-content-start mb-3 mt-5 px-5">
-                <div class="col-sm-12 col-md-2 col-xl-2 d-flex justify-content-center mb-4"
-                    v-for="computers in props.computers.data" :key="computers.id">
-                    <ListCard @click.prevent="gotoComputerDetails(computers.host_name)">
-                        <img :src="getComputerImagePath(computers)" class="img-fluid" style="max-height: 8rem;"
-                            :alt="computers.model" />
+                <div
+                    class="col-sm-12 col-md-2 col-xl-2 d-flex justify-content-center mb-4"
+                    v-for="computers in props.computers.data"
+                    :key="computers.id"
+                >
+                    <ListCard
+                        @click.prevent="
+                            gotoComputerDetails(computers.host_name)
+                        "
+                    >
+                        <img
+                            :src="getComputerImagePath(computers)"
+                            class="img-fluid"
+                            style="max-height: 8rem"
+                            :alt="computers.model"
+                        />
 
-                        <div class="mb-0 gap-0 mt-2">
+                        <div class="mb-0 mt-2 gap-0">
                             <h4 class="card-title formal-font text-wrap">
                                 {{ computers.manufacturer }}
                                 {{ computers.model }}
                             </h4>
 
                             <p class="text-muted fw-bold fs-7">
-                                {{ computers.current_transaction?.department || 'Unassigned' }}
+                                {{
+                                    computers.current_transaction?.department ||
+                                    'Unassigned'
+                                }}
                             </p>
                         </div>
 
-                        <span :class="{
-                            'badge bg-success': computers.status === 'In Storage',
-                            'badge bg-warning text-dark': computers.status === 'In Use',
-                            'badge bg-info': computers.status === 'In Repair',
-                            'badge bg-danger': computers.status === 'Pullout',
-                            'badge bg-dark': computers.status === 'Retired',
-                        }">
+                        <span
+                            :class="{
+                                'badge bg-success':
+                                    computers.status === 'In Storage',
+                                'badge bg-warning text-dark':
+                                    computers.status === 'In Use',
+                                'badge bg-info':
+                                    computers.status === 'In Repair',
+                                'badge bg-danger':
+                                    computers.status === 'Pullout',
+                                'badge bg-dark': computers.status === 'Retired',
+                            }"
+                        >
                             {{ computers.status }}
                         </span>
                     </ListCard>
                 </div>
 
-                <div v-if="props.computers.data && props.computers.data.length === 0" class="col-12">
+                <div
+                    v-if="
+                        props.computers.data &&
+                        props.computers.data.length === 0
+                    "
+                    class="col-12"
+                >
                     <p class="text-muted text-center">
                         No computer records found.
                     </p>
                 </div>
             </div>
 
-            <div class="text-muted d-flex justify-content-end align-items-center mb-2">
+            <div
+                class="text-muted d-flex justify-content-end align-items-center mb-2"
+            >
                 {{ props.computers?.from || 0 }} -
                 {{ props.computers?.to || 0 }} of
                 {{ props.computers?.total || 0 }} computers
             </div>
             <nav aria-label="Computer pagination">
-                <ul class="pagination d-flex justify-content-end align-items-center mb-0 gap-2">
-                    <li v-for="(link, index) in props.computers.links" :key="index" class="page-item" :class="{
-                        active: link.active,
-                        disabled: !link.url,
-                    }">
-                        <button class="page-link" @click.prevent="gotoPage(link.url)" v-html="link.label"
-                            :disabled="!link.url"></button>
+                <ul
+                    class="pagination d-flex justify-content-end align-items-center mb-0 gap-2"
+                >
+                    <li
+                        v-for="(link, index) in props.computers.links"
+                        :key="index"
+                        class="page-item"
+                        :class="{
+                            active: link.active,
+                            disabled: !link.url,
+                        }"
+                    >
+                        <button
+                            class="page-link"
+                            @click.prevent="gotoPage(link.url)"
+                            v-html="link.label"
+                            :disabled="!link.url"
+                        ></button>
                     </li>
                 </ul>
             </nav>
         </div>
     </div>
 
-    <Modals id="AddComputerModals" title="Add new workstation" header-class="bg-success text-white bg-gradient">
+    <Modals
+        id="AddComputerModals"
+        title="Add new workstation"
+        header-class="bg-success text-white bg-gradient"
+    >
         <template #body>
             <form>
-                <div class="row mb-3 d-flex align-items-center">
+                <div class="row d-flex align-items-center mb-3">
                     <div class="col-sm-12 col-md-6">
                         <label for="modelInput" class="form-label">Model</label>
-                        <input type="text" id="modelInput" v-model="addForm.model" class="form-control" required />
+                        <input
+                            type="text"
+                            id="modelInput"
+                            v-model="addForm.model"
+                            class="form-control"
+                            required
+                        />
                     </div>
                     <div class="col-sm-12 col-md-6">
-                        <label for="manufacturerInput" class="form-label">Manufacturer</label>
-                        <input type="text" id="manufacturerInput" v-model="addForm.manufacturer" class="form-control" required />
+                        <label for="manufacturerInput" class="form-label"
+                            >Manufacturer</label
+                        >
+                        <input
+                            type="text"
+                            id="manufacturerInput"
+                            v-model="addForm.manufacturer"
+                            class="form-control"
+                            required
+                        />
                     </div>
                 </div>
-                <div class="row mb-3 d-flex align-items-center">
+                <div class="row d-flex align-items-center mb-3">
                     <div class="col-sm-12 col-md-6">
-                        <label for="hostNameInput" class="form-label">Host Name</label>
-                        <input type="text" id="hostNameInput" v-model="addForm.host_name" class="form-control" required />
+                        <label for="hostNameInput" class="form-label"
+                            >Host Name</label
+                        >
+                        <input
+                            type="text"
+                            id="hostNameInput"
+                            v-model="addForm.host_name"
+                            class="form-control"
+                            required
+                        />
                     </div>
                     <div class="col-sm-12 col-md-6">
-                        <label for="serialNumInput" class="form-label">Serial Number</label>
-                        <input type="text" id="serialNumInput" v-model="addForm.serial_number" class="form-control" required />
+                        <label for="serialNumInput" class="form-label"
+                            >Serial Number</label
+                        >
+                        <input
+                            type="text"
+                            id="serialNumInput"
+                            v-model="addForm.serial_number"
+                            class="form-control"
+                            required
+                        />
                     </div>
                 </div>
-                <div class="row mb-3 d-flex align-items-center">
+                <div class="row d-flex align-items-center mb-3">
                     <div class="col-sm-12 col-md-6">
-                        <label for="osInput" class="form-label">OS Version</label>
-                        <input type="text" id="osInput" v-model="addForm.os_version" class="form-control" required />
+                        <label for="osInput" class="form-label"
+                            >OS Version</label
+                        >
+                        <input
+                            type="text"
+                            id="osInput"
+                            v-model="addForm.os_version"
+                            class="form-control"
+                            required
+                        />
                     </div>
                     <div class="col-sm-12 col-md-6">
                         <label for="cpuInput" class="form-label">CPU</label>
-                        <input type="text" id="cpuInput" v-model="addForm.cpu" class="form-control" required />
+                        <input
+                            type="text"
+                            id="cpuInput"
+                            v-model="addForm.cpu"
+                            class="form-control"
+                            required
+                        />
                     </div>
                 </div>
 
-                <div class="row mb-3 d-flex align-items-center">
+                <div class="row d-flex align-items-center mb-3">
                     <div class="col-sm-12 col-md-6">
                         <label for="ramInput" class="form-label">RAM</label>
-                        <input type="text" id="ramInput" v-model="addForm.ram_gb" class="form-control" required />
+                        <input
+                            type="text"
+                            id="ramInput"
+                            v-model="addForm.ram_gb"
+                            class="form-control"
+                            required
+                        />
                     </div>
                     <div class="col-sm-12 col-md-6">
                         <label for="romInput" class="form-label">ROM</label>
-                        <input type="text" id="romInput" v-model="addForm.storage_gb" class="form-control" required />
+                        <input
+                            type="text"
+                            id="romInput"
+                            v-model="addForm.storage_gb"
+                            class="form-control"
+                            required
+                        />
                     </div>
                 </div>
 
-                <div class="row mb-3 d-flex align-items-center">
+                <div class="row d-flex align-items-center mb-3">
                     <div class="col-sm-12 col-md-6">
-                        <label for="macInput" class="form-label">Mac Address</label>
-                        <input type="text" id="macInput" v-model="addForm.mac_address" class="form-control" required />
+                        <label for="macInput" class="form-label"
+                            >Mac Address</label
+                        >
+                        <input
+                            type="text"
+                            id="macInput"
+                            v-model="addForm.mac_address"
+                            class="form-control"
+                            required
+                        />
                     </div>
                     <div class="col-sm-12 col-md-6">
-                        <label for="ipInput" class="form-label">IP Address</label>
-                        <input type="text" id="ipInput" v-model="addForm.ip_address" class="form-control" required />
+                        <label for="ipInput" class="form-label"
+                            >IP Address</label
+                        >
+                        <input
+                            type="text"
+                            id="ipInput"
+                            v-model="addForm.ip_address"
+                            class="form-control"
+                            required
+                        />
                     </div>
                 </div>
 
-                <div class="row mb-3 d-flex align-items-center">
+                <div class="row d-flex align-items-center mb-3">
                     <div class="col-sm-12 col-md-6">
-                        <label for="purchaseDate" class="form-label">Purchase Date</label>
-                        <input type="date" id="purchaseDate" v-model="addForm.purchase_date" class="form-control" required />
+                        <label for="purchaseDate" class="form-label"
+                            >Purchase Date</label
+                        >
+                        <input
+                            type="date"
+                            id="purchaseDate"
+                            v-model="addForm.purchase_date"
+                            class="form-control"
+                            required
+                        />
                     </div>
                     <div class="col-sm-12 col-md-6">
-                        <label for="warrantyDate" class="form-label">Warranty Expiry</label>
-                        <input type="date" id="warrantyDate" v-model="addForm.warranty_expiry" class="form-control" required />
+                        <label for="warrantyDate" class="form-label"
+                            >Warranty Expiry</label
+                        >
+                        <input
+                            type="date"
+                            id="warrantyDate"
+                            v-model="addForm.warranty_expiry"
+                            class="form-control"
+                            required
+                        />
                     </div>
                 </div>
 
                 <div class="mb-3">
                     <label for="modelInput" class="form-label">Remarks</label>
-                    <textarea id="modelInput" v-model="addForm.remarks" class="form-control" rows="3"></textarea>
+                    <textarea
+                        id="modelInput"
+                        v-model="addForm.remarks"
+                        class="form-control"
+                        rows="3"
+                    ></textarea>
                 </div>
-
             </form>
         </template>
     </Modals>

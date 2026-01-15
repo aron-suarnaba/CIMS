@@ -6,6 +6,8 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
+
 
 class UserController extends Controller
 {
@@ -35,6 +37,29 @@ class UserController extends Controller
             'password' => 'The provided password do not match our records.',
         ])->onlyInput('email');
 
+    }
+
+
+    public function update(Request $request)
+    {
+        $user = Auth::user();
+
+        // 1. Validate the incoming data
+        $validated = $request->validate([
+            'first_name' => ['required', 'string', 'max:255'],
+            'last_name' => ['required', 'string', 'max:255'],
+            'employee_id' => ['required', 'string', Rule::unique('users')->ignore($user->id)],
+            'position' => ['nullable', 'string', 'max:255'],
+            'department' => ['nullable', 'string', 'max:255'],
+            'email' => ['required', 'string', 'max:255'],
+            'password' => ['required', 'string', 'max:255'],
+        ]);
+
+        // 2. Update the user
+        $user->update($validated);
+
+        // 3. Redirect back with a success message
+        return redirect()->back()->with('message', 'Profile updated successfully!');
     }
 
     public function logout(Request $request)
