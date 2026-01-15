@@ -3,9 +3,9 @@ import { ref } from 'vue';
 import { Link } from '@inertiajs/vue3';
 
 // Use absolute paths for images in Laravel public folder
-const logo = ref('./img/logo.png'); 
+const logo = ref('./img/logo.png');
 
-// Note: You don't actually need to wrap these in ref() 
+// Note: You don't actually need to wrap these in ref()
 // unless you plan on changing the strings dynamically.
 const HomePath = route('welcome');
 const LoginPath = route('login');
@@ -14,7 +14,9 @@ const LoginPath = route('login');
 <template>
     <div class="app-header">
         <div class="container-fluid">
-            <header class="d-flex justify-content-center mb-4 flex-wrap px-5 pt-4">
+            <header
+                class="d-flex justify-content-center mb-4 flex-wrap px-5 pt-4"
+            >
                 <Link
                     :href="HomePath"
                     class="d-flex align-items-center mb-md-0 me-md-auto link-body-emphasis text-decoration-none mb-3"
@@ -34,15 +36,24 @@ const LoginPath = route('login');
                             :href="HomePath"
                             class="nav-link active"
                             aria-current="page"
-                        >Home</Link>
+                            >Home</Link
+                        >
                     </li>
                     <li class="nav-item">
                         <Link :href="LoginPath" class="nav-link">Login</Link>
                     </li>
-                    <li class="nav-item"><a href="#" class="nav-link">Features</a></li>
-                    <li class="nav-item"><a href="#" class="nav-link">Pricing</a></li>
-                    <li class="nav-item"><a href="#" class="nav-link">FAQs</a></li>
-                    <li class="nav-item"><a href="#" class="nav-link">About</a></li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">Features</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">Pricing</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">FAQs</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">About</a>
+                    </li>
                 </ul>
             </header>
         </div>

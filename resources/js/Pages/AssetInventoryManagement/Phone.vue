@@ -5,6 +5,7 @@ import BackButton from '@/Components/BackButton.vue';
 import Breadcrumb from '@/Components/Breadcrumb.vue';
 import { router } from '@inertiajs/vue3';
 import { ref } from 'vue';
+import Modals from '@/Components/Modals.vue';
 
 defineOptions({ layout: HomeLayout });
 
@@ -29,9 +30,12 @@ const gotoPage = (url) => {
 };
 
 const myBreadcrumb = [
-    { label: 'Home', url: route('dashboard') },
-    { label: 'Inventory', url: route('AssetAndInventoryManagement') },
-    { label: 'Computer Asset' },
+    { label: 'Dashboard', url: route('dashboard') },
+    {
+        label: 'Asset Inventory and Management',
+        url: route('AssetAndInventoryManagement'),
+    },
+    { label: 'Phone Asset' },
 ];
 
 const filterBrand = ref(
@@ -40,6 +44,19 @@ const filterBrand = ref(
 const currentSort = ref(
     new URLSearchParams(window.location.search).get('sort') || 'availability',
 );
+
+const addForm = ref({
+    brand: '',
+    model: '',
+    serial_num: '',
+    imei_one: '',
+    imei_two: '',
+    ram: '',
+    rom: '',
+    purchase_date: '',
+    sim_no: '',
+    remarks: '',
+});
 
 const sortOption = [
     { label: 'Name', value: 'name' },
@@ -64,9 +81,6 @@ const applyFilter = (brand = filterBrand.value, sort = currentSort.value) => {
             replace: true,
         },
     );
-};
-const gotoAddPhone = () => {
-    router.get(route('phone.create'));
 };
 
 const gotoPhoneDetails = (phoneSerialNumber) => {
@@ -115,7 +129,7 @@ const getPhoneImagePath = (phone) => {
     </div>
     <div class="app-content">
         <div class="container">
-            <div class="row mb-3 d-flex flex-wrap justify-content-center g-2">
+            <div class="row d-flex justify-content-center g-2 mb-3 flex-wrap">
                 <div class="col-sm-12 col-md-4 mb-2">
                     <BackButton
                         @click.prevent="
@@ -138,12 +152,13 @@ const getPhoneImagePath = (phone) => {
                     </div>
                 </div>
                 <div
-                    class="col-sm-12 col-md-4 d-flex justify-content-end gap-2 mb-2"
+                    class="col-sm-12 col-md-4 d-flex justify-content-end mb-2 gap-2"
                 >
                     <button
                         type="button"
                         class="btn btn-success bg-gradient"
-                        @click.prevent="gotoAddPhone"
+                        data-bs-toggle="modal"
+                        data-bs-target="#AddPhoneModal"
                     >
                         <i class="bi bi-plus-lg"></i>
                         Add a phone
@@ -192,7 +207,7 @@ const getPhoneImagePath = (phone) => {
                         <img
                             :src="getPhoneImagePath(phone)"
                             class="img-fluid"
-                            style="max-height: 8rem;"
+                            style="max-height: 8rem"
                             :alt="phone.model"
                         />
                         <h4 class="card-title formal-font my-2 text-wrap">
@@ -207,7 +222,10 @@ const getPhoneImagePath = (phone) => {
                                     phone.status === 'returned',
                             }"
                         >
-                            {{ phone.status }}
+                            {{
+                                phone.status[0].toUpperCase() +
+                                phone.status.slice(1)
+                            }}
                         </span>
                     </ListCard>
                 </div>
@@ -257,4 +275,130 @@ const getPhoneImagePath = (phone) => {
             </div>
         </div>
     </div>
+    <Modals
+        id="AddPhoneModal"
+        title="Add new phone"
+        header-class="bg-success text-white bg-gradient"
+    >
+        <template #body>
+            <form>
+                <div class="row d-flex align-items-center mb-3">
+                    <div class="col-sm-12 col-md-6">
+                        <label for="brandInput" class="form-label">Brand</label>
+                        <input
+                            type="text"
+                            id="brandInput"
+                            v-model="addForm.brand"
+                            class="form-control"
+                            required
+                        />
+                    </div>
+                    <div class="col-sm-12 col-md-6">
+                        <label for="modelInput" class="form-label">Model</label>
+                        <input
+                            type="text"
+                            id="modelInput"
+                            v-model="addForm.model"
+                            class="form-control"
+                            required
+                        />
+                    </div>
+                </div>
+                <div class="row d-flex align-items-center mb-3">
+                    <div class="col-sm-12 col-md-6">
+                        <label for="serialNumInput" class="form-label"
+                            >Serial Number</label
+                        >
+                        <input
+                            type="text"
+                            id="serialNumInput"
+                            v-model="addForm.serial_num"
+                            class="form-control"
+                            required
+                        />
+                    </div>
+                    <div class="col-sm-12 col-md-6">
+                        <label for="imeiOneInput" class="form-label"
+                            >IMEI One</label
+                        >
+                        <input
+                            type="text"
+                            id="imeiOneInput"
+                            v-model="addForm.imei_one"
+                            class="form-control"
+                            required
+                        />
+                    </div>
+                </div>
+                <div class="row d-flex align-items-center mb-3">
+                    <div class="col-sm-12 col-md-6">
+                        <label for="imeiTwoInput" class="form-label"
+                            >IMEI Two</label
+                        >
+                        <input
+                            type="text"
+                            id="imeiTwoInput"
+                            v-model="addForm.imei_two"
+                            class="form-control"
+                        />
+                    </div>
+                    <div class="col-sm-12 col-md-6">
+                        <label for="ramInput" class="form-label">RAM</label>
+                        <input
+                            type="text"
+                            id="ramInput"
+                            v-model="addForm.ram"
+                            class="form-control"
+                            required
+                        />
+                    </div>
+                </div>
+                <div class="row d-flex align-items-center mb-3">
+                    <div class="col-sm-12 col-md-6">
+                        <label for="romInput" class="form-label">ROM</label>
+                        <input
+                            type="text"
+                            id="romInput"
+                            v-model="addForm.rom"
+                            class="form-control"
+                            required
+                        />
+                    </div>
+                    <div class="col-sm-12 col-md-6">
+                        <label for="simNoInput" class="form-label"
+                            >SIM Number</label
+                        >
+                        <input
+                            type="text"
+                            id="simNoInput"
+                            v-model="addForm.sim_no"
+                            class="form-control"
+                        />
+                    </div>
+                </div>
+                <div class="row d-flex align-items-center mb-3">
+                    <div class="col-sm-12 col-md-6">
+                        <label for="purchaseDate" class="form-label"
+                            >Purchase Date</label
+                        >
+                        <input
+                            type="date"
+                            id="purchaseDate"
+                            v-model="addForm.purchase_date"
+                            class="form-control"
+                        />
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="remarksInput" class="form-label">Remarks</label>
+                    <textarea
+                        id="remarksInput"
+                        v-model="addForm.remarks"
+                        class="form-control"
+                        rows="3"
+                    ></textarea>
+                </div>
+            </form>
+        </template>
+    </Modals>
 </template>

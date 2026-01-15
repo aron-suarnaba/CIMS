@@ -7,10 +7,7 @@ import logo from '/public/img/logo.png';
 </script>
 
 <template>
-    <aside
-        class="app-sidebar bg-secondary-subtle shadow"
-        data-bs-theme="light"
-    >
+    <aside class="app-sidebar bg-secondary-subtle shadow" data-bs-theme="light">
         <div class="sidebar-brand">
             <a href="#" class="brand-link">
                 <img
@@ -60,17 +57,19 @@ import logo from '/public/img/logo.png';
                                 class="nav-link"
                             >
                                 <i class="bi bi-pc-display"></i>
-                                <p>
-                                    Assets & Inventory Management
-                                </p>
+                                <p>Assets & Inventory Management</p>
                             </Link>
                         </li>
-                        <!-- <li class="nav-item">
-                            <a href="#" class="nav-link">
+                        <li class="nav-item">
+                            <Link
+                                :href="route('network.index')"
+                                class="nav-link"
+                            >
                                 <i class="bi bi-router-fill"></i>
                                 <p>Network Monitoring & Management</p>
-                            </a>
+                            </Link>
                         </li>
+                        <!--
                         <li class="nav-item">
                             <a href="#" class="nav-link">
                                 <i class="bi bi-database-fill"></i>

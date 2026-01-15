@@ -3,6 +3,8 @@
 use App\Http\Controllers\ComputersController;
 use App\Http\Controllers\PhoneController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\FortigateController;
+use App\Http\Controllers\NetworkMonitoringController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -19,6 +21,9 @@ Route::post('/logout', [UserController::class, 'logout'])->name('logout');
 
 Route::middleware('auth')->group(function () {
 
+    Route::get('/user/{userid}', [UserController::class, 'index'])->name('user.index');
+    Route::patch('/user/update', [UserController::class, 'update'])->name('user.update');
+
     Route::get('/Home', function () {
         return Inertia::render('Home');
     })->name('dashboard');
@@ -30,7 +35,7 @@ Route::middleware('auth')->group(function () {
         })->name('AssetAndInventoryManagement');
 
         // Phone Routes
-        Route::prefix('phone')->group(function () {
+        Route::prefix('Phone')->group(function () {
             Route::get('/', [PhoneController::class, 'index'])->name('phone.index');
             Route::get('/create', [PhoneController::class, 'create'])->name('phone.create');
             Route::post('/', [PhoneController::class, 'store'])->name('phone.store');
@@ -46,12 +51,19 @@ Route::middleware('auth')->group(function () {
         // Route::post('/Phone/Transaction', [PhoneController::class, 'phoneTransStore'])
         //     ->name('phone.trans.store');
 
-        Route::prefix('Computer')->group(function(){
+        Route::prefix('Computer')->group(function () {
 
             Route::get('/', [ComputersController::class, 'index'])
                 ->name('computer.index');
             Route::get('/{computer}', [ComputersController::class, 'show'])->name('computer.show');
+
+            Route::post('/{computer}/issue', [ComputersController::class, 'issue'])->name('computer.issue');
+            Route::post('/{computer}/return', [ComputersController::class, 'return'])->name('computer.return');
+            Route::delete('/{computer:host_name}', [ComputersController::class, 'destroy'])->name('computer.destroy');
+
         });
     });
+
+    Route::get('/NetworkMonitoringAndManagement', [NetworkMonitoringController::class, 'index'])->name('network.index');
 
 });

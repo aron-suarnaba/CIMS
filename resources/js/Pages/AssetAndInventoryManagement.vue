@@ -5,21 +5,30 @@ import { router } from '@inertiajs/vue3';
 import BackButton from '@/Components/BackButton.vue';
 import Breadcrumb from '@/Components/Breadcrumb.vue';
 
-
 defineOptions({ layout: HomeLayout });
 
 const navigateTo = (url) => {
     if (url) router.get(url);
-}
+};
 
 const myBreadcrumb = [
-    { label : 'Home', url : route('dashboard') },
-    { label : 'Inventory' },
+    { label: 'Home', url: route('dashboard') },
+    { label: 'Inventory' },
 ];
 
 const navCard = [
-    { label : 'Company Phone', url : route('phone.index'), color : 'bg-primary bg-gradient text-white', icon : 'bi bi-phone' },
-    { label : 'Computer', url : route('computer.index'), color : 'bg-info bg-gradient text-white', icon : 'bi bi-pc-display' },
+    {
+        label: 'Company Phone',
+        url: route('phone.index'),
+        color: 'bg-primary bg-gradient text-white',
+        icon: 'bi bi-phone',
+    },
+    {
+        label: 'Computer',
+        url: route('computer.index'),
+        color: 'bg-info bg-gradient text-white',
+        icon: 'bi bi-pc-display',
+    },
 ];
 </script>
 <template>
@@ -52,7 +61,11 @@ const navCard = [
                 </div>
             </div>
             <div class="row mb-3 mt-5">
-                <div class="col-sm-12 col-md-2" v-for="option in navCard" :key="option.label">
+                <div
+                    class="col-sm-12 col-md-2"
+                    v-for="option in navCard"
+                    :key="option.label"
+                >
                     <InfoBox
                         :boxClass="option.color"
                         @click.prevent="navigateTo(option.url)"
