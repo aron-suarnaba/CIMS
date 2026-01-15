@@ -3,7 +3,7 @@ defineProps({
     id: { type: String, required: true },
     title: { type: String, default: 'Modal Title' },
     size: { type: String, default: '' },
-    headerClass : { type: String, default: '' },
+    headerClass: { type: String, default: '' },
 });
 </script>
 

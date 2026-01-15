@@ -133,7 +133,7 @@ onMounted(fetchDevices);
                                             'Unnamed'
                                         }}</strong>
                                     </td>
-                                    <td>{{ device.ipv4_address }}</td>
+                                    <td>{{ device.ipv4_address || 'Unknown' }}</td>
                                     <td>
                                         <code>{{ device.mac }}</code>
                                     </td>

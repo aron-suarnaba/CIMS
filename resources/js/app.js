@@ -3,12 +3,12 @@ import 'admin-lte';
 import 'admin-lte/dist/js/adminlte.min.js';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
+import Swal from 'sweetalert2';
 import { createApp, h, watch } from 'vue';
-import { ZiggyVue } from '../../vendor/tightenco/ziggy';
 import VueApexCharts from 'vue3-apexcharts';
+import { ZiggyVue } from '../../vendor/tightenco/ziggy';
 import '../css/app.css';
 import './bootstrap';
-import Swal from 'sweetalert2';
 
 const appName = import.meta.env.VITE_APP_NAME || 'CIMS';
 
@@ -26,9 +26,7 @@ createInertiaApp({
         const app = createApp({ render: () => h(App, props) })
             .use(plugin)
             .use(ZiggyVue)
-            .use(VueApexCharts)
-            ;
-
+            .use(VueApexCharts);
         const page = usePage();
 
         watch(

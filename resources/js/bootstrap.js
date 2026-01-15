@@ -4,7 +4,6 @@ import Pusher from 'pusher-js';
 window.Pusher = Pusher;
 window.axios = axios;
 
-
 window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 window.Echo = new Echo({
     broadcaster: 'reverb',
@@ -14,4 +13,4 @@ window.Echo = new Echo({
     wssPort: import.meta.env.VITE_REVERB_PORT ?? 443,
     forceTLS: (import.meta.env.VITE_REVERB_SCHEME ?? 'https') === 'https',
     enabledTransports: ['ws', 'wss'],
-})
+});

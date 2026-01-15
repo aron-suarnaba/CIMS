@@ -63,16 +63,6 @@ const getPhoneImagePath = (phone) => {
 };
 
 // Function for date formatting
-const formatDate = (dateString, locale = 'en-US') => {
-    if (!dateString) return '';
-    const date = new Date(dateString);
-
-    return new Intl.DateTimeFormat(locale, {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-    }).format(date);
-};
 
 const deleteItem = (serial_num) => {
     Swal.fire({
