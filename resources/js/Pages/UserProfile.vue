@@ -22,7 +22,9 @@ const form = useForm({
     employee_id: user.employee_id,
     position: user.position,
     department: user.department,
+    email: user.email,
     password: '',
+    password_confirmation: '',
 });
 
 const formatDate = (dateString, locale = 'en-US') => {
@@ -38,8 +40,6 @@ const formatDate = (dateString, locale = 'en-US') => {
 const submitPersonalInfoEdit = () => {
     form.patch(route('user.update'), {
         onSuccess: () => {
-            form.reset();
-
             const closeButton = document.querySelector(
                 '#personalInfoEditModals [data-bs-dismiss="modal"]',
             );
@@ -253,22 +253,36 @@ const submitPersonalInfoEdit = () => {
                         >
                         <input
                             v-model="form.password"
-                            type="text"
+                            type="password"
                             class="form-control"
                             id="password"
+                            placeholder="Leave blank to keep current"
                         />
+                        <div
+                            v-if="form.errors.password"
+                            class="text-danger small"
+                        >
+                            {{ form.errors.password }}
+                        </div>
                     </div>
                     <div class="col-sm-12 col-md-6">
                         <label for="confirm_password" class="form-label"
                             >Confirm Password</label
                         >
                         <input
-                            v-model="form.password"
-                            type="text"
+                            v-model="form.password_confirmation"
+                            type="password"
                             class="form-control"
                             id="confirm_password"
+                            placeholder="Confirm new password"
                         />
                     </div>
+                </div>
+                <div v-if="form.errors.employee_id" class="text-danger small">
+                    {{ form.errors.employee_id }}
+                </div>
+                <div v-if="form.errors.email" class="text-danger small">
+                    {{ form.errors.email }}
                 </div>
             </form>
         </template>

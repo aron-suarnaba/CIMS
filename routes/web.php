@@ -22,7 +22,7 @@ Route::post('/logout', [UserController::class, 'logout'])->name('logout');
 Route::middleware('auth')->group(function () {
 
     Route::get('/user/{userid}', [UserController::class, 'index'])->name('user.index');
-    Route::patch('/user/update/{userid}', [UserController::class, 'update'])->name('user.update');
+    Route::patch('/user/update/', [UserController::class, 'update'])->name('user.update');
 
     Route::get('/Home', function () {
         return Inertia::render('Home');

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use Hash;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Auth;
@@ -51,15 +52,19 @@ class UserController extends Controller
             'employee_id' => ['required', 'string', Rule::unique('users')->ignore($user->id)],
             'position' => ['nullable', 'string', 'max:255'],
             'department' => ['nullable', 'string', 'max:255'],
-            'email' => ['required', 'string', 'max:255'],
-            'password' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'max:255', Rule::unique('users')->ignore($user->id)],
+            'password' => ['nullable', 'string', 'max:255', 'confirmed'],
         ]);
 
-        // 2. Update the user
-        $user->update($validated);
+        $user->fill($request->except('password', 'password_confirmation'));
 
-        // 3. Redirect back with a success message
-        return redirect()->back()->with('message', 'Profile updated successfully!');
+        if($request->filled('password')){
+            $user->password = Hash::make($request->password);
+        }
+
+        $user->save();
+
+        return redirect()->back()->with('success', 'Profile updated successfully!');
     }
 
     public function logout(Request $request)
