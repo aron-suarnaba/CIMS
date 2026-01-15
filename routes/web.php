@@ -22,7 +22,7 @@ Route::post('/logout', [UserController::class, 'logout'])->name('logout');
 Route::middleware('auth')->group(function () {
 
     Route::get('/user/{userid}', [UserController::class, 'index'])->name('user.index');
-    Route::patch('/user/update/', [UserController::class, 'update'])->name('user.update');
+    Route::patch('/user/update', [UserController::class, 'update'])->name('user.update');
 
     Route::get('/Home', function () {
         return Inertia::render('Home');
@@ -65,11 +65,5 @@ Route::middleware('auth')->group(function () {
     });
 
     Route::get('/NetworkMonitoringAndManagement', [NetworkMonitoringController::class, 'index'])->name('network.index');
-
-    Route::prefix('NetworkMonitoringManagement')->group(function(){
-        Route::get('/', function(){
-            return Inertia::render('NetworkMonitoringManagement/Firewall');
-        })->name('firewall.index');
-    });
 
 });

@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import axios from 'axios';
 import HomeLayout from '@/Layouts/HomeLayout.vue';
 import { router } from '@inertiajs/vue3';
@@ -10,6 +10,8 @@ defineOptions({
 });
 
 const deviceList = ref([]);
+const currentPage = ref(1);
+const itemsPerPage = ref(25);
 
 const fetchDevices = async () => {
     try {
@@ -22,6 +24,22 @@ const fetchDevices = async () => {
         }
     } catch (error) {
         console.error('Failed:', error);
+    }
+};
+
+const totalPages = computed(() =>
+    Math.ceil(deviceList.value.length / itemsPerPage.value),
+);
+
+const paginatedDevices = computed(() => {
+    const start = (currentPage.value - 1) * itemsPerPage.value;
+    const end = start + itemsPerPage.value;
+    return deviceList.value.slice(start, end);
+});
+
+const setPage = (page) => {
+    if (page >= 1 && page <= totalPages.value) {
+        currentPage.value = page;
     }
 };
 
@@ -71,7 +89,7 @@ const myBreadcrumb = [
                             </thead>
                             <tbody>
                                 <tr
-                                    v-for="device in deviceList"
+                                    v-for="device in paginatedDevices"
                                     :key="device.mac"
                                 >
                                     <td>
@@ -101,8 +119,80 @@ const myBreadcrumb = [
                                         </span>
                                     </td>
                                 </tr>
+                                <tr v-if="deviceList.length === 0">
+                                    <td colspan="5" class="text-center">
+                                        Loading devices...
+                                    </td>
+                                </tr>
                             </tbody>
                         </table>
+
+                        <div
+                            class="d-flex justify-content-between align-items-center mt-4"
+                        >
+                            <div class="text-muted small">
+                                Showing
+                                {{ (currentPage - 1) * itemsPerPage + 1 }} to
+                                {{
+                                    Math.min(
+                                        currentPage * itemsPerPage,
+                                        deviceList.length,
+                                    )
+                                }}
+                                of {{ deviceList.length }} entries
+                            </div>
+
+                            <nav v-if="totalPages > 1">
+                                <ul class="pagination mb-0">
+                                    <li
+                                        class="page-item"
+                                        :class="{ disabled: currentPage === 1 }"
+                                    >
+                                        <a
+                                            class="page-link"
+                                            href="#"
+                                            @click.prevent="
+                                                setPage(currentPage - 1)
+                                            "
+                                            >Previous</a
+                                        >
+                                    </li>
+
+                                    <li
+                                        v-for="page in totalPages"
+                                        :key="page"
+                                        class="page-item"
+                                        :class="{
+                                            active: currentPage === page,
+                                        }"
+                                    >
+                                        <a
+                                            class="page-link"
+                                            href="#"
+                                            @click.prevent="setPage(page)"
+                                            >{{ page }}</a
+                                        >
+                                    </li>
+
+                                    <li
+                                        class="page-item"
+                                        :class="{
+                                            disabled:
+                                                currentPage === totalPages,
+                                        }"
+                                    >
+                                        <a
+                                            class="page-link"
+                                            href="#"
+                                            @click.prevent="
+                                                setPage(currentPage + 1)
+                                            "
+                                            >Next</a
+                                        >
+                                    </li>
+                                </ul>
+                            </nav>
+                        </div>
                     </div>
                 </div>
             </div>
