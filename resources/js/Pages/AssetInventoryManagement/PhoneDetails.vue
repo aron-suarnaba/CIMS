@@ -1,12 +1,11 @@
 <script setup>
-import HomeLayout from '@/Layouts/HomeLayout.vue';
-import { router } from '@inertiajs/vue3';
 import BackButton from '@/Components/BackButton.vue';
-import Modals from '@/Components/Modals.vue';
-import { useForm } from '@inertiajs/vue3';
 import Breadcrumb from '@/Components/Breadcrumb.vue';
+import Modals from '@/Components/Modals.vue';
+import HomeLayout from '@/Layouts/HomeLayout.vue';
+import { router, useForm } from '@inertiajs/vue3';
 import Swal from 'sweetalert2';
-import { ref, watch, computed } from 'vue';
+import { computed, ref, watch } from 'vue';
 
 defineOptions({ layout: HomeLayout });
 

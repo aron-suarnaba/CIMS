@@ -63,7 +63,9 @@ const submitAddForm = () => {
         onSuccess: () => {
             addForm.reset();
             // Close modal
-            const closeButton = document.querySelector('#AddPhoneModal [data-bs-dismiss="modal"]');
+            const closeButton = document.querySelector(
+                '#AddPhoneModal [data-bs-dismiss="modal"]',
+            );
             if (closeButton) {
                 closeButton.click();
             }
