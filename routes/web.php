@@ -1,7 +1,10 @@
 <?php
 
+use App\Http\Controllers\ComputersController;
 use App\Http\Controllers\PhoneController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\FortigateController;
+use App\Http\Controllers\NetworkMonitoringController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -13,29 +16,55 @@ Route::get('/login', function () {
     return Inertia::render('Login');
 })->name('login');
 
-Route::post('/login', [UserController::class, 'store'])
-    ->name('login.store');
-
-Route::post('/logout', [UserController::class, 'logout'])
-    ->name('logout');
+Route::post('/login', [UserController::class, 'store'])->name('login.store');
+Route::post('/logout', [UserController::class, 'logout'])->name('logout');
 
 Route::middleware('auth')->group(function () {
+
+    Route::get('/user/{userid}', [UserController::class, 'index'])->name('user.index');
+    Route::patch('/user/update', [UserController::class, 'update'])->name('user.update');
 
     Route::get('/Home', function () {
         return Inertia::render('Home');
     })->name('dashboard');
 
-    Route::get('/AssetAndInventoryManagement', function () {
-        return Inertia::render('AssetAndInventoryManagement');
-    })->name('AssetAndInventoryManagement');
+    Route::prefix('AssetAndInventoryManagement')->group(function () {
 
-    Route::get('/AssetAndInventoryManagement/Phone', [PhoneController::class, 'index'])
-        ->name('phone.index');
+        Route::get('/', function () {
+            return Inertia::render('AssetAndInventoryManagement');
+        })->name('AssetAndInventoryManagement');
 
-    Route::get('/AssetAndInventoryManagement/Phone/AddPhone', [PhoneController::class, 'create'])
-        ->name('phone.create');
+        // Phone Routes
+        Route::prefix('Phone')->group(function () {
+            Route::get('/', [PhoneController::class, 'index'])->name('phone.index');
+            Route::get('/create', [PhoneController::class, 'create'])->name('phone.create');
+            Route::post('/', [PhoneController::class, 'store'])->name('phone.store');
+            Route::get('/{phone}', [PhoneController::class, 'show'])->name('phone.show');
+            Route::put('/{phone}', [PhoneController::class, 'update'])->name('phone.update');
 
-    Route::get('/AssetAndInventoryManagement/Phone/{phone}', [PhoneController::class, 'show'])
-        ->name('phone.show');
+            // Asset Actions
+            Route::post('/{phone}/issue', [PhoneController::class, 'issue'])->name('phone.issue');
+            Route::post('/{phone}/return', [PhoneController::class, 'return'])->name('phone.return');
+            Route::delete('/{phone:serial_num}', [PhoneController::class, 'destroy'])->name('phone.destroy');
+        });
+
+        // Your existing transaction store (if used for logging)
+        // Route::post('/Phone/Transaction', [PhoneController::class, 'phoneTransStore'])
+        //     ->name('phone.trans.store');
+
+        Route::prefix('Computer')->group(function () {
+
+            Route::get('/', [ComputersController::class, 'index'])
+                ->name('computer.index');
+            Route::get('/{computer}', [ComputersController::class, 'show'])->name('computer.show');
+
+            Route::post('/{computer}/issue', [ComputersController::class, 'issue'])->name('computer.issue');
+            Route::post('/{computer}/return', [ComputersController::class, 'return'])->name('computer.return');
+            Route::delete('/{computer:host_name}', [ComputersController::class, 'destroy'])->name('computer.destroy');
+
+        });
+    });
+
+    Route::get('/NetworkMonitoringAndManagement', [NetworkMonitoringController::class, 'index'])->name('network.index');
 
 });
