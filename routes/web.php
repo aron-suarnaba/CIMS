@@ -40,6 +40,7 @@ Route::middleware('auth')->group(function () {
             Route::get('/create', [PhoneController::class, 'create'])->name('phone.create');
             Route::post('/', [PhoneController::class, 'store'])->name('phone.store');
             Route::get('/{phone}', [PhoneController::class, 'show'])->name('phone.show');
+            Route::put('/{phone}', [PhoneController::class, 'update'])->name('phone.update');
 
             // Asset Actions
             Route::post('/{phone}/issue', [PhoneController::class, 'issue'])->name('phone.issue');

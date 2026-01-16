@@ -1,11 +1,11 @@
 <script setup>
-import HomeLayout from '@/Layouts/HomeLayout.vue';
-import ListCard from '@/Components/ListCard.vue';
 import BackButton from '@/Components/BackButton.vue';
 import Breadcrumb from '@/Components/Breadcrumb.vue';
-import { router } from '@inertiajs/vue3';
-import { ref } from 'vue';
+import ListCard from '@/Components/ListCard.vue';
 import Modals from '@/Components/Modals.vue';
+import HomeLayout from '@/Layouts/HomeLayout.vue';
+import { router, useForm } from '@inertiajs/vue3';
+import { ref } from 'vue';
 
 defineOptions({ layout: HomeLayout });
 
@@ -45,7 +45,7 @@ const currentSort = ref(
     new URLSearchParams(window.location.search).get('sort') || 'availability',
 );
 
-const addForm = ref({
+const addForm = useForm({
     brand: '',
     model: '',
     serial_num: '',
@@ -57,6 +57,19 @@ const addForm = ref({
     sim_no: '',
     remarks: '',
 });
+
+const submitAddForm = () => {
+    addForm.post(route('phone.store'), {
+        onSuccess: () => {
+            addForm.reset();
+            // Close modal
+            const closeButton = document.querySelector('#AddPhoneModal [data-bs-dismiss="modal"]');
+            if (closeButton) {
+                closeButton.click();
+            }
+        },
+    });
+};
 
 const sortOption = [
     { label: 'Name', value: 'name' },
@@ -281,7 +294,7 @@ const getPhoneImagePath = (phone) => {
         header-class="bg-success text-white bg-gradient"
     >
         <template #body>
-            <form>
+            <form @submit.prevent="submitAddForm" id="addPhoneForm">
                 <div class="row d-flex align-items-center mb-3">
                     <div class="col-sm-12 col-md-6">
                         <label for="brandInput" class="form-label">Brand</label>
@@ -399,6 +412,27 @@ const getPhoneImagePath = (phone) => {
                     ></textarea>
                 </div>
             </form>
+        </template>
+        <template #footer>
+            <button
+                type="button"
+                class="btn btn-secondary"
+                data-bs-dismiss="modal"
+            >
+                Close
+            </button>
+            <button
+                type="submit"
+                class="btn btn-success bg-gradient"
+                form="addPhoneForm"
+                :disabled="addForm.processing"
+            >
+                <span
+                    v-if="addForm.processing"
+                    class="spinner-border spinner-border-sm me-1"
+                ></span>
+                Add Asset
+            </button>
         </template>
     </Modals>
 </template>

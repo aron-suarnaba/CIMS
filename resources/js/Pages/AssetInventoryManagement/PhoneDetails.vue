@@ -172,6 +172,20 @@ const returnform = useForm({
     remarks: '',
 });
 
+// Form for update
+const updateForm = useForm({
+    brand: props.phone.brand || '',
+    model: props.phone.model || '',
+    serial_num: props.phone.serial_num || '',
+    imei_one: props.phone.imei_one || '',
+    imei_two: props.phone.imei_two || '',
+    ram: props.phone.ram || '',
+    rom: props.phone.rom || '',
+    sim_no: props.phone.sim_no || '',
+    purchase_date: props.phone.purchase_date || '',
+    remarks: props.phone.remarks || '',
+});
+
 // Listeners
 
 watch(selectedAcc, (newVal) => {
@@ -212,6 +226,19 @@ const returnSubmit = () => {
 
             const closeButton = document.querySelector(
                 '#ReturnPhoneModal [data-bs-dismiss="modal"]',
+            );
+            if (closeButton) {
+                closeButton.click();
+            }
+        },
+    });
+};
+
+const updateSubmit = () => {
+    updateForm.put(route('phone.update', props.phone.serial_num), {
+        onSuccess: () => {
+            const closeButton = document.querySelector(
+                '#UpdatePhoneModal [data-bs-dismiss="modal"]',
             );
             if (closeButton) {
                 closeButton.click();
@@ -386,8 +413,12 @@ const returnSubmit = () => {
                                 <i class="bi bi-trash me-1"></i> Delete Asset
                                 Record
                             </button>
-                            <button class="btn btn-outline-warning">
-                                <i class="bi bi-trash me-1"></i> Update Asset
+                            <button
+                                class="btn btn-outline-warning"
+                                data-bs-toggle="modal"
+                                data-bs-target="#UpdatePhoneModal"
+                            >
+                                <i class="bi bi-pencil me-1"></i> Update Asset
                                 Record
                             </button>
                         </div>
@@ -1392,6 +1423,167 @@ const returnSubmit = () => {
                     class="spinner-border spinner-border-sm me-1"
                 ></span>
                 Return
+            </button>
+        </template>
+    </Modals>
+
+    <!-- Update Modal -->
+    <Modals
+        id="UpdatePhoneModal"
+        title="Update Phone Asset"
+        header-class="bg-warning text-white bg-gradient"
+    >
+        <template #body>
+            <form @submit.prevent="updateSubmit" id="updateForm">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="update_brand" class="form-label"
+                            >Brand</label
+                        >
+                        <input
+                            type="text"
+                            id="update_brand"
+                            v-model="updateForm.brand"
+                            class="form-control"
+                            required
+                        />
+                    </div>
+                    <div class="col-md-6">
+                        <label for="update_model" class="form-label"
+                            >Model</label
+                        >
+                        <input
+                            type="text"
+                            id="update_model"
+                            v-model="updateForm.model"
+                            class="form-control"
+                            required
+                        />
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="update_serial_num" class="form-label"
+                            >Serial Number</label
+                        >
+                        <input
+                            type="text"
+                            id="update_serial_num"
+                            v-model="updateForm.serial_num"
+                            class="form-control"
+                            required
+                        />
+                    </div>
+                    <div class="col-md-6">
+                        <label for="update_sim_no" class="form-label"
+                            >SIM Number</label
+                        >
+                        <input
+                            type="text"
+                            id="update_sim_no"
+                            v-model="updateForm.sim_no"
+                            class="form-control"
+                        />
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="update_imei_one" class="form-label"
+                            >IMEI One</label
+                        >
+                        <input
+                            type="text"
+                            id="update_imei_one"
+                            v-model="updateForm.imei_one"
+                            class="form-control"
+                            required
+                        />
+                    </div>
+                    <div class="col-md-6">
+                        <label for="update_imei_two" class="form-label"
+                            >IMEI Two</label
+                        >
+                        <input
+                            type="text"
+                            id="update_imei_two"
+                            v-model="updateForm.imei_two"
+                            class="form-control"
+                        />
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="update_ram" class="form-label">RAM</label>
+                        <input
+                            type="text"
+                            id="update_ram"
+                            v-model="updateForm.ram"
+                            class="form-control"
+                            required
+                        />
+                    </div>
+                    <div class="col-md-6">
+                        <label for="update_rom" class="form-label">ROM</label>
+                        <input
+                            type="text"
+                            id="update_rom"
+                            v-model="updateForm.rom"
+                            class="form-control"
+                            required
+                        />
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="update_purchase_date" class="form-label"
+                            >Purchase Date</label
+                        >
+                        <input
+                            type="date"
+                            id="update_purchase_date"
+                            v-model="updateForm.purchase_date"
+                            class="form-control"
+                        />
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="update_remarks" class="form-label"
+                        >Remarks</label
+                    >
+                    <textarea
+                        v-model="updateForm.remarks"
+                        id="update_remarks"
+                        rows="3"
+                        class="form-control"
+                    ></textarea>
+                </div>
+            </form>
+        </template>
+
+        <template #footer>
+            <button
+                type="button"
+                class="btn btn-secondary"
+                data-bs-dismiss="modal"
+            >
+                Cancel
+            </button>
+            <button
+                type="submit"
+                class="btn btn-warning"
+                form="updateForm"
+                :disabled="updateForm.processing"
+            >
+                <span
+                    v-if="updateForm.processing"
+                    class="spinner-border spinner-border-sm me-1"
+                ></span>
+                Update Asset
             </button>
         </template>
     </Modals>

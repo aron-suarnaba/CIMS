@@ -135,15 +135,30 @@ onMounted(fetchDevices);
                                     v-for="device in paginatedDevices"
                                     :key="device.mac"
                                 >
-                                    <td>
+                                    <td
+                                        :class="
+                                            device.ipv4_address
+                                                ? 'text-success'
+                                                : 'text-danger'
+                                        "
+                                    >
                                         <i class="bi bi-laptop me-2"></i>
                                         <strong>{{
                                             device.hostname ||
                                             device.alias ||
                                             'Unnamed'
                                         }}</strong>
+                                        <small class="text-secondary fw-bold">{{
+                                            device.mac_firewall_address
+                                                ? '(' +
+                                                  device.mac_firewall_address +
+                                                  ')'
+                                                : ''
+                                        }}</small>
                                     </td>
-                                    <td>{{ device.ipv4_address || 'Unknown' }}</td>
+                                    <td>
+                                        {{ device.ipv4_address || 'Unknown' }}
+                                    </td>
                                     <td>
                                         <code>{{ device.mac }}</code>
                                     </td>

@@ -103,15 +103,16 @@ class PhoneController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'brand' => 'required|string',
-            'model' => 'required|string',
-            'serial_num' => 'required|string|unique:phones,serial_num',
-            'imei_one' => 'required|string|unique:phones,imei_one',
-            'imei_two' => 'nullable|string',
-            'ram' => 'required|string',
-            'rom' => 'required|string',
-            'sim_no' => 'nullable|string',
-            'cashout' => 'required|boolean',
+            'brand' => 'required|string|max:255',
+            'model' => 'required|string|max:255',
+            'serial_num' => 'required|string|max:255|unique:phones,serial_num',
+            'imei_one' => 'required|string|max:255|unique:phones,imei_one',
+            'imei_two' => 'nullable|string|max:255|unique:phones,imei_two',
+            'ram' => 'required|string|max:255',
+            'rom' => 'required|string|max:255',
+            'sim_no' => 'nullable|string|max:255',
+            'purchase_date' => 'nullable|date',
+            'remarks' => 'nullable|string',
         ]);
 
         $validated['status'] = 'available';
@@ -215,7 +216,25 @@ class PhoneController extends Controller
      */
     public function update(Request $request, Phone $phone)
     {
-        //
+        $validated = $request->validate([
+            'brand' => 'required|string|max:255',
+            'model' => 'required|string|max:255',
+            'serial_num' => 'required|string|max:255|unique:phones,serial_num,' . $phone->id,
+            'imei_one' => 'required|string|max:255|unique:phones,imei_one,' . $phone->id,
+            'imei_two' => 'nullable|string|max:255|unique:phones,imei_two,' . $phone->id,
+            'ram' => 'required|string|max:255',
+            'rom' => 'required|string|max:255',
+            'sim_no' => 'nullable|string|max:255',
+            'purchase_date' => 'nullable|date',
+            'remarks' => 'nullable|string',
+        ]);
+
+        try {
+            $phone->update($validated);
+            return redirect()->back()->with('success', 'Phone asset updated successfully');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Failed to update phone asset.');
+        }
     }
 
     /**
