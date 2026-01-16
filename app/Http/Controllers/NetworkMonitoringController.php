@@ -11,10 +11,10 @@ class NetworkMonitoringController extends Controller
 {
     public function index()
     {
-        return Inertia::render('NetworkMonitoringManagement', [
-            // Changed "Device" to "NetworkDevice" to match your import/model
-            'initialDevices' => NetworkDevice::all(['id', 'name', 'ip_address', 'status', 'community','uptime'])
-        ]);
+        return Inertia::render('NetworkMonitoringManagement'
+        // , [// Changed "Device" to "NetworkDevice" to match your import/model
+        //     'initialDevices' => NetworkDevice::all(['id', 'name', 'ip_address', 'status', 'community', 'uptime'])    ]
+    );
     }
 
     public function list()

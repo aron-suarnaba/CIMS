@@ -45,7 +45,7 @@ Route::middleware('auth')->group(function () {
             // Asset Actions
             Route::post('/{phone}/issue', [PhoneController::class, 'issue'])->name('phone.issue');
             Route::post('/{phone}/return', [PhoneController::class, 'return'])->name('phone.return');
-            Route::delete('/{phone:serial_num}', [PhoneController::class, 'destroy'])->name('phone.destroy');
+            Route::delete('/{phone}', [PhoneController::class, 'destroy'])->name('phone.destroy');
         });
 
         // Your existing transaction store (if used for logging)
@@ -56,10 +56,12 @@ Route::middleware('auth')->group(function () {
 
             Route::get('/', [ComputersController::class, 'index'])
                 ->name('computer.index');
-            Route::get('/{computer}', [ComputersController::class, 'show'])->name('computer.show');
+            Route::post('/', [ComputersController::class, 'store'])
+                ->name('computer.store');
+            Route::get('/{computer:host_name}', [ComputersController::class, 'show'])->name('computer.show');
 
-            Route::post('/{computer}/issue', [ComputersController::class, 'issue'])->name('computer.issue');
-            Route::post('/{computer}/return', [ComputersController::class, 'return'])->name('computer.return');
+            Route::post('/{computer:host_name}/issue', [ComputersController::class, 'issue'])->name('computer.issue');
+            Route::post('/{computer:host_name}/return', [ComputersController::class, 'return'])->name('computer.return');
             Route::delete('/{computer:host_name}', [ComputersController::class, 'destroy'])->name('computer.destroy');
 
         });

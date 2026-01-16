@@ -27,6 +27,7 @@ class PhoneTransaction extends Model
         'it_ack_returned',
         'purch_ack_returned',
         'cashout',
+        'remarks',
     ];
 
     public function phone()

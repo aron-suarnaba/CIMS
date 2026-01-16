@@ -51,10 +51,7 @@ class Phone extends Model
         'purchase_date' => 'date',
     ];
 
-    public function getRouteKeyName()
-    {
-        return 'serial_num';
-    }
+    // Use default id for routing (no custom getRouteKeyName needed)
 
     public function transactions()
     {

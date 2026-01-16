@@ -16,7 +16,7 @@ const itemsPerPage = ref(25);
 const fetchDevices = async () => {
     try {
         // We use the full path because of the XAMPP subfolder
-        const response = await axios.get('/CIMS/public/api/fortigate/devices');
+        const response = await axios.get('/api/fortigate/devices');
 
         // FortiGate returns a 'results' array for this endpoint
         if (response.data && response.data.results) {

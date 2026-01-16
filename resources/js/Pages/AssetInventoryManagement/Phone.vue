@@ -98,8 +98,10 @@ const applyFilter = (brand = filterBrand.value, sort = currentSort.value) => {
     );
 };
 
-const gotoPhoneDetails = (phoneSerialNumber) => {
-    router.get(route('phone.show', { phone: phoneSerialNumber }));
+const gotoPhoneDetails = (phoneId) => {
+    // Use phone id for routing to avoid issues with serial numbers containing special characters
+    const url = `/AssetAndInventoryManagement/Phone/${phoneId}`;
+    router.get(url);
 };
 
 const getPhoneImagePath = (phone) => {
@@ -216,9 +218,7 @@ const getPhoneImagePath = (phone) => {
                     v-for="phone in props.phones.data"
                     :key="phone.id"
                 >
-                    <ListCard
-                        @click.prevent="gotoPhoneDetails(phone.serial_num)"
-                    >
+                    <ListCard @click.prevent="gotoPhoneDetails(phone.id)">
                         <img
                             :src="getPhoneImagePath(phone)"
                             class="img-fluid"
@@ -425,8 +425,8 @@ const getPhoneImagePath = (phone) => {
             </button>
             <button
                 type="submit"
-                class="btn btn-success bg-gradient"
                 form="addPhoneForm"
+                class="btn btn-success bg-gradient"
                 :disabled="addForm.processing"
             >
                 <span

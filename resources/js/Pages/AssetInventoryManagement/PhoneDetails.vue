@@ -83,7 +83,7 @@ const deleteItem = (serial_num) => {
         confirmButtonText: 'Yes, delete it!',
     }).then((result) => {
         if (result.isConfirmed) {
-            router.delete(route('phone.destroy', serial_num), {
+            router.delete(route('phone.destroy', props.phone.id), {
                 onBefore: () => {
                     Swal.fire({
                         title: 'Processing...',
@@ -196,7 +196,7 @@ watch(selectedReturnAcc, (newVal) => {
 
 //Submission
 const submit = () => {
-    form.post(route('phone.issue', props.phone.serial_num), {
+    form.post(route('phone.issue', props.phone.id), {
         onSuccess: () => {
             form.reset();
             selectedAcc.value = [];
@@ -218,7 +218,7 @@ const submit = () => {
     });
 };
 const returnSubmit = () => {
-    returnform.post(route('phone.return', props.phone.serial_num), {
+    returnform.post(route('phone.return', props.phone.id), {
         onSuccess: () => {
             returnform.reset();
             selectedReturnAcc.value = [];
@@ -234,7 +234,7 @@ const returnSubmit = () => {
 };
 
 const updateSubmit = () => {
-    updateForm.put(route('phone.update', props.phone.serial_num), {
+    updateForm.put(route('phone.update', props.phone.id), {
         onSuccess: () => {
             const closeButton = document.querySelector(
                 '#UpdatePhoneModal [data-bs-dismiss="modal"]',

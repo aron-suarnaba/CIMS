@@ -107,6 +107,27 @@ const addForm = useForm({
     warranty_expiry: '',
     remarks: '',
 });
+
+const submit = () => {
+    // 1. Use the correct form name: addForm
+    // 2. Point to the correct store route
+    addForm.post(route('computer.store'), {
+        onSuccess: () => {
+            addForm.reset();
+            
+            // Close the modal using the correct ID
+            const closeButton = document.querySelector(
+                '#AddComputerModals [data-bs-dismiss="modal"]'
+            );
+            if (closeButton) {
+                closeButton.click();
+            }
+        },
+        onError: (errors) => {
+            console.error(errors);
+        }
+    });
+};
 </script>
 
 <template>
@@ -284,7 +305,7 @@ const addForm = useForm({
         header-class="bg-success text-white bg-gradient"
     >
         <template #body>
-            <form>
+            <form id="addComputerForm" @submit.prevent="submit">
                 <div class="row d-flex align-items-center mb-3">
                     <div class="col-sm-12 col-md-6">
                         <label for="modelInput" class="form-label">Model</label>
@@ -447,6 +468,28 @@ const addForm = useForm({
                     ></textarea>
                 </div>
             </form>
+        </template>
+        <template #footer>
+            <button
+                type="button"
+                class="btn btn-secondary"
+                data-bs-dismiss="modal"
+            >
+                Close
+            </button>
+            <button
+                type="submit"
+                class="btn btn-success bg-gradient"
+                form="addComputerForm"
+                :disabled="addForm.processing"
+                @click="submit"
+            >
+                <span
+                    v-if="addForm.processing"
+                    class="spinner-border spinner-border-sm me-1"
+                ></span>
+                Add Asset
+            </button>
         </template>
     </Modals>
 </template>

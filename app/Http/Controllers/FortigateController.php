@@ -14,7 +14,9 @@ class FortigateController extends Controller
         try {
             $response = Http::timeout(5)
                 ->withoutVerifying()
-                ->withToken(config('services.fortigate.token'))
+                ->withHeaders([
+                    'Authorization' => 'Bearer ' . config('services.fortigate.token'),
+                ])
                 ->get($url);
 
             if ($response->failed()) {
@@ -34,7 +36,9 @@ class FortigateController extends Controller
         try {
             $response = Http::timeout(10)
                 ->withoutVerifying()
-                ->withToken(config('services.fortigate.token'))
+                ->withHeaders([
+                    'Authorization' => 'Bearer ' . config('services.fortigate.token'),
+                ])
                 ->get($url);
 
             if ($response->failed()) {
