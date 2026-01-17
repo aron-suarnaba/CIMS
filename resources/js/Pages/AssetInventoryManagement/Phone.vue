@@ -5,6 +5,7 @@ import ListCard from '@/Components/ListCard.vue';
 import Modals from '@/Components/Modals.vue';
 import HomeLayout from '@/Layouts/HomeLayout.vue';
 import { router, useForm } from '@inertiajs/vue3';
+import Swal from 'sweetalert2';
 import { ref } from 'vue';
 
 defineOptions({ layout: HomeLayout });
@@ -60,6 +61,9 @@ const addForm = useForm({
 
 const submitAddForm = () => {
     addForm.post(route('phone.store'), {
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content,
+        },
         onSuccess: () => {
             addForm.reset();
             // Close modal
@@ -69,6 +73,28 @@ const submitAddForm = () => {
             if (closeButton) {
                 closeButton.click();
             }
+        },
+        onError: (errors) => {
+            let errorMessage = 'An error occurred while adding the phone.';
+            let errorDetails = '';
+
+            // Check for validation errors
+            if (errors && Object.keys(errors).length > 0) {
+                errorDetails = Object.values(errors)
+                    .map((error) => `<li>${error}</li>`)
+                    .join('');
+                errorMessage = 'Validation errors:';
+            }
+
+            Swal.fire({
+                icon: 'error',
+                title: 'Error!',
+                html: errorDetails
+                    ? `${errorMessage}<ul style="text-align: left; margin-top: 10px;">${errorDetails}</ul>`
+                    : errorMessage,
+                confirmButtonText: 'Close',
+                confirmButtonColor: '#dc3545',
+            });
         },
     });
 };
