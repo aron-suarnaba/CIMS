@@ -106,7 +106,7 @@ class PhoneController extends Controller
             'brand' => 'required|string|max:255',
             'model' => 'required|string|max:255',
             'serial_num' => 'required|string|max:255|unique:phones,serial_num',
-            'imei_one' => 'required|string|max:255|unique:phones,imei_one',
+            'imei_one' => 'nullable|string|max:255|unique:phones,imei_one',
             'imei_two' => 'nullable|string|max:255|unique:phones,imei_two',
             'ram' => 'required|string|max:255',
             'rom' => 'required|string|max:255',

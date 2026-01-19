@@ -12,9 +12,7 @@ Route::get('/', function () {
     return Inertia::render('Welcome');
 })->name('welcome');
 
-Route::get('/login', function () {
-    return Inertia::render('Login');
-})->name('login');
+Route::get('/login', [UserController::class, 'showLogin'])->name('login');
 
 Route::post('/login', [UserController::class, 'store'])->name('login.store');
 Route::post('/logout', [UserController::class, 'logout'])->name('logout');

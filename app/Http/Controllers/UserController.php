@@ -13,6 +13,11 @@ use Illuminate\Validation\Rule;
 class UserController extends Controller
 {
 
+    public function showLogin()
+    {
+        return Inertia::render('Login');
+    }
+
     public function index(User $user)
     {
         return Inertia::render('UserProfile', [
