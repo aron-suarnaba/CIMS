@@ -1,10 +1,10 @@
 <script setup>
-import { ref, onMounted, computed } from 'vue'; // Added computed
-import axios from 'axios';
-import HomeLayout from '@/Layouts/HomeLayout.vue';
-import { router } from '@inertiajs/vue3';
 import BackButton from '@/Components/BackButton.vue';
 import Breadcrumb from '@/Components/Breadcrumb.vue';
+import HomeLayout from '@/Layouts/HomeLayout.vue';
+import { router } from '@inertiajs/vue3';
+import axios from 'axios';
+import { computed, onMounted, ref } from 'vue'; // Added computed
 
 defineOptions({
     layout: HomeLayout,
@@ -78,12 +78,12 @@ onMounted(fetchDevices);
                     />
                 </div>
                 <div class="col-sm-12 col-md-6 text-end">
-                    <button
+                    <!-- <button
                         @click.prevent="router.get(route('firewall.index'))"
                         class="btn btn-outline-primary"
                     >
                         <i class="bi bi-shield-lock me-1"></i> Firewall Settings
-                    </button>
+                    </button> -->
                 </div>
             </div>
 
@@ -143,11 +143,13 @@ onMounted(fetchDevices);
                                         "
                                     >
                                         <i class="bi bi-laptop me-2"></i>
-                                        <strong>{{
-                                            device.hostname ||
-                                            device.alias ||
-                                            'Unnamed'
-                                        }}</strong>
+                                        <strong
+                                            >{{
+                                                device.hostname ||
+                                                device.alias ||
+                                                'Unnamed'
+                                            }}
+                                        </strong>
                                         <small class="text-secondary fw-bold">{{
                                             device.mac_firewall_address
                                                 ? '(' +

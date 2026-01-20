@@ -15,7 +15,7 @@ return new class extends Migration {
             $table->string('brand');
             $table->string('model');
             $table->string('serial_num')->unique();
-            $table->string('imei_one')->unique();
+            $table->string('imei_one')->unique()->nullable();
             $table->string('imei_two')->nullable();
             $table->string('ram');
             $table->string('rom');

@@ -62,7 +62,8 @@ const addForm = useForm({
 const submitAddForm = () => {
     addForm.post(route('phone.store'), {
         headers: {
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content,
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')
+                ?.content,
         },
         onSuccess: () => {
             addForm.reset();
@@ -85,7 +86,6 @@ const submitAddForm = () => {
                     .join('');
                 errorMessage = 'Validation errors:';
             }
-
             Swal.fire({
                 icon: 'error',
                 title: 'Error!',

@@ -1,9 +1,9 @@
 <script setup>
-import HomeLayout from '@/Layouts/HomeLayout.vue';
-import InfoBox from '@/Components/InfoBox.vue';
-import { router } from '@inertiajs/vue3';
 import BackButton from '@/Components/BackButton.vue';
 import Breadcrumb from '@/Components/Breadcrumb.vue';
+import InfoBox from '@/Components/InfoBox.vue';
+import HomeLayout from '@/Layouts/HomeLayout.vue';
+import { router } from '@inertiajs/vue3';
 
 defineOptions({ layout: HomeLayout });
 
@@ -18,15 +18,13 @@ const myBreadcrumb = [
 
 const navCard = [
     {
-        label: 'Company Phone',
+        label: 'Phone',
         url: route('phone.index'),
-        color: 'bg-primary bg-gradient text-white',
         icon: 'bi bi-phone',
     },
     {
         label: 'Computer',
         url: route('computer.index'),
-        color: 'bg-info bg-gradient text-white',
         icon: 'bi bi-pc-display',
     },
 ];
@@ -67,7 +65,7 @@ const navCard = [
                     :key="option.label"
                 >
                     <InfoBox
-                        :boxClass="option.color"
+                        class="bg-secondary-subtle text-dark"
                         @click.prevent="navigateTo(option.url)"
                     >
                         <template #header>

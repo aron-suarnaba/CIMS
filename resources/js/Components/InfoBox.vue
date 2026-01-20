@@ -1,13 +1,7 @@
 <script setup>
-const props = defineProps({
-    boxClass: {
-        type: String,
-        default: 'text-bg-primary',
-    },
-});
 </script>
 <template>
-    <span class="info-box bg-gradient clickable-card" :class="props.boxClass">
+    <span class="info-box bg-gradient clickable-card">
         <span class="info-box-icon">
             <slot name="header" />
         </span>
