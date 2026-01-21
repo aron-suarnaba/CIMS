@@ -1,5 +1,9 @@
 <script setup>
 import { Link, router } from '@inertiajs/vue3';
+import avatarPath from '/public/img/avatar.png';
+import { useDateFormatter } from '@/composables/useDateFormatter';
+
+const { formatDate } = useDateFormatter();
 
 const toggleSidebar = () => {
     const body = document.body;
@@ -12,24 +16,14 @@ const toggleSidebar = () => {
     }
 };
 
-const formatDate = (dateString, locale = 'en-US') => {
-    if (!dateString) return '';
-    const date = new Date(dateString);
-
-    return new Intl.DateTimeFormat(locale, {
-        year: 'numeric',
-        month: 'long',
-    }).format(date);
-};
 
 const handleLogout = () => {
     router.post(route('logout'));
 };
-import avatarPath from '/public/img/avatar.png';
 </script>
 <template>
     <nav
-        class="app-header navbar navbar-expand bg-primary bg-gradient"
+        class="app-header navbar navbar-expand bg-primary text-white"
         data-bs-theme="dark"
         id="navigation"
         tabindex="-1"
@@ -71,7 +65,6 @@ import avatarPath from '/public/img/avatar.png';
                 <li class="nav-item dropdown">
                     <a class="nav-link" data-bs-toggle="dropdown" href="#">
                         <i class="bi bi-chat-text"></i>
-                        <span class="navbar-badge badge text-bg-danger">3</span>
                     </a>
                     <div
                         class="dropdown-menu dropdown-menu-lg dropdown-menu-end"
@@ -86,9 +79,6 @@ import avatarPath from '/public/img/avatar.png';
                 <li class="nav-item dropdown">
                     <a class="nav-link" data-bs-toggle="dropdown" href="#">
                         <i class="bi bi-bell-fill"></i>
-                        <span class="navbar-badge badge text-bg-warning"
-                            >15</span
-                        >
                     </a>
                     <div
                         class="dropdown-menu dropdown-menu-lg dropdown-menu-end"

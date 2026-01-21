@@ -1,9 +1,9 @@
 <script setup>
-import { ref, onMounted, computed } from 'vue';
-import axios from 'axios';
+import BackButton from '@/Components/BackButton.vue';
 import HomeLayout from '@/Layouts/HomeLayout.vue';
 import { router } from '@inertiajs/vue3';
-import BackButton from '@/Components/BackButton.vue';
+import axios from 'axios';
+import { computed, onMounted, ref } from 'vue';
 
 defineOptions({
     layout: HomeLayout,

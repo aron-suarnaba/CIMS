@@ -12,6 +12,10 @@ Route::get('/', function () {
     return Inertia::render('Welcome');
 })->name('welcome');
 
+Route::get('/refresh-session', function () {
+    return response()->json(['status' => 'alive']);
+})->middleware(['auth']);
+
 Route::get('/login', [UserController::class, 'showLogin'])->name('login');
 
 Route::post('/login', [UserController::class, 'store'])->name('login.store');
@@ -56,6 +60,7 @@ Route::middleware('auth')->group(function () {
                 ->name('computer.index');
             Route::post('/', [ComputersController::class, 'store'])
                 ->name('computer.store');
+
             Route::get('/{computer:host_name}', [ComputersController::class, 'show'])->name('computer.show');
 
             Route::post('/{computer:host_name}/issue', [ComputersController::class, 'issue'])->name('computer.issue');

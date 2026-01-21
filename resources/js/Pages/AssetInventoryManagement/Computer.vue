@@ -1,12 +1,11 @@
 <script setup>
-import HomeLayout from '@/Layouts/HomeLayout.vue';
-import ListCard from '@/Components/ListCard.vue';
 import BackButton from '@/Components/BackButton.vue';
 import Breadcrumb from '@/Components/Breadcrumb.vue';
-import { router } from '@inertiajs/vue3';
-import { ref } from 'vue';
+import ListCard from '@/Components/ListCard.vue';
 import Modals from '@/Components/Modals.vue';
-import { useForm } from '@inertiajs/vue3';
+import HomeLayout from '@/Layouts/HomeLayout.vue';
+import { router, useForm } from '@inertiajs/vue3';
+import { ref } from 'vue';
 
 defineOptions({ layout: HomeLayout });
 
@@ -91,6 +90,25 @@ const getComputerImagePath = (computers) => {
     return defaultPath;
 };
 
+const computerManufacturer = [
+    'Lenovo',
+    'HP',
+    'Dell Technologies',
+    'Apple',
+    'ASUS',
+    'Acer',
+    'Microsoft',
+    'Samsung',
+    'MSI',
+    'Razer',
+    'Gigabyte',
+    'Huawei',
+    'LG',
+    'Panasonic',
+    'Fujitsu',
+    'Others',
+];
+
 const addForm = useForm({
     host_name: '',
     serial_number: '',
@@ -109,15 +127,11 @@ const addForm = useForm({
 });
 
 const submit = () => {
-    // 1. Use the correct form name: addForm
-    // 2. Point to the correct store route
     addForm.post(route('computer.store'), {
         onSuccess: () => {
             addForm.reset();
-            
-            // Close the modal using the correct ID
             const closeButton = document.querySelector(
-                '#AddComputerModals [data-bs-dismiss="modal"]'
+                '#AddComputerModals [data-bs-dismiss="modal"]',
             );
             if (closeButton) {
                 closeButton.click();
@@ -125,7 +139,7 @@ const submit = () => {
         },
         onError: (errors) => {
             console.error(errors);
-        }
+        },
     });
 };
 </script>
@@ -308,23 +322,32 @@ const submit = () => {
             <form id="addComputerForm" @submit.prevent="submit">
                 <div class="row d-flex align-items-center mb-3">
                     <div class="col-sm-12 col-md-6">
+                        <label for="manufacturerInput" class="form-label"
+                            >Manufacturer</label
+                        >
+                        <select
+                            class="form-select"
+                            aria-label="Manufacturer"
+                            v-model="addForm.manufacturer"
+                        >
+                            <option selected disabled>
+                                Select Manufacturer
+                            </option>
+                            <option
+                                v-for="manufacturer in computerManufacturer"
+                                :key="manufacturer.id || manufacturer"
+                                :value="manufacturer"
+                            >
+                                {{ manufacturer || 'Others'}}
+                            </option>
+                        </select>
+                    </div>
+                    <div class="col-sm-12 col-md-6">
                         <label for="modelInput" class="form-label">Model</label>
                         <input
                             type="text"
                             id="modelInput"
                             v-model="addForm.model"
-                            class="form-control"
-                            required
-                        />
-                    </div>
-                    <div class="col-sm-12 col-md-6">
-                        <label for="manufacturerInput" class="form-label"
-                            >Manufacturer</label
-                        >
-                        <input
-                            type="text"
-                            id="manufacturerInput"
-                            v-model="addForm.manufacturer"
                             class="form-control"
                             required
                         />

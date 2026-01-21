@@ -35,7 +35,7 @@ class ComputersController extends Controller
         /** Sorting */
         switch ($sort) {
             case 'name':
-                $query->orderBy('manufacturer', 'asc') // Fixed: changed 'brand' to 'manufacturer'
+                $query->orderBy('manufacturer', 'asc')
                     ->orderBy('model', 'asc');
                 break;
 
@@ -104,17 +104,22 @@ class ComputersController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'brand' => 'required|string',
+            'host_name' => 'nullable|string',
+            'serial_number' => 'required|string|unique:computers,serial_number',
+            'manufacturer' => 'required|string',
             'model' => 'required|string',
-            'serial_num' => 'required|string|unique:computers,serial_num',
-            'processor' => 'required|string',
-            'ram' => 'required|string',
-            'storage' => 'required|string',
-            'os' => 'nullable|string',
-            'cashout' => 'required|boolean',
+            'os_version' => 'required|string',
+            'cpu' => 'nullable|string',
+            'ram_gb' => 'required|string',
+            'storage_gb' => 'required|string',
+            'mac_address' => 'required|string',
+            'ip_address' => 'nullable|string',
+            'purchase_date' => 'nullable|date',
+            'warranty_expiry' => 'nullable|date',
+            'remarks' => 'nullable|string',
         ]);
 
-        $validated['status'] = 'available';
+        $validated['status'] = 'In Storage';
 
         Computers::create($validated);
 
@@ -166,7 +171,7 @@ class ComputersController extends Controller
             $computer->update([
                 'status' => $validated['pullout_reason'],
                 'remarks' => $validated['remarks'],
-        ]);
+            ]);
             $transaction->update($validated);
 
             return redirect()->back()->with('success', 'The computer has been returned successfully.');

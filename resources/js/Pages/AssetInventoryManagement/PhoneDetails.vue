@@ -2,12 +2,15 @@
 import BackButton from '@/Components/BackButton.vue';
 import Breadcrumb from '@/Components/Breadcrumb.vue';
 import Modals from '@/Components/Modals.vue';
+import { useDateFormatter } from '@/composables/useDateFormatter';
 import HomeLayout from '@/Layouts/HomeLayout.vue';
 import { router, useForm } from '@inertiajs/vue3';
 import Swal from 'sweetalert2';
 import { computed, ref, watch } from 'vue';
 
 defineOptions({ layout: HomeLayout });
+
+const { formatDate } = useDateFormatter();
 
 const props = defineProps({
     phone: {
@@ -61,18 +64,8 @@ const getPhoneImagePath = (phone) => {
     return defaultPath;
 };
 
-// Function for date formatting
-const formatDate = (date) => {
-    if (!date) return 'N/A';
-    return new Date(date).toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-    });
-};
-
 // Deleting function
-const deleteItem = (serial_num) => {
+const deleteItem = (id) => {
     Swal.fire({
         title: 'Confirm Delete Asset?',
         text: 'All the data including the table history, issuance, return information, etc., will be deleted.',
@@ -83,7 +76,7 @@ const deleteItem = (serial_num) => {
         confirmButtonText: 'Yes, delete it!',
     }).then((result) => {
         if (result.isConfirmed) {
-            router.delete(route('phone.destroy', props.phone.id), {
+            router.delete(route('phone.destroy', id), {
                 onBefore: () => {
                     Swal.fire({
                         title: 'Processing...',
@@ -99,6 +92,9 @@ const deleteItem = (serial_num) => {
                         text: 'The asset record has been deleted.',
                         icon: 'success',
                     });
+                },
+                onFinish: () => {
+                    if (!Swal.isVisible()) return;
                 },
                 onError: () => {
                     Swal.close();
@@ -141,11 +137,18 @@ const totalPages = computed(() => {
     return Math.ceil(filteredHistory.value.length / itemsPerPage);
 });
 
+const nextPage = () => {
+    if (currentPage.value < totalPages.value) currentPage.value++;
+};
+
+const prevPage = () => {
+    if (currentPage.value > 1) currentPage.value--;
+};
+
 watch(historySearch, () => {
     currentPage.value = 1;
 });
 
-// Forms
 // Form for Issuance
 const form = useForm({
     issued_by: '',
@@ -260,7 +263,7 @@ const updateSubmit = () => {
             <div class="row g-4">
                 <!-- Navigation Menu -->
                 <div class="col-12">
-                    <div class="card bg-light mb-4 border-0 shadow-sm">
+                    <div class="card mb-4">
                         <div
                             class="card-body d-flex justify-content-between align-items-center"
                         >
@@ -279,7 +282,7 @@ const updateSubmit = () => {
                                     data-bs-toggle="modal"
                                     data-bs-target="#IssuePhoneModal"
                                 >
-                                    <i class="bi bi-person-plus me-1"></i> Issue
+                                    <i class="bi bi-plus-circle me-1"></i> Issue
                                     Asset
                                 </button>
                                 <button
@@ -331,7 +334,7 @@ const updateSubmit = () => {
                                         },
                                     ]"
                                 >
-                                    Status: {{ props.phone.status }}
+                                    {{ props.phone.status }}
                                 </span>
                             </div>
 
@@ -401,24 +404,20 @@ const updateSubmit = () => {
                             </ul>
                         </div>
                         <div
-                            class="card-footer d-flex justify-content-around align-items-center gap-2 border-0 bg-transparent pb-3 text-center"
+                            class="card-footer d-flex justify-content-around align-items-center border-0 bg-transparent pb-3 text-center"
                         >
                             <button
                                 class="btn btn-outline-danger"
-                                @click.prevent="
-                                    deleteItem(props.phone.serial_num)
-                                "
+                                @click.prevent="deleteItem(props.phone.id)"
                             >
-                                <i class="bi bi-trash me-1"></i> Delete Asset
-                                Record
+                                <i class="bi bi-trash me-1"></i> Delete
                             </button>
                             <button
                                 class="btn btn-outline-warning"
                                 data-bs-toggle="modal"
                                 data-bs-target="#UpdatePhoneModal"
                             >
-                                <i class="bi bi-pencil me-1"></i> Update Asset
-                                Record
+                                <i class="bi bi-pencil me-1"></i> Update
                             </button>
                         </div>
                     </div>
@@ -669,7 +668,16 @@ const updateSubmit = () => {
                                         <div
                                             class="d-flex align-items-center flex-wrap"
                                         >
-                                            <strong>Acknowledgement:</strong>
+                                            <div
+                                                class="d-flex align-items-center g-1 flex-wrap"
+                                            >
+                                                <div
+                                                    class="bi bi-check-lg me-1"
+                                                ></div>
+                                                <strong
+                                                    >Acknowledgement:</strong
+                                                >
+                                            </div>
 
                                             <span
                                                 class="badge ms-2 border text-white"
@@ -966,7 +974,7 @@ const updateSubmit = () => {
                                             >
                                                 <button
                                                     class="page-link"
-                                                    @click="currentPage--"
+                                                    @click="prevPage"
                                                 >
                                                     Previous
                                                 </button>
@@ -999,7 +1007,7 @@ const updateSubmit = () => {
                                             >
                                                 <button
                                                     class="page-link"
-                                                    @click="currentPage++"
+                                                    @click="nextPage"
                                                 >
                                                     Next
                                                 </button>
@@ -1358,20 +1366,6 @@ const updateSubmit = () => {
                                 class="form-check-label"
                                 for="headphonesReturnCheckInput"
                                 >Headphones</label
-                            >
-                        </div>
-                        <div class="form-check">
-                            <input
-                                class="form-check-input"
-                                type="checkbox"
-                                value="Case"
-                                v-model="selectedReturnAcc"
-                                id="caseReturnCheckInput"
-                            />
-                            <label
-                                class="form-check-label"
-                                for="caseReturnCheckInput"
-                                >Case</label
                             >
                         </div>
                     </div>
