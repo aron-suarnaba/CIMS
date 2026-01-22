@@ -41,8 +41,6 @@ return new class extends Migration {
             $table->date('date_issued');
             $table->string('issued_by');
             $table->text('issued_accessories')->nullable();
-            $table->boolean('it_ack_issued')->default(false);
-            $table->boolean('purch_ack_issued')->default(false);
             $table->boolean('cashout')->default(false);
 
             // Return Info (Starts as Null)
@@ -51,8 +49,6 @@ return new class extends Migration {
             $table->string('returned_by')->nullable();
             $table->string('returnee_department')->nullable();
             $table->text('returned_accessories')->nullable();
-            $table->boolean('it_ack_returned')->default(false);
-            $table->boolean('purch_ack_returned')->default(false);
 
             $table->timestamps();
         });

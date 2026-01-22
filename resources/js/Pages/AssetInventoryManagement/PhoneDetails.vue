@@ -330,7 +330,12 @@ const updateSubmit = () => {
                                         },
                                     ]"
                                 >
-                                    {{ props.phone.status }}
+                                    {{
+                                        props.phone.status
+                                            .charAt(0)
+                                            .toUpperCase() +
+                                        props.phone.status.slice(1)
+                                    }}
                                 </span>
                             </div>
 

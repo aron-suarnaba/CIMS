@@ -37,6 +37,11 @@ watch(searchQuery, () => {
     debouncedSearch();
 });
 
+const getRowNumber = (index) => {
+    return (
+        (props.phones.current_page - 1) * props.phones.per_page + (index + 1)
+    );
+};
 // --- FORM LOGIC ---
 const addForm = useForm({
     brand: '',
@@ -223,11 +228,12 @@ const sortOption = [
                                     <th>Specs (RAM/ROM)</th>
                                     <th>Assigned To</th>
                                     <th>Date Issued</th>
+                                    <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr
-                                    v-for="phone in props.phones.data"
+                                    v-for="(phone, i) in props.phones.data"
                                     :key="phone.id"
                                     @click="
                                         router.get(
@@ -239,7 +245,7 @@ const sortOption = [
                                     style="cursor: pointer"
                                 >
                                     <td class="text-muted ps-4">
-                                        #{{ phone.id }}
+                                        {{ getRowNumber(i) }}
                                     </td>
                                     <td>
                                         <div class="d-flex align-items-center">
@@ -282,8 +288,8 @@ const sortOption = [
                                     </td>
                                     <td>
                                         <small class="text-muted"
-                                            >{{ phone.ram }}GB /
-                                            {{ phone.rom }}GB</small
+                                            >{{ phone.ram }} /
+                                            {{ phone.rom }}</small
                                         >
                                     </td>
                                     <td>
@@ -308,6 +314,15 @@ const sortOption = [
                                             ) || 'Not yet Issued'
                                         }}
                                     </td>
+                                    <td></td>
+                                </tr>
+                                <tr v-if="props.phones.data.length === 0">
+                                    <td
+                                        colspan="7"
+                                        class="text-muted py-5 text-center"
+                                    >
+                                        No phones found matching your criteria.
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>
@@ -316,29 +331,99 @@ const sortOption = [
 
                 <div class="card-footer border-top-0 bg-white py-3">
                     <div
-                        class="d-flex justify-content-between align-items-center"
+                        class="d-flex align-items-center justify-content-between p-3"
                     >
-                        <span class="text-muted small"
-                            >Showing {{ props.phones.from }} to
-                            {{ props.phones.to }} of
-                            {{ props.phones.total }} results</span
-                        >
-                        <nav>
-                            <ul class="pagination pagination-sm mb-0 gap-2">
+                        <div class="text-secondary small">
+                            Showing
+                            <span class="fw-bold text-dark">{{
+                                props.phones.from ?? 0
+                            }}</span>
+                            to
+                            <span class="fw-bold text-dark">{{
+                                props.phones.to ?? 0
+                            }}</span>
+                            of
+                            <span class="fw-bold text-dark">{{
+                                props.phones.total
+                            }}</span>
+                            entries
+                        </div>
+
+                        <nav aria-label="Phone pagination">
+                            <ul class="pagination pagination-sm mb-0 gap-1">
                                 <li
-                                    v-for="link in props.phones.links"
-                                    :key="link.label"
                                     class="page-item"
                                     :class="{
-                                        active: link.active,
-                                        disabled: !link.url,
+                                        disabled:
+                                            props.phones.current_page === 1,
                                     }"
                                 >
                                     <button
-                                        class="page-link"
-                                        @click.prevent="router.get(link.url)"
-                                        v-html="link.label"
-                                    ></button>
+                                        class="page-link rounded-pill bg-light text-dark border-0 px-3"
+                                        @click="
+                                            router.get(
+                                                route('phone.index'),
+                                                {
+                                                    ...$page.props.filters,
+                                                    page:
+                                                        props.phones
+                                                            .current_page - 1,
+                                                },
+                                                { preserveScroll: true },
+                                            )
+                                        "
+                                        :disabled="
+                                            props.phones.current_page === 1
+                                        "
+                                    >
+                                        <span aria-hidden="true">&larr;</span>
+                                        <span class="d-none d-sm-inline ms-1"
+                                            >Previous</span
+                                        >
+                                    </button>
+                                </li>
+
+                                <li class="page-item disabled">
+                                    <span
+                                        class="page-link text-dark fw-medium border-0 bg-transparent px-3"
+                                    >
+                                        Page {{ props.phones.current_page }} of
+                                        {{ props.phones.last_page }}
+                                    </span>
+                                </li>
+
+                                <li
+                                    class="page-item"
+                                    :class="{
+                                        disabled:
+                                            props.phones.current_page ===
+                                            props.phones.last_page,
+                                    }"
+                                >
+                                    <button
+                                        class="page-link rounded-pill bg-light text-dark border-0 px-3"
+                                        @click="
+                                            router.get(
+                                                route('phone.index'),
+                                                {
+                                                    ...$page.props.filters,
+                                                    page:
+                                                        props.phones
+                                                            .current_page + 1,
+                                                },
+                                                { preserveScroll: true },
+                                            )
+                                        "
+                                        :disabled="
+                                            props.phones.current_page ===
+                                            props.phones.last_page
+                                        "
+                                    >
+                                        <span class="d-none d-sm-inline me-1"
+                                            >Next</span
+                                        >
+                                        <span aria-hidden="true">&rarr;</span>
+                                    </button>
                                 </li>
                             </ul>
                         </nav>

@@ -22,49 +22,97 @@ class PhoneController extends Controller
         $search = $request->get('search');
 
         $perPage = 12;
+        $page = max((int) $request->get('page', 1), 1);
+        $start = (($page - 1) * $perPage) + 1;
+        $end = $page * $perPage;
 
-        $query = Phone::query()
-            // Filter by Brand (Dropdown)
-            ->when($filterBrand, function ($q) use ($filterBrand) {
-                $q->where('brand', 'LIKE', '%' . $filterBrand . '%');
-            })
-            // Global Search Bar
-            ->when($search, function ($q) use ($search) {
-                $q->where(function ($sub) use ($search) {
-                    // Search Phone Table
-                    $sub->where('brand', 'LIKE', "%{$search}%")
-                        ->orWhere('model', 'LIKE', "%{$search}%")
-                        ->orWhere('serial_num', 'LIKE', "%{$search}%")
-                        ->orWhere('status', 'LIKE', "%{$search}%")
-                        ->orWhereHas('currentTransaction', function ($rel) use ($search) {
-                        $rel->where('department', 'LIKE', "%{$search}%");
-                    });
-                });
-            });
-
-        /** Sorting Logic **/
-        switch ($sort) {
-            case 'name':
-                $query->orderBy('brand', 'asc')->orderBy('model', 'asc');
-                break;
-            case 'availability':
-                $query->orderByRaw("CASE
+        /*
+        |--------------------------------------------------------------------------
+        | ORDER BY clause (must be duplicated inside ROW_NUMBER)
+        |--------------------------------------------------------------------------
+        */
+        $orderBy = match ($sort) {
+            'name' => 'brand ASC, model ASC, id ASC',
+            'availability' => "
+            CASE
                 WHEN status = 'available' THEN 1
                 WHEN status = 'issued' THEN 2
                 WHEN status = 'return' THEN 3
-                ELSE 4 END");
-                break;
-            case 'date_modified':
-            default:
-                $query->orderBy('updated_at', 'desc');
-                break;
+                ELSE 4
+            END ASC, id DESC
+        ",
+            default => 'updated_at DESC, id DESC',
+        };
+
+        /*
+        |--------------------------------------------------------------------------
+        | WHERE conditions
+        |--------------------------------------------------------------------------
+        */
+        $where = "WHERE 1 = 1";
+        $bindings = [];
+
+        if ($filterBrand) {
+            $where .= " AND brand LIKE ?";
+            $bindings[] = "%{$filterBrand}%";
         }
 
-        // paginate() automatically handles the SQL Server OFFSET logic
-        $phones = $query->with(['currentTransaction'])->paginate($perPage)->withQueryString();
+        if ($search) {
+            $where .= " AND (
+            brand LIKE ?
+            OR model LIKE ?
+            OR serial_num LIKE ?
+            OR status LIKE ?
+        )";
+
+            array_push(
+                $bindings,
+                "%{$search}%",
+                "%{$search}%",
+                "%{$search}%",
+                "%{$search}%"
+            );
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | TOTAL COUNT
+        |--------------------------------------------------------------------------
+        */
+        $total = DB::selectOne("
+        SELECT COUNT(*) AS total
+        FROM phones
+        $where
+    ", $bindings)->total;
+
+        /*
+        |--------------------------------------------------------------------------
+        | ROW_NUMBER PAGINATION QUERY (SQL SERVER 2008 SAFE)
+        |--------------------------------------------------------------------------
+        */
+        $phones = DB::select("
+        SELECT *
+        FROM (
+            SELECT
+                *,
+                ROW_NUMBER() OVER (ORDER BY $orderBy) AS row_num
+            FROM phones
+            $where
+        ) AS numbered
+        WHERE row_num BETWEEN ? AND ?
+        ORDER BY row_num
+    ", [...$bindings, $start, $end]);
 
         return Inertia::render('AssetInventoryManagement/PhoneList', [
-            'phones' => $phones,
+            'phones' => [
+                'data' => $phones,
+                'current_page' => $page,
+                'per_page' => $perPage,
+                'total' => $total,
+                'from' => $start <= $total ? $start : null,
+                'to' => min($end, $total),
+                'last_page' => (int) ceil($total / $perPage),
+            ],
             'filters' => $request->only(['brand', 'sort', 'search']),
         ]);
     }
