@@ -34,7 +34,6 @@ class PhoneSeeder extends Seeder
             'date_issued' => now()->subYear(),
             'date_returned' => now()->subMonths(2),
             'returned_to' => 'IT Department',
-            'it_ack_returned' => true,
         ]);
     }
 }

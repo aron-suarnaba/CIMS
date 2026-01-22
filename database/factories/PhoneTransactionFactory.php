@@ -16,8 +16,6 @@ class PhoneTransactionFactory extends Factory
             'date_issued' => $this->faker->date(),
             'issued_by' => 'IT Admin',
             'issued_accessories' => 'Charger, Case',
-            'it_ack_issued' => true,
-            'purch_ack_issued' => true,
             'date_returned' => $this->faker->date(),
             'returned_by' => $this->faker->name(),
             'returnee_department' => $this->faker->jobTitle(),

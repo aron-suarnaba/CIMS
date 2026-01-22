@@ -156,8 +156,6 @@ const form = useForm({
     department: '',
     date_issued: new Date().toISOString().substr(0, 10),
     issued_accessories: '',
-    it_ack_issued: false,
-    purch_ack_issued: false,
     cashout: false,
     remarks: '',
 });
@@ -169,8 +167,6 @@ const returnform = useForm({
     returnee_department: '',
     date_returned: new Date().toISOString().substr(0, 10),
     returned_accessories: '',
-    it_ack_returned: false,
-    purch_ack_returned: false,
     remarks: '',
 });
 
@@ -502,66 +498,6 @@ const updateSubmit = () => {
                                         <div
                                             class="vr d-none d-md-block mx-2"
                                         ></div>
-                                        <div
-                                            class="d-flex align-items-center flex-wrap"
-                                        >
-                                            <div class="g-1">
-                                                <i
-                                                    class="bi bi-check-lg me-1"
-                                                ></i>
-                                                <strong
-                                                    >Acknowledgement:</strong
-                                                >
-                                            </div>
-                                            <span
-                                                class="badge text-dark ms-2 border text-white"
-                                                :class="
-                                                    props.phone_transaction
-                                                        ?.it_ack_issued
-                                                        ? 'bg-success'
-                                                        : 'bg-danger'
-                                                "
-                                                >IT:
-                                                {{
-                                                    props.phone_transaction
-                                                        ?.it_ack_issued
-                                                        ? 'Yes'
-                                                        : 'No'
-                                                }}
-                                                <i
-                                                    :class="
-                                                        props.phone_transaction
-                                                            ?.it_ack_issued
-                                                            ? 'bi bi-check-circle-fill'
-                                                            : 'bi-x-circle-fill'
-                                                    "
-                                                ></i>
-                                            </span>
-                                            <span
-                                                class="badge text-dark ms-2 border text-white"
-                                                :class="
-                                                    props.phone_transaction
-                                                        ?.purch_ack_issued
-                                                        ? 'bg-success'
-                                                        : 'bg-danger'
-                                                "
-                                                >Purchasing:
-                                                {{
-                                                    props.phone_transaction
-                                                        ?.purch_ack_issued
-                                                        ? 'Yes'
-                                                        : 'No'
-                                                }}
-                                                <i
-                                                    :class="
-                                                        props.phone_transaction
-                                                            ?.it_ack_issued
-                                                            ? 'bi bi-check-circle-fill'
-                                                            : 'bi-x-circle-fill'
-                                                    "
-                                                ></i>
-                                            </span>
-                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -665,74 +601,6 @@ const updateSubmit = () => {
                                         <div
                                             class="vr d-none d-md-block mx-2"
                                         ></div>
-                                        <div
-                                            class="d-flex align-items-center flex-wrap"
-                                        >
-                                            <div
-                                                class="d-flex align-items-center g-1 flex-wrap"
-                                            >
-                                                <div
-                                                    class="bi bi-check-lg me-1"
-                                                ></div>
-                                                <strong
-                                                    >Acknowledgement:</strong
-                                                >
-                                            </div>
-
-                                            <span
-                                                class="badge ms-2 border text-white"
-                                                :class="
-                                                    props.phone_transaction
-                                                        ?.it_ack_returned
-                                                        ? 'bg-success'
-                                                        : 'bg-danger'
-                                                "
-                                            >
-                                                IT:
-                                                {{
-                                                    props.phone_transaction
-                                                        ?.it_ack_returned
-                                                        ? 'Yes'
-                                                        : 'No'
-                                                }}
-                                                <i
-                                                    class="bi ms-1"
-                                                    :class="
-                                                        props.phone_transaction
-                                                            ?.it_ack_returned
-                                                            ? 'bi-check-circle-fill'
-                                                            : 'bi-x-circle-fill'
-                                                    "
-                                                ></i>
-                                            </span>
-
-                                            <span
-                                                class="badge ms-2 border text-white"
-                                                :class="
-                                                    props.phone_transaction
-                                                        ?.purch_ack_returned
-                                                        ? 'bg-success'
-                                                        : 'bg-danger'
-                                                "
-                                            >
-                                                Purchasing:
-                                                {{
-                                                    props.phone_transaction
-                                                        ?.purch_ack_returned
-                                                        ? 'Yes'
-                                                        : 'No'
-                                                }}
-                                                <i
-                                                    class="bi ms-1"
-                                                    :class="
-                                                        props.phone_transaction
-                                                            ?.purch_ack_returned
-                                                            ? 'bi-check-circle-fill'
-                                                            : 'bi-x-circle-fill'
-                                                    "
-                                                ></i>
-                                            </span>
-                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -1087,42 +955,6 @@ const updateSubmit = () => {
 
                 <div class="mb-3">
                     <label class="form-label text-muted small fw-bold"
-                        >Acknowledgement</label
-                    >
-                    <div
-                        class="d-flex justify-content-around gap-4 rounded border p-2"
-                    >
-                        <div class="form-check">
-                            <input
-                                type="checkbox"
-                                v-model="form.it_ack_issued"
-                                id="ITAcknowledgement"
-                                class="form-check-input"
-                            />
-                            <label
-                                for="ITAcknowledgement"
-                                class="form-check-label"
-                                >IT Dept</label
-                            >
-                        </div>
-                        <div class="form-check">
-                            <input
-                                type="checkbox"
-                                v-model="form.purch_ack_issued"
-                                id="PurchAcknowledgement"
-                                class="form-check-input"
-                            />
-                            <label
-                                for="PurchAcknowledgement"
-                                class="form-check-label"
-                                >Purchasing</label
-                            >
-                        </div>
-                    </div>
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label text-muted small fw-bold"
                         >Select Accessories</label
                     >
                     <div
@@ -1298,40 +1130,6 @@ const updateSubmit = () => {
                             class="form-control"
                             required
                         />
-                    </div>
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label">Acknowledgement</label>
-                    <div
-                        class="d-flex justify-content-around align-items-center g-2 rounded border p-2"
-                    >
-                        <div class="form-check">
-                            <input
-                                type="checkbox"
-                                v-model="returnform.it_ack_returned"
-                                id="ITReturnAcknowledgement"
-                                class="form-check-input"
-                            />
-                            <label
-                                for="ITReturnAcknowledgement"
-                                class="form-check-label"
-                                >IT</label
-                            >
-                        </div>
-                        <div class="form-check">
-                            <input
-                                type="checkbox"
-                                v-model="returnform.purch_ack_returned"
-                                id="PurchReturnAcknowledgement"
-                                class="form-check-input"
-                            />
-                            <label
-                                for="PurchReturnAcknowledgement"
-                                class="form-check-label"
-                                >Purchasing</label
-                            >
-                        </div>
                     </div>
                 </div>
 

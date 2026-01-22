@@ -338,7 +338,7 @@ const submit = () => {
                                 :key="manufacturer.id || manufacturer"
                                 :value="manufacturer"
                             >
-                                {{ manufacturer || 'Others'}}
+                                {{ manufacturer || 'Others' }}
                             </option>
                         </select>
                     </div>
