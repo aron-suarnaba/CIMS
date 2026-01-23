@@ -26,29 +26,21 @@ class PhoneController extends Controller
         $start = (($page - 1) * $perPage) + 1;
         $end = $page * $perPage;
 
-        /*
-        |--------------------------------------------------------------------------
-        | ORDER BY clause (must be duplicated inside ROW_NUMBER)
-        |--------------------------------------------------------------------------
-        */
+        // Explicitly prefix columns with 'p.' to avoid ambiguity during JOINs
         $orderBy = match ($sort) {
-            'name' => 'brand ASC, model ASC, id ASC',
+            'name' => 'p.brand ASC, p.model ASC, p.id ASC',
             'availability' => "
-            CASE
-                WHEN status = 'available' THEN 1
-                WHEN status = 'issued' THEN 2
-                WHEN status = 'return' THEN 3
-                ELSE 4
-            END ASC, id DESC
-        ",
-            default => 'updated_at DESC, id DESC',
+        CASE
+            WHEN p.status = 'available' THEN 1
+            WHEN p.status = 'issued' THEN 2
+            WHEN p.status = 'return' THEN 3
+            ELSE 4
+        END ASC, p.id DESC
+    ",
+            // This was the culprit: updated_at -> p.updated_at
+            default => 'p.updated_at DESC, p.id DESC',
         };
 
-        /*
-        |--------------------------------------------------------------------------
-        | WHERE conditions
-        |--------------------------------------------------------------------------
-        */
         $where = "WHERE 1 = 1";
         $bindings = [];
 
@@ -61,51 +53,49 @@ class PhoneController extends Controller
             $where .= " AND (
             brand LIKE ?
             OR model LIKE ?
-            OR serial_num LIKE ?
+            OR p.serial_num LIKE ?
             OR status LIKE ?
         )";
-
-            array_push(
-                $bindings,
-                "%{$search}%",
-                "%{$search}%",
-                "%{$search}%",
-                "%{$search}%"
-            );
+            array_push($bindings, "%{$search}%", "%{$search}%", "%{$search}%", "%{$search}%");
         }
 
-        /*
-        |--------------------------------------------------------------------------
-        | TOTAL COUNT
-        |--------------------------------------------------------------------------
-        */
-        $total = DB::selectOne("
-        SELECT COUNT(*) AS total
-        FROM phones
-        $where
-    ", $bindings)->total;
+        $total = DB::selectOne("SELECT COUNT(*) AS total FROM phones p $where", $bindings)->total;
 
         /*
         |--------------------------------------------------------------------------
-        | ROW_NUMBER PAGINATION QUERY (SQL SERVER 2008 SAFE)
+        | JOINED QUERY
+        | We join phone_transactions where date_returned is NULL to get the active user
         |--------------------------------------------------------------------------
         */
-        $phones = DB::select("
+        $phonesRaw = DB::select("
         SELECT *
         FROM (
             SELECT
-                *,
+                p.*,
+                t.department as trans_dept,
+                t.date_issued as trans_date,
                 ROW_NUMBER() OVER (ORDER BY $orderBy) AS row_num
-            FROM phones
+            FROM phones p
+            LEFT JOIN phone_transactions t ON p.serial_num = t.serial_num
+                 AND t.date_returned IS NULL
             $where
         ) AS numbered
         WHERE row_num BETWEEN ? AND ?
         ORDER BY row_num
     ", [...$bindings, $start, $end]);
 
+        // Map the flat SQL result into the nested object structure your Vue component expects
+        $formattedData = array_map(function ($phone) {
+            $phone->current_transaction = $phone->trans_dept ? [
+                'department' => $phone->trans_dept,
+                'date_issued' => $phone->trans_date,
+            ] : null;
+            return $phone;
+        }, $phonesRaw);
+
         return Inertia::render('AssetInventoryManagement/PhoneList', [
             'phones' => [
-                'data' => $phones,
+                'data' => $formattedData,
                 'current_page' => $page,
                 'per_page' => $perPage,
                 'total' => $total,

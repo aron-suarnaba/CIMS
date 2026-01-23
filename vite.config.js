@@ -27,4 +27,12 @@ export default defineConfig({
             'ziggy-js': path.resolve(__dirname, 'vendor/tightenco/ziggy/dist/vue.m'),
         },
     },
+    server: {
+        proxy: {
+            '/api': {
+                target: 'http://localhost',
+                changeOrigin: true,
+            },
+        },
+    },
 });

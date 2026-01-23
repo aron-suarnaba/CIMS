@@ -255,7 +255,7 @@ const updateSubmit = () => {
     </div>
 
     <div class="app-content mt-4">
-        <div class="container-fluid">
+        <div class="container">
             <div class="row g-4">
                 <!-- Navigation Menu -->
                 <div class="col-12">

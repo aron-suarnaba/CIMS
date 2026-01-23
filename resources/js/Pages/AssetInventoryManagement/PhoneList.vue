@@ -295,14 +295,14 @@ const sortOption = [
                                     <td>
                                         <span
                                             :class="
-                                                phone.current_transaction
+                                                phone.phone?.issued_to
                                                     ? 'text-dark'
                                                     : 'text-muted fst-italic'
                                             "
                                         >
                                             {{
-                                                phone.current_transaction
-                                                    ?.department || 'Unassigned'
+                                                phone.phone?.issued_to ||
+                                                'Unassigned'
                                             }}
                                         </span>
                                     </td>
@@ -314,7 +314,22 @@ const sortOption = [
                                             ) || 'Not yet Issued'
                                         }}
                                     </td>
-                                    <td></td>
+                                    <td
+                                        class="d-flex justify-content-start align-items-center gap-2"
+                                    >
+                                        <button
+                                            type="button"
+                                            class="btn btn-outline-warning"
+                                        >
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button
+                                            type="button"
+                                            class="btn btn-outline-danger"
+                                        >
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </td>
                                 </tr>
                                 <tr v-if="props.phones.data.length === 0">
                                     <td
@@ -359,7 +374,7 @@ const sortOption = [
                                     }"
                                 >
                                     <button
-                                        class="page-link rounded-pill bg-light text-dark border-0 px-3"
+                                        class="page-link text-dark border-0 px-3"
                                         @click="
                                             router.get(
                                                 route('phone.index'),
@@ -401,7 +416,7 @@ const sortOption = [
                                     }"
                                 >
                                     <button
-                                        class="page-link rounded-pill bg-light text-dark border-0 px-3"
+                                        class="page-link text-dark border-0 px-3"
                                         @click="
                                             router.get(
                                                 route('phone.index'),

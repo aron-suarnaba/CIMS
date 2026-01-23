@@ -108,8 +108,14 @@ onMounted(fetchDevices);
                             <h5 class="text-primary mb-0">Active Device</h5>
                         </div>
                         <div class="col-sm-12 col-md-4">
-                            <input type="text" class="form-control" />
-                            <i class="bi-bi-search form-label"></i>
+                            <label for="searchNetwork" class="form-label"
+                                ><i class="bi-bi-search"></i
+                            ></label>
+                            <input
+                                type="text"
+                                class="form-control"
+                                id="searchNetwork"
+                            />
                         </div>
                         <div class="col-sm-12 col-md-4 float-end text-end">
                             <span class="badge bg-primary fs-5"
@@ -180,7 +186,7 @@ onMounted(fetchDevices);
                                         colspan="5"
                                         class="text-muted py-4 text-center"
                                     >
-                                        Loading inventory...
+                                        No devices found.
                                     </td>
                                 </tr>
                             </tbody>
