@@ -10,7 +10,7 @@ export function useDateFormatter() {
             }
             return new Intl.DateTimeFormat(locale, {
                 year: 'numeric',
-                month: 'short',
+                month: 'long',
                 day: '2-digit',
             }).format(date);
         } catch (error) {

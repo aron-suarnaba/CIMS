@@ -1,4 +1,5 @@
 import { createInertiaApp, router, usePage } from '@inertiajs/vue3';
+// import * as bootstrap from'bootstrap';
 import 'admin-lte';
 import 'admin-lte/dist/js/adminlte.min.js';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
@@ -9,6 +10,7 @@ import VueApexCharts from 'vue3-apexcharts';
 import { ZiggyVue } from '../../vendor/tightenco/ziggy';
 import '../css/app.css';
 import './bootstrap'; // This usually defines window.axios
+
 
 const appName = import.meta.env.VITE_APP_NAME || 'CIMS';
 

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\Request;
 use App\Models\NetworkDevice; // Your model name
 use App\Jobs\PollNetworkDevice; // Ensure this is imported
 use Inertia\Inertia;

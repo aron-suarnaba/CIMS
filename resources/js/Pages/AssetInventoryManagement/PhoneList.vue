@@ -5,9 +5,9 @@ import Modals from '@/Components/Modals.vue';
 import { useDateFormatter } from '@/composables/useDateFormatter';
 import HomeLayout from '@/Layouts/HomeLayout.vue';
 import { router, useForm } from '@inertiajs/vue3';
-import debounce from 'lodash/debounce'; // Import debounce
+import debounce from 'lodash/debounce';
 import Swal from 'sweetalert2';
-import { ref, watch } from 'vue'; // Add watch here
+import { ref, watch } from 'vue';
 
 const { formatDate } = useDateFormatter();
 defineOptions({ layout: HomeLayout });
@@ -30,7 +30,7 @@ const searchQuery = ref(
 //Searching
 const debouncedSearch = debounce(() => {
     applyFilter();
-}, 500); // 500ms delay
+}, 300);
 
 // Watch the searchQuery ref for changes
 watch(searchQuery, () => {
@@ -126,6 +126,49 @@ const sortOption = [
     { label: 'Date Modified', value: 'date_modified' },
     { label: 'Availability', value: 'availability' },
 ];
+const updateForm = useForm({
+    brand: '',
+    model: '',
+    serial_num: '',
+    imei_one: '',
+    imei_two: '',
+    ram: '',
+    rom: '',
+    sim_no: '',
+    purchase_date: '',
+    remarks: '',
+});
+watch(
+    () => props.phone,
+    (newPhone) => {
+        if (newPhone) {
+            updateForm.brand = newPhone.brand ?? '';
+            updateForm.model = newPhone.model ?? '';
+            updateForm.serial_num = newPhone.serial_num ?? '';
+            updateForm.imei_one = newPhone.imei_one ?? '';
+            updateForm.imei_two = newPhone.imei_two ?? '';
+            updateForm.ram = newPhone.ram ?? '';
+            updateForm.rom = newPhone.rom ?? '';
+            updateForm.sim_no = newPhone.sim_no ?? '';
+            updateForm.purchase_date = newPhone.purchase_date ?? '';
+            updateForm.remarks = newPhone.remarks ?? '';
+        }
+    },
+    { immediate: true },
+);
+const updateSubmit = () => {
+    updateForm.put(route('phone.update', props.phone.id), {
+        preserveScroll: true,
+        onSuccess: () => {
+            // Closes modal using the data-bs-dismiss trigger
+            const modalElement = document.getElementById('UpdatePhoneModal');
+            const closeBtn = modalElement.querySelector(
+                '[data-bs-dismiss="modal"]',
+            );
+            closeBtn?.click();
+        },
+    });
+};
 </script>
 
 <template>
@@ -228,7 +271,7 @@ const sortOption = [
                                     <th>Specs (RAM/ROM)</th>
                                     <th>Assigned To</th>
                                     <th>Date Issued</th>
-                                    <th>Actions</th>
+                                    <th class="text-center">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -315,7 +358,7 @@ const sortOption = [
                                         }}
                                     </td>
                                     <td
-                                        class="d-flex justify-content-start align-items-center gap-2"
+                                        class="d-flex justify-content-center align-items-center gap-2"
                                     >
                                         <button
                                             type="button"
@@ -457,7 +500,9 @@ const sortOption = [
             <form @submit.prevent="submitAddForm" id="addPhoneForm">
                 <div class="row d-flex align-items-center mb-3">
                     <div class="col-sm-12 col-md-6">
-                        <label for="brandInput" class="form-label">Brand</label>
+                        <label for="brandInput" class="form-label"
+                            >Brand<i class="text-danger">*</i></label
+                        >
                         <input
                             type="text"
                             id="brandInput"
@@ -467,7 +512,9 @@ const sortOption = [
                         />
                     </div>
                     <div class="col-sm-12 col-md-6">
-                        <label for="modelInput" class="form-label">Model</label>
+                        <label for="modelInput" class="form-label"
+                            >Model<i class="text-danger">*</i></label
+                        >
                         <input
                             type="text"
                             id="modelInput"
@@ -480,7 +527,7 @@ const sortOption = [
                 <div class="row d-flex align-items-center mb-3">
                     <div class="col-sm-12 col-md-6">
                         <label for="serialNumInput" class="form-label"
-                            >Serial Number</label
+                            >Serial Number<i class="text-danger">*</i></label
                         >
                         <input
                             type="text"
@@ -516,7 +563,9 @@ const sortOption = [
                         />
                     </div>
                     <div class="col-sm-12 col-md-6">
-                        <label for="ramInput" class="form-label">RAM</label>
+                        <label for="ramInput" class="form-label"
+                            >RAM<i class="text-danger">*</i></label
+                        >
                         <input
                             type="text"
                             id="ramInput"
@@ -528,7 +577,9 @@ const sortOption = [
                 </div>
                 <div class="row d-flex align-items-center mb-3">
                     <div class="col-sm-12 col-md-6">
-                        <label for="romInput" class="form-label">ROM</label>
+                        <label for="romInput" class="form-label"
+                            >ROM<i class="text-danger">*</i></label
+                        >
                         <input
                             type="text"
                             id="romInput"
@@ -592,6 +643,174 @@ const sortOption = [
                     class="spinner-border spinner-border-sm me-1"
                 ></span>
                 Add Asset
+            </button>
+        </template>
+    </Modals>
+    <Modals
+        id="UpdatePhoneModal"
+        title="Update Phone Asset"
+        header-class="bg-warning text-white bg-gradient"
+    >
+        <template #body>
+            <form @submit.prevent="updateSubmit" id="updateForm">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="update_brand" class="form-label"
+                            >Brand</label
+                        >
+                        <input
+                            type="text"
+                            id="update_brand"
+                            v-model="updateForm.brand"
+                            class="form-control"
+                            required
+                        />
+                    </div>
+                    <div class="col-md-6">
+                        <label for="update_model" class="form-label"
+                            >Model</label
+                        >
+                        <input
+                            type="text"
+                            id="update_model"
+                            v-model="updateForm.model"
+                            class="form-control"
+                            required
+                        />
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="update_serial_num" class="form-label"
+                            >Serial Number</label
+                        >
+                        <input
+                            type="text"
+                            id="update_serial_num"
+                            v-model="updateForm.serial_num"
+                            class="form-control"
+                            required
+                        />
+                    </div>
+                    <div class="col-md-6">
+                        <label for="update_sim_no" class="form-label"
+                            >SIM Number</label
+                        >
+                        <input
+                            type="text"
+                            id="update_sim_no"
+                            v-model="updateForm.sim_no"
+                            class="form-control"
+                        />
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="update_imei_one" class="form-label"
+                            >IMEI One</label
+                        >
+                        <input
+                            type="text"
+                            id="update_imei_one"
+                            v-model="updateForm.imei_one"
+                            class="form-control"
+                            required
+                        />
+                    </div>
+                    <div class="col-md-6">
+                        <label for="update_imei_two" class="form-label"
+                            >IMEI Two</label
+                        >
+                        <input
+                            type="text"
+                            id="update_imei_two"
+                            v-model="updateForm.imei_two"
+                            class="form-control"
+                        />
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="update_ram" class="form-label">RAM</label>
+                        <input
+                            type="text"
+                            id="update_ram"
+                            v-model="updateForm.ram"
+                            class="form-control"
+                            required
+                        />
+                    </div>
+                    <div class="col-md-6">
+                        <label for="update_rom" class="form-label">ROM</label>
+                        <input
+                            type="text"
+                            id="update_rom"
+                            v-model="updateForm.rom"
+                            class="form-control"
+                            required
+                        />
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="update_purchase_date" class="form-label"
+                            >Purchase Date</label
+                        >
+                        <input
+                            type="date"
+                            id="update_purchase_date"
+                            v-model="updateForm.purchase_date"
+                            class="form-control"
+                        />
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="update_remarks" class="form-label"
+                        >Remarks</label
+                    >
+                    <textarea
+                        v-model="updateForm.remarks"
+                        id="update_remarks"
+                        rows="3"
+                        class="form-control"
+                    ></textarea>
+                </div>
+                <input
+                    type="text"
+                    v-model="updateForm.brand"
+                    class="form-control"
+                    :class="{ 'is-invalid': updateForm.errors.brand }"
+                />
+                <div v-if="updateForm.errors.brand" class="invalid-feedback">
+                    {{ updateForm.errors.brand }}
+                </div>
+            </form>
+        </template>
+
+        <template #footer>
+            <button
+                type="button"
+                class="btn btn-secondary"
+                data-bs-dismiss="modal"
+            >
+                Cancel
+            </button>
+            <button
+                type="submit"
+                class="btn btn-warning"
+                form="updateForm"
+                :disabled="updateForm.processing"
+            >
+                <span
+                    v-if="updateForm.processing"
+                    class="spinner-border spinner-border-sm me-1"
+                ></span>
+                Update Asset
             </button>
         </template>
     </Modals>

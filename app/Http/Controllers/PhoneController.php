@@ -6,7 +6,6 @@ use App\Models\Phone;
 use App\Models\PhoneTransaction;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 
 class PhoneController extends Controller
@@ -36,8 +35,7 @@ class PhoneController extends Controller
             WHEN p.status = 'return' THEN 3
             ELSE 4
         END ASC, p.id DESC
-    ",
-            // This was the culprit: updated_at -> p.updated_at
+        ",
             default => 'p.updated_at DESC, p.id DESC',
         };
 
@@ -84,7 +82,6 @@ class PhoneController extends Controller
         ORDER BY row_num
     ", [...$bindings, $start, $end]);
 
-        // Map the flat SQL result into the nested object structure your Vue component expects
         $formattedData = array_map(function ($phone) {
             $phone->current_transaction = $phone->trans_dept ? [
                 'department' => $phone->trans_dept,
@@ -149,9 +146,9 @@ class PhoneController extends Controller
         // 1. Validate Transaction Data
         $validated = $request->validate([
             'issued_to' => 'required|string|max:255',
+            'issued_by' => 'nullable|string|max:255',
             'department' => 'required|string|max:255',
             'date_issued' => 'required|date',
-            'issued_by' => 'nullable|string|max:255',
             'issued_accessories' => 'nullable|string',
             'cashout' => 'required|boolean',
             'remarks' => 'nullable|string|max:255',

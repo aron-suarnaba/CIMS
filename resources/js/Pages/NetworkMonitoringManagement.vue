@@ -1,10 +1,10 @@
 <script setup>
-import BackButton from '@/Components/BackButton.vue';
-import Breadcrumb from '@/Components/Breadcrumb.vue';
+import { ref, onMounted, computed } from 'vue'; // Added computed
+import axios from 'axios';
 import HomeLayout from '@/Layouts/HomeLayout.vue';
 import { router } from '@inertiajs/vue3';
-import axios from 'axios';
-import { computed, onMounted, ref } from 'vue'; // Added computed
+import BackButton from '@/Components/BackButton.vue';
+import Breadcrumb from '@/Components/Breadcrumb.vue';
 
 defineOptions({
     layout: HomeLayout,
@@ -78,12 +78,12 @@ onMounted(fetchDevices);
                     />
                 </div>
                 <div class="col-sm-12 col-md-6 text-end">
-                    <!-- <button
+                    <button
                         @click.prevent="router.get(route('firewall.index'))"
                         class="btn btn-outline-primary"
                     >
                         <i class="bi bi-shield-lock me-1"></i> Firewall Settings
-                    </button> -->
+                    </button>
                 </div>
             </div>
 
@@ -108,14 +108,8 @@ onMounted(fetchDevices);
                             <h5 class="text-primary mb-0">Active Device</h5>
                         </div>
                         <div class="col-sm-12 col-md-4">
-                            <label for="searchNetwork" class="form-label"
-                                ><i class="bi-bi-search"></i
-                            ></label>
-                            <input
-                                type="text"
-                                class="form-control"
-                                id="searchNetwork"
-                            />
+                            <input type="text" class="form-control" />
+                            <i class="bi-bi-search form-label"></i>
                         </div>
                         <div class="col-sm-12 col-md-4 float-end text-end">
                             <span class="badge bg-primary fs-5"
@@ -149,13 +143,11 @@ onMounted(fetchDevices);
                                         "
                                     >
                                         <i class="bi bi-laptop me-2"></i>
-                                        <strong
-                                            >{{
-                                                device.hostname ||
-                                                device.alias ||
-                                                'Unnamed'
-                                            }}
-                                        </strong>
+                                        <strong>{{
+                                            device.hostname ||
+                                            device.alias ||
+                                            'Unnamed'
+                                        }}</strong>
                                         <small class="text-secondary fw-bold">{{
                                             device.mac_firewall_address
                                                 ? '(' +
@@ -186,7 +178,7 @@ onMounted(fetchDevices);
                                         colspan="5"
                                         class="text-muted py-4 text-center"
                                     >
-                                        No devices found.
+                                        No device found
                                     </td>
                                 </tr>
                             </tbody>
