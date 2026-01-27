@@ -56,6 +56,22 @@ const addForm = useForm({
     remarks: '',
 });
 
+// Form for update
+const updateForm = useForm({
+    id: null,
+    brand: props.phones.brand || '',
+    model: props.phones.model || '',
+    serial_num: props.phones.serial_num || '',
+    imei_one: props.phones.imei_one || '',
+    imei_two: props.phones.imei_two || '',
+    ram: props.phones.ram || '',
+    rom: props.phones.rom || '',
+    sim_no: props.phones.sim_no || '',
+    purchase_date: props.phones.purchase_date || '',
+    remarks: props.phones.remarks || '',
+});
+
+
 const submitAddForm = () => {
     addForm.post(route('phone.store'), {
         onSuccess: () => {
@@ -126,38 +142,34 @@ const sortOption = [
     { label: 'Date Modified', value: 'date_modified' },
     { label: 'Availability', value: 'availability' },
 ];
-const updateForm = useForm({
-    brand: '',
-    model: '',
-    serial_num: '',
-    imei_one: '',
-    imei_two: '',
-    ram: '',
-    rom: '',
-    sim_no: '',
-    purchase_date: '',
-    remarks: '',
-});
-watch(
-    () => props.phone,
-    (newPhone) => {
-        if (newPhone) {
-            updateForm.brand = newPhone.brand ?? '';
-            updateForm.model = newPhone.model ?? '';
-            updateForm.serial_num = newPhone.serial_num ?? '';
-            updateForm.imei_one = newPhone.imei_one ?? '';
-            updateForm.imei_two = newPhone.imei_two ?? '';
-            updateForm.ram = newPhone.ram ?? '';
-            updateForm.rom = newPhone.rom ?? '';
-            updateForm.sim_no = newPhone.sim_no ?? '';
-            updateForm.purchase_date = newPhone.purchase_date ?? '';
-            updateForm.remarks = newPhone.remarks ?? '';
-        }
-    },
-    { immediate: true },
-);
+// const updateForm = useForm({
+//     brand: '',
+//     model: '',
+//     serial_num: '',
+//     imei_one: '',
+//     imei_two: '',
+//     ram: '',
+//     rom: '',
+//     sim_no: '',
+//     purchase_date: '',
+//     remarks: '',
+// });
+const openUpdateModal = (phone) => {
+    updateForm.id = phone.id;
+    updateForm.brand = phone.brand || '';
+    updateForm.model = phone.model || '';
+    updateForm.serial_num = phone.serial_num || '';
+    updateForm.imei_one = phone.imei_one || '';
+    updateForm.imei_two = phone.imei_two || '';
+    updateForm.ram = phone.ram || '';
+    updateForm.rom = phone.rom || '';
+    updateForm.sim_no = phone.sim_no || '';
+    updateForm.purchase_date = phone.purchase_date || '';
+    updateForm.remarks = phone.remarks || '';
+};
+
 const updateSubmit = () => {
-    updateForm.put(route('phone.update', props.phone.id), {
+    updateForm.put(route('phone.update', updateForm.id), {
         preserveScroll: true,
         onSuccess: () => {
             // Closes modal using the data-bs-dismiss trigger
@@ -188,7 +200,7 @@ const updateSubmit = () => {
                 />
             </div>
 
-            <div class="card border-0 shadow-sm">
+            <div class="card mb-5 border-0 shadow-sm">
                 <div class="card-header bg-white py-3">
                     <div class="row align-items-center g-3">
                         <div class="col-md-4">
@@ -363,12 +375,16 @@ const updateSubmit = () => {
                                         <button
                                             type="button"
                                             class="btn btn-outline-warning"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#UpdatePhoneModal"
+                                            @click.stop="openUpdateModal(phone)"
                                         >
                                             <i class="bi bi-pencil"></i>
                                         </button>
                                         <button
                                             type="button"
                                             class="btn btn-outline-danger"
+                                            @click.stop
                                         >
                                             <i class="bi bi-trash"></i>
                                         </button>
@@ -490,6 +506,167 @@ const updateSubmit = () => {
             </div>
         </div>
     </div>
+
+    <!-- Update Modals -->
+    <Modals
+        id="UpdatePhoneModal"
+        title="Update Phone Asset"
+        header-class="bg-warning text-white bg-gradient"
+    >
+        <template #body>
+            <form @submit.prevent="updateSubmit" id="updateForm">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="update_brand" class="form-label"
+                            >Brand</label
+                        >
+                        <input
+                            type="text"
+                            id="update_brand"
+                            v-model="updateForm.brand"
+                            class="form-control"
+                            required
+                        />
+                    </div>
+                    <div class="col-md-6">
+                        <label for="update_model" class="form-label"
+                            >Model</label
+                        >
+                        <input
+                            type="text"
+                            id="update_model"
+                            v-model="updateForm.model"
+                            class="form-control"
+                            required
+                        />
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="update_serial_num" class="form-label"
+                            >Serial Number</label
+                        >
+                        <input
+                            type="text"
+                            id="update_serial_num"
+                            v-model="updateForm.serial_num"
+                            class="form-control"
+                            required
+                        />
+                    </div>
+                    <div class="col-md-6">
+                        <label for="update_sim_no" class="form-label"
+                            >SIM Number</label
+                        >
+                        <input
+                            type="text"
+                            id="update_sim_no"
+                            v-model="updateForm.sim_no"
+                            class="form-control"
+                        />
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="update_imei_one" class="form-label"
+                            >IMEI One</label
+                        >
+                        <input
+                            type="text"
+                            id="update_imei_one"
+                            v-model="updateForm.imei_one"
+                            class="form-control"
+                            required
+                        />
+                    </div>
+                    <div class="col-md-6">
+                        <label for="update_imei_two" class="form-label"
+                            >IMEI Two</label
+                        >
+                        <input
+                            type="text"
+                            id="update_imei_two"
+                            v-model="updateForm.imei_two"
+                            class="form-control"
+                        />
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="update_ram" class="form-label">RAM</label>
+                        <input
+                            type="text"
+                            id="update_ram"
+                            v-model="updateForm.ram"
+                            class="form-control"
+                            required
+                        />
+                    </div>
+                    <div class="col-md-6">
+                        <label for="update_rom" class="form-label">ROM</label>
+                        <input
+                            type="text"
+                            id="update_rom"
+                            v-model="updateForm.rom"
+                            class="form-control"
+                            required
+                        />
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="update_purchase_date" class="form-label"
+                            >Purchase Date</label
+                        >
+                        <input
+                            type="date"
+                            id="update_purchase_date"
+                            v-model="updateForm.purchase_date"
+                            class="form-control"
+                        />
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="update_remarks" class="form-label"
+                        >Remarks</label
+                    >
+                    <textarea
+                        v-model="updateForm.remarks"
+                        id="update_remarks"
+                        rows="3"
+                        class="form-control"
+                    ></textarea>
+                </div>
+            </form>
+        </template>
+
+        <template #footer>
+            <button
+                type="button"
+                class="btn btn-secondary"
+                data-bs-dismiss="modal"
+            >
+                Cancel
+            </button>
+            <button
+                type="submit"
+                class="btn btn-warning"
+                form="updateForm"
+                :disabled="updateForm.processing"
+            >
+                <span
+                    v-if="updateForm.processing"
+                    class="spinner-border spinner-border-sm me-1"
+                ></span>
+                Update Asset
+            </button>
+        </template>
+    </Modals>
 
     <Modals
         id="AddPhoneModal"
@@ -643,174 +820,6 @@ const updateSubmit = () => {
                     class="spinner-border spinner-border-sm me-1"
                 ></span>
                 Add Asset
-            </button>
-        </template>
-    </Modals>
-    <Modals
-        id="UpdatePhoneModal"
-        title="Update Phone Asset"
-        header-class="bg-warning text-white bg-gradient"
-    >
-        <template #body>
-            <form @submit.prevent="updateSubmit" id="updateForm">
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        <label for="update_brand" class="form-label"
-                            >Brand</label
-                        >
-                        <input
-                            type="text"
-                            id="update_brand"
-                            v-model="updateForm.brand"
-                            class="form-control"
-                            required
-                        />
-                    </div>
-                    <div class="col-md-6">
-                        <label for="update_model" class="form-label"
-                            >Model</label
-                        >
-                        <input
-                            type="text"
-                            id="update_model"
-                            v-model="updateForm.model"
-                            class="form-control"
-                            required
-                        />
-                    </div>
-                </div>
-
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        <label for="update_serial_num" class="form-label"
-                            >Serial Number</label
-                        >
-                        <input
-                            type="text"
-                            id="update_serial_num"
-                            v-model="updateForm.serial_num"
-                            class="form-control"
-                            required
-                        />
-                    </div>
-                    <div class="col-md-6">
-                        <label for="update_sim_no" class="form-label"
-                            >SIM Number</label
-                        >
-                        <input
-                            type="text"
-                            id="update_sim_no"
-                            v-model="updateForm.sim_no"
-                            class="form-control"
-                        />
-                    </div>
-                </div>
-
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        <label for="update_imei_one" class="form-label"
-                            >IMEI One</label
-                        >
-                        <input
-                            type="text"
-                            id="update_imei_one"
-                            v-model="updateForm.imei_one"
-                            class="form-control"
-                            required
-                        />
-                    </div>
-                    <div class="col-md-6">
-                        <label for="update_imei_two" class="form-label"
-                            >IMEI Two</label
-                        >
-                        <input
-                            type="text"
-                            id="update_imei_two"
-                            v-model="updateForm.imei_two"
-                            class="form-control"
-                        />
-                    </div>
-                </div>
-
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        <label for="update_ram" class="form-label">RAM</label>
-                        <input
-                            type="text"
-                            id="update_ram"
-                            v-model="updateForm.ram"
-                            class="form-control"
-                            required
-                        />
-                    </div>
-                    <div class="col-md-6">
-                        <label for="update_rom" class="form-label">ROM</label>
-                        <input
-                            type="text"
-                            id="update_rom"
-                            v-model="updateForm.rom"
-                            class="form-control"
-                            required
-                        />
-                    </div>
-                </div>
-
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        <label for="update_purchase_date" class="form-label"
-                            >Purchase Date</label
-                        >
-                        <input
-                            type="date"
-                            id="update_purchase_date"
-                            v-model="updateForm.purchase_date"
-                            class="form-control"
-                        />
-                    </div>
-                </div>
-
-                <div class="mb-3">
-                    <label for="update_remarks" class="form-label"
-                        >Remarks</label
-                    >
-                    <textarea
-                        v-model="updateForm.remarks"
-                        id="update_remarks"
-                        rows="3"
-                        class="form-control"
-                    ></textarea>
-                </div>
-                <input
-                    type="text"
-                    v-model="updateForm.brand"
-                    class="form-control"
-                    :class="{ 'is-invalid': updateForm.errors.brand }"
-                />
-                <div v-if="updateForm.errors.brand" class="invalid-feedback">
-                    {{ updateForm.errors.brand }}
-                </div>
-            </form>
-        </template>
-
-        <template #footer>
-            <button
-                type="button"
-                class="btn btn-secondary"
-                data-bs-dismiss="modal"
-            >
-                Cancel
-            </button>
-            <button
-                type="submit"
-                class="btn btn-warning"
-                form="updateForm"
-                :disabled="updateForm.processing"
-            >
-                <span
-                    v-if="updateForm.processing"
-                    class="spinner-border spinner-border-sm me-1"
-                ></span>
-                Update Asset
             </button>
         </template>
     </Modals>

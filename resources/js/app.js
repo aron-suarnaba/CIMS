@@ -1,6 +1,7 @@
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { faHouse, faUser } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { createInertiaApp, router, usePage } from '@inertiajs/vue3';
-// import * as bootstrap from'bootstrap';
-import 'admin-lte';
 import 'admin-lte/dist/js/adminlte.min.js';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
@@ -11,8 +12,9 @@ import { ZiggyVue } from '../../vendor/tightenco/ziggy';
 import '../css/app.css';
 import './bootstrap'; // This usually defines window.axios
 
-
 const appName = import.meta.env.VITE_APP_NAME || 'CIMS';
+
+library.add(faUser, faHouse);
 
 // Intercept Axios requests (for manual calls)
 window.axios.interceptors.response.use(
@@ -39,8 +41,8 @@ createInertiaApp({
         const app = createApp({ render: () => h(App, props) })
             .use(plugin)
             .use(ZiggyVue)
-            .use(VueApexCharts);
-
+            .use(VueApexCharts)
+            .component('font-awesome-icon', FontAwesomeIcon);
         const page = usePage();
 
         // FIX: Use 'invalid' to catch session timeouts during navigation
