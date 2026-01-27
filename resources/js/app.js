@@ -3,7 +3,7 @@ import { faHouse, faUser } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { createInertiaApp, router, usePage } from '@inertiajs/vue3';
 import 'admin-lte/dist/js/adminlte.min.js';
-import 'bootstrap/dist/js/bootstrap.bundle.min.js';
+import * as bootstrap from 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import Swal from 'sweetalert2';
 import { createApp, h, watch } from 'vue';
@@ -11,12 +11,12 @@ import VueApexCharts from 'vue3-apexcharts';
 import { ZiggyVue } from '../../vendor/tightenco/ziggy';
 import '../css/app.css';
 import './bootstrap'; // This usually defines window.axios
+window.bootstrap = bootstrap;
 
 const appName = import.meta.env.VITE_APP_NAME || 'CIMS';
 
 library.add(faUser, faHouse);
 
-// Intercept Axios requests (for manual calls)
 window.axios.interceptors.response.use(
     (response) => response,
     (error) => {
@@ -44,8 +44,6 @@ createInertiaApp({
             .use(VueApexCharts)
             .component('font-awesome-icon', FontAwesomeIcon);
         const page = usePage();
-
-        // FIX: Use 'invalid' to catch session timeouts during navigation
         router.on('invalid', (event) => {
             if (event.detail.response.status === 419) {
                 event.preventDefault(); // Prevent Inertia's default modal

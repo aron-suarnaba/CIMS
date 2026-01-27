@@ -193,18 +193,54 @@ watch(selectedReturnAcc, (newVal) => {
     returnform.returned_accessories = newVal.join(', ');
 });
 
+const openIssueModal = () => {
+    const modalElement = document.getElementById('IssuePhoneModal');
+    if (!modalElement) return;
+
+    const modal = window.bootstrap.Modal.getOrCreateInstance(modalElement, {
+        backdrop: true,
+        keyboard: true,
+    });
+
+    modal.show();
+};
+
 //Submission
 const submit = () => {
     form.post(route('phone.issue', props.phone.id), {
         onSuccess: () => {
-            const modalElement = document.getElementById('IssuePhoneModal');
-            // No 'window' prefix needed here
-            const modalInstance =
-                bootstrap.Modal.getOrCreateInstance(modalElement);
-            modalInstance.hide();
+            // const modalElement = document.getElementById('IssuePhoneModal');
+            // // No 'window' prefix needed here
+            // const modalInstance =
+            //     bootstrap.Modal.getOrCreateInstance(modalElement);
+            // modalInstance.hide();
+
+            const closeButton = document.querySelector(
+                '#IssuePhoneModal [data-bs-dismiss="modal"]',
+            );
+            if (closeButton) {
+                closeButton.click();
+            }
         },
     });
 };
+
+const returnSubmit = () => {
+    returnform.post(route('phone.return', props.phone.id), {
+        onSuccess: () => {
+            returnform.reset();
+            selectedReturnAcc.value = [];
+
+            const closeButton = document.querySelector(
+                '#ReturnPhoneModal [data-bs-dismiss="modal"]',
+            );
+            if (closeButton) {
+                closeButton.click();
+            }
+        },
+    });
+};
+
 
 const updateSubmit = () => {
     updateForm.put(route('phone.update', props.phone.id), {
@@ -217,6 +253,46 @@ const updateSubmit = () => {
             }
         },
     });
+};
+
+const openUpdateModal = (phone) => {
+    // 1. Map the phone data to the form fields
+    updateForm.id = phone.id;
+    updateForm.brand = phone.brand;
+    updateForm.model = phone.model;
+    updateForm.imei_one = phone.imei_one;
+    updateForm.imei_two = phone.imei_two;
+    updateForm.serial_number = phone.serial_number;
+    updateForm.status = phone.status;
+
+    // 2. Clear any previous validation errors
+    updateForm.clearErrors();
+
+    // 3. Open Modal safely
+    const modalElement = document.getElementById('UpdatePhoneModal');
+    if (modalElement) {
+        // Use the global bootstrap instance defined in app.js
+        const modalInstance =
+            window.bootstrap.Modal.getOrCreateInstance(modalElement);
+        modalInstance.show();
+    } else {
+        console.error('Modal element #UpdatePhoneModal not found');
+    }
+};
+const openReturnModal = () => {
+    const modalElement = document.getElementById('ReturnPhoneModal');
+    if (!modalElement) {
+        console.error('ReturnPhoneModal not found');
+        return;
+    }
+
+    const modal = window.bootstrap.Modal.getOrCreateInstance(modalElement, {
+        backdrop: true,
+        keyboard: true,
+        focus: true,
+    });
+
+    modal.show();
 };
 </script>
 
@@ -249,8 +325,7 @@ const updateSubmit = () => {
                                         props.phone.status === 'returned'
                                     "
                                     class="btn btn-primary"
-                                    data-bs-toggle="modal"
-                                    data-bs-target="#IssuePhoneModal"
+                                    @click="openIssueModal"
                                 >
                                     <i class="bi bi-plus-circle me-1"></i> Issue
                                     Asset
@@ -258,8 +333,7 @@ const updateSubmit = () => {
                                 <button
                                     v-else-if="props.phone.status === 'issued'"
                                     class="btn btn-warning"
-                                    data-bs-toggle="modal"
-                                    data-bs-target="#ReturnPhoneModal"
+                                    @click="openReturnModal"
                                 >
                                     <i class="bi bi-arrow-return-left me-1"></i>
                                     Process Return
@@ -389,8 +463,7 @@ const updateSubmit = () => {
                             </button>
                             <button
                                 class="btn btn-outline-warning"
-                                data-bs-toggle="modal"
-                                data-bs-target="#UpdatePhoneModal"
+                                @click="openUpdateModal(props.phone)"
                             >
                                 <i class="bi bi-pencil me-1"></i> Update
                             </button>
@@ -985,6 +1058,151 @@ const updateSubmit = () => {
                     class="spinner-border spinner-border-sm me-1"
                 ></span>
                 Issue Asset
+            </button>
+        </template>
+    </Modals>
+
+    <!-- Return Modal -->
+    <Modals
+        id="ReturnPhoneModal"
+        title="Return Phone Asset"
+        header-class="bg-warning text-white bg-gradient"
+    >
+        <template #body>
+            <form @submit.prevent="returnSubmit" id="returnForm">
+                <div class="row mb-3">
+                    <div class="col-sm-12 col-md-6">
+                        <label for="returned_to" class="form-label"
+                            >Returned To</label
+                        >
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="returned_to"
+                            v-model="returnform.returned_to"
+                        />
+                    </div>
+                    <div class="col-sm-12 col-md-6">
+                        <label for="date_returned" class="form-label"
+                            >Date Returned</label
+                        >
+                        <input
+                            type="date"
+                            id="date_returned"
+                            v-model="returnform.date_returned"
+                            class="form-control"
+                            required
+                        />
+                    </div>
+                </div>
+                <div class="row d-flex justify-content-center mb-3">
+                    <div class="col-sm-12 col-md-6">
+                        <label for="returned_by" class="form-label"
+                            >Returned By</label
+                        >
+                        <input
+                            type="text"
+                            id="returned_by"
+                            v-model="returnform.returned_by"
+                            class="form-control"
+                            required
+                        />
+                    </div>
+                    <div class="col-sm-12 col-md-6">
+                        <label for="returnee_department" class="form-label"
+                            >Department</label
+                        >
+                        <input
+                            type="text"
+                            id="returnee_department"
+                            v-model="returnform.returnee_department"
+                            class="form-control"
+                            required
+                        />
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Select Accessories</label>
+                    <div
+                        class="d-flex justify-content-around align-items-center rounded border p-2"
+                    >
+                        <div class="form-check">
+                            <input
+                                class="form-check-input"
+                                type="checkbox"
+                                value="Charger"
+                                v-model="selectedReturnAcc"
+                                id="chargerReturnCheckInput"
+                            />
+                            <label
+                                class="form-check-label"
+                                for="chargerReturnCheckInput"
+                                >Charger</label
+                            >
+                        </div>
+                        <div class="form-check">
+                            <input
+                                class="form-check-input"
+                                type="checkbox"
+                                value="Headphones"
+                                v-model="selectedReturnAcc"
+                                id="headphonesReturnCheckInput"
+                            />
+                            <label
+                                class="form-check-label"
+                                for="headphonesReturnCheckInput"
+                                >Headphones</label
+                            >
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="returned_accessories_summary" class="form-label"
+                        >Other / All Accessories (Summary)</label
+                    >
+                    <input
+                        type="text"
+                        id="returned_accessories_summary"
+                        v-model="returnform.returned_accessories"
+                        class="form-control"
+                        placeholder="e.g. Charger, USB-C Cable"
+                    />
+                </div>
+
+                <div class="mb-3">
+                    <label for="remarksTextarea" class="form-label"
+                        >Remarks</label
+                    >
+                    <textarea
+                        v-model="returnform.remarks"
+                        id="remarksTextarea"
+                        class="form-control"
+                        rows="3"
+                    ></textarea>
+                </div>
+            </form>
+        </template>
+        <template #footer>
+            <button
+                type="button"
+                class="btn btn-secondary"
+                data-bs-dismiss="modal"
+            >
+                Cancel
+            </button>
+            <button
+                type="submit"
+                class="btn btn-primary"
+                form="returnForm"
+                :disabled="returnform.processing"
+            >
+                <span
+                    v-if="returnform.processing"
+                    class="spinner-border spinner-border-sm me-1"
+                ></span>
+                Return
             </button>
         </template>
     </Modals>
