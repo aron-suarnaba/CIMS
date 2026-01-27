@@ -71,7 +71,6 @@ const updateForm = useForm({
     remarks: props.phones.remarks || '',
 });
 
-
 const submitAddForm = () => {
     addForm.post(route('phone.store'), {
         onSuccess: () => {
@@ -179,6 +178,45 @@ const updateSubmit = () => {
             );
             closeBtn?.click();
         },
+    });
+};
+
+const deleteItem = (id) => {
+    Swal.fire({
+        title: 'Confirm Delete Asset?',
+        text: 'All the data including the table history, issuance, return information, etc., will be deleted.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Yes, delete it!',
+    }).then((result) => {
+        if (result.isConfirmed) {
+            router.delete(route('phone.destroy', id), {
+                onBefore: () => {
+                    Swal.fire({
+                        title: 'Processing...',
+                        allowOutsideClick: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        },
+                    });
+                },
+                onSuccess: () => {
+                    Swal.fire({
+                        title: 'Deleted!',
+                        text: 'The asset record has been deleted.',
+                        icon: 'success',
+                    });
+                },
+                onFinish: () => {
+                    if (!Swal.isVisible()) return;
+                },
+                onError: () => {
+                    Swal.close();
+                },
+            });
+        }
     });
 };
 </script>
@@ -384,7 +422,7 @@ const updateSubmit = () => {
                                         <button
                                             type="button"
                                             class="btn btn-outline-danger"
-                                            @click.stop
+                                            @click.stop="deleteItem(phone.id)"
                                         >
                                             <i class="bi bi-trash"></i>
                                         </button>
