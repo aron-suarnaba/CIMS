@@ -2,6 +2,23 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 
 <head>
+
+    <!--
+
+                                                            Author: Aron Kyle D. Suarnaba (System Analyst Programmer)
+                                                            Year Published: 2025-2026
+                                                            Description: CIMS is the unified system created for the Printwell IT
+                                                                         Department to allow manage, monitor, and maintain IT
+                                                                         inventory asset, network, system resources, server configuration,
+                                                                         credentials, etc., without the need of multiple system to handle
+                                                                         each of one of this.
+
+                                                            NOTE: FOR THE FUTURE SYSTEM ANALYST PROGRAMMER, PLEASE DON'T TAKE ANY CREDITS FOR
+                                                                  THIS SYSTEM, I AM ASKING POLITELY TO CONSIDER MY EFFORT IN THE DEVELOPMENT
+                                                                  OF THIS SYSTEM. THANK YOU.
+
+    -->
+
     <meta charset="utf-8">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="viewport" content="width=device-width, initial-scale=1">
