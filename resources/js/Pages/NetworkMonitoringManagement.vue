@@ -1,10 +1,10 @@
 <script setup>
-import { ref, onMounted, computed } from 'vue'; // Added computed
-import axios from 'axios';
-import HomeLayout from '@/Layouts/HomeLayout.vue';
-import { router } from '@inertiajs/vue3';
 import BackButton from '@/Components/BackButton.vue';
 import Breadcrumb from '@/Components/Breadcrumb.vue';
+import HomeLayout from '@/Layouts/HomeLayout.vue';
+import { router } from '@inertiajs/vue3';
+import axios from 'axios';
+import { computed, onMounted, ref } from 'vue'; // Added computed
 
 defineOptions({
     layout: HomeLayout,
@@ -13,7 +13,7 @@ defineOptions({
 // State
 const deviceList = ref([]);
 const currentPage = ref(1);
-const itemsPerPage = ref(25); // Adjust items per page here
+const itemsPerPage = ref(25);
 
 // Breadcrumbs
 const myBreadcrumb = [
@@ -24,7 +24,7 @@ const myBreadcrumb = [
 // Fetching Data
 const fetchDevices = async () => {
     try {
-        const response = await axios.get('/api/fortigate/devices');
+        const response = await axios.get('/CIMS/public/api/fortigate/devices');
 
         // Handle different possible response structures from FortiGate API
         if (response.data && response.data.results) {

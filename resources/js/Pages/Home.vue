@@ -1,10 +1,33 @@
 <script setup>
-import HomeLayout from '@/Layouts/HomeLayout.vue';
 import Breadcrumb from '@/Components/Breadcrumb.vue';
+import HomeLayout from '@/Layouts/HomeLayout.vue';
+import { reactive } from 'vue';
 
 defineOptions({ layout: HomeLayout });
 
 const myBreadcrumb = [{ label: 'Dashboard' }];
+
+const chartOption = reactive({
+    chart: {
+        id: 'vueChart1',
+        type: 'bar',
+    },
+    xaxis: {
+        categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+    },
+    colors: ['#0d6efd'],
+    title: {
+        text: 'Monthly Asset Acquisitions',
+        align: 'center',
+    },
+});
+
+const chartSeries = reactive([
+    {
+        name: 'Phones',
+        data: [22, 65, 32, 54, 76, 45],
+    },
+]);
 </script>
 
 <template>
@@ -16,7 +39,9 @@ const myBreadcrumb = [{ label: 'Dashboard' }];
 
     <div class="app-content mt-5">
         <div class="container">
-            <div class="row justify-content-center">
+            <!-- <div class="row justify-content-center">
+
+
                 <div class="col-12 col-md-8 text-center">
                     <div class="mb-4">
                         <svg
@@ -203,9 +228,25 @@ const myBreadcrumb = [{ label: 'Dashboard' }];
                         updates!
                     </p>
 
-                    <!-- <button @click="window.history.back()" class="btn btn-primary mt-3 px-4">
+                    <button @click="window.history.back()" class="btn btn-primary mt-3 px-4">
                         Go Back
-                    </button> -->
+                    </button>
+                </div>
+            </div> -->
+
+            <div class="row mb-3">
+                <div class="col-sm-12 col-md-3">
+                    <div class="card bg-subtle-secondary">
+                        <apexchart
+                            class="my-3"
+                            width="100%"
+                            height="350"
+                            :type="bar"
+                            :options="chartOption"
+                            :series="chartSeries"
+                        >
+                        </apexchart>
+                    </div>
                 </div>
             </div>
         </div>
