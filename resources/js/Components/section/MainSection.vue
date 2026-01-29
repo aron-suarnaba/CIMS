@@ -3,15 +3,14 @@ const navigateToDashboard = () => {
     // Use router.push('/dashboard') if using vue-router
     window.location.href = '#';
 };
+
+const videoSource = '/CIMS/public/video/WelcomeBackground.mp4';
 </script>
 
 <template>
     <div class="hero-wrapper">
         <video autoplay muted loop playsinline class="video-bg">
-            <source
-                src="/CIMS/public/video/WelcomeBackground.mp4"
-                type="video/mp4"
-            />
+            <source :src="videoSource" type="video/mp4" />
             Your browser does not support the video tag.
         </video>
         <div class="app-content">
@@ -38,7 +37,7 @@ const navigateToDashboard = () => {
                             </p>
 
                             <button
-                                class="btn btn-primary btn-lg fw-bold mb-3 px-5 py-3 shadow-sm"
+                                class="btn btn-primary btn-lg fw-bold mb-3 px-4 py-3 shadow-sm"
                                 type="button"
                                 @click="navigateToDashboard"
                             >
