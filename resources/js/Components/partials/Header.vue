@@ -1,51 +1,61 @@
 <script setup>
+import { Link } from '@inertiajs/vue3';
 import { ref } from 'vue';
 
+// Use absolute paths for images in Laravel public folder
 const logo = ref('./img/logo.png');
-const HomePath = ref(route('welcome'));
-const LoginPath = ref(route('login'));
+
+// Note: You don't actually need to wrap these in ref()
+// unless you plan on changing the strings dynamically.
+const HomePath = route('welcome');
+
+const navItem = [
+    {
+        name: 'Home',
+        url: 'welcome',
+    },
+    {
+        name: 'Login',
+        url: 'login',
+    },
+    {
+        name: 'Features',
+        url: 'login',
+    },
+    {
+        name: 'Pricing',
+        url: 'login',
+    },
+    {
+        name: 'FAQs',
+        url: 'login',
+    },
+    {
+        name: 'About',
+        url: 'login',
+    },
+];
 </script>
+
 <template>
     <div class="app-header">
         <div class="container-fluid">
             <header
                 class="d-flex justify-content-center mb-4 flex-wrap px-5 pt-4"
             >
-                <a
-                    href="/"
+                <Link
+                    :href="HomePath"
                     class="d-flex align-items-center mb-md-0 me-md-auto link-body-emphasis text-decoration-none mb-3"
                 >
-                    <img
-                        :src="logo"
-                        alt="logo"
-                        id="logo"
-                        class="rounded-circle me-2 shadow"
-                    />
-                    <span class="fs-4">CIMS</span>
-                </a>
+                    <img :src="logo" alt="logo" id="logo" class="me-2" />
+                    <span class="fs-4 fw-bold text-primary">CIMS</span>
+                </Link>
+
                 <ul class="nav nav-pills">
-                    <li class="nav-item">
-                        <a
-                            v-bind:href="HomePath"
-                            class="nav-link active"
-                            aria-current="page"
-                            >Home</a
-                        >
-                    </li>
-                    <li class="nav-item">
-                        <a v-bind:href="LoginPath" class="nav-link">Login</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="#" class="nav-link">Features</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="#" class="nav-link">Pricing</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="#" class="nav-link">FAQs</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="#" class="nav-link">About</a>
+                    <li class="nav-item" v-for="nav in navItem" :key="nav.id">
+                        <a :href="route(nav.url)" class="nav-link">{{
+                            nav.name
+                        }}</a>
                     </li>
                 </ul>
             </header>
