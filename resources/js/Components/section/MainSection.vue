@@ -8,7 +8,7 @@ const videoSource = '/CIMS/public/video/WelcomeBackground.mp4';
 </script>
 
 <template>
-    <div class="hero-wrapper">
+    <section class="hero-wrapper">
         <video autoplay muted loop playsinline class="video-bg">
             <source :src="videoSource" type="video/mp4" />
             Your browser does not support the video tag.
@@ -52,7 +52,7 @@ const videoSource = '/CIMS/public/video/WelcomeBackground.mp4';
                 </div>
             </div>
         </div>
-    </div>
+    </section>
 </template>
 
 <style scoped>
