@@ -1,8 +1,18 @@
-<script setup></script>
+<script setup>
+defineProps({
+    id: { type: String, default: '' },
+    aosValue: { type: String, default: '' },
+});
+</script>
 <template>
-    <section class="text-dark mb-5 bg-white py-5">
+    <section class="text-dark bg-white py-5" :id="id" :data-aos="aosValue">
         <div class="container">
-            <div class="mb-5 text-center">
+            <div
+                class="mb-5 text-center"
+                data-aos="fade-left"
+                data-aos-duration="1800"
+                data-aos-ease="ease-in-sine"
+            >
                 <h2 class="fw-bold text-body-emphasis">
                     Engineered for Performance
                 </h2>
@@ -13,7 +23,12 @@
             </div>
 
             <div class="row row-cols-1 row-cols-md-3 g-4 text-center">
-                <div class="col">
+                <div
+                    class="col"
+                    data-aos="fade-up"
+                    data-aos-duration="1400"
+                    data-aos-ease="ease-in-sine"
+                >
                     <div
                         class="border-light-subtle rounded-4 bg-light h-100 transition-hover border p-4 shadow-sm"
                     >
@@ -29,7 +44,12 @@
                     </div>
                 </div>
 
-                <div class="col">
+                <div
+                    class="col"
+                    data-aos="fade-up"
+                    data-aos-duration="1800"
+                    data-aos-ease="ease-in-sine"
+                >
                     <div
                         class="border-light-subtle rounded-4 bg-light h-100 transition-hover border p-4 shadow-sm"
                     >
@@ -44,7 +64,12 @@
                     </div>
                 </div>
 
-                <div class="col">
+                <div
+                    class="col"
+                    data-aos="fade-up"
+                    data-aos-duration="2200"
+                    data-aos-ease="ease"
+                >
                     <div
                         class="border-light-subtle rounded-4 bg-light h-100 transition-hover border p-4 shadow-sm"
                     >

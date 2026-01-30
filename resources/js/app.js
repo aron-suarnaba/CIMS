@@ -3,6 +3,8 @@ import { faHouse, faUser } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { createInertiaApp, router, usePage } from '@inertiajs/vue3';
 import 'admin-lte/dist/js/adminlte.min.js';
+import AOS from 'aos';
+import 'aos/dist/aos.css';
 import * as bootstrap from 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import Swal from 'sweetalert2';
@@ -16,6 +18,10 @@ window.bootstrap = bootstrap;
 const appName = import.meta.env.VITE_APP_NAME || 'CIMS';
 
 library.add(faUser, faHouse);
+
+AOS.init({
+    duration: 1700,
+});
 
 window.axios.interceptors.response.use(
     (response) => response,

@@ -12,17 +12,17 @@ defineOptions({ layout: WelcomeLayout });
 
 <template>
     <div class="short-divider"></div>
-    <MainSection />
+    <MainSection id="mainSection" />
     <div class="long-divider"></div>
-    <FeaturesSection />
+    <FeaturesSection id="featureSection" />
     <div class="long-divider"></div>
-    <SocialProofSection />
+    <SocialProofSection id="proofSection" />
     <div class="long-divider"></div>
-    <HowItWorksSection />
+    <HowItWorksSection id="howItWorksSection" />
     <div class="long-divider"></div>
-    <FAQsSection />
+    <FAQsSection id="faqsSection" />
     <div class="long-divider"></div>
-    <FinalCTASection />
+    <FinalCTASection id="ctaSection" />
     <div class="long-divider"></div>
 </template>
 <style scoped>

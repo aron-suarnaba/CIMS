@@ -12,7 +12,7 @@ const HomePath = route('welcome');
 const navItem = [
     {
         name: 'Home',
-        url: 'welcome',
+        url: '#mainSection',
     },
     {
         name: 'Login',
@@ -20,19 +20,23 @@ const navItem = [
     },
     {
         name: 'Features',
-        url: 'login',
+        url: '#featureSection',
     },
     {
-        name: 'Pricing',
-        url: 'login',
+        name: 'Proof',
+        url: '#proofSection',
+    },
+    {
+        name: 'How It Works',
+        url: '#howItWorksSection',
     },
     {
         name: 'FAQs',
-        url: 'login',
+        url: '#faqsSection',
     },
     {
-        name: 'About',
-        url: 'login',
+        name: 'CTA',
+        url: '#ctaSection',
     },
 ];
 </script>
@@ -53,7 +57,7 @@ const navItem = [
 
                 <ul class="nav nav-pills">
                     <li class="nav-item" v-for="nav in navItem" :key="nav.id">
-                        <a :href="route(nav.url)" class="nav-link">{{
+                        <a :href="nav.url" class="nav-link">{{
                             nav.name
                         }}</a>
                     </li>

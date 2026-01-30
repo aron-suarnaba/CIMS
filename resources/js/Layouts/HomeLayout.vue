@@ -17,3 +17,9 @@ import Footer from '@/Components/partials/Footer.vue';
         <Footer />
     </div>
 </template>
+<style scoped>
+#main{
+    padding-bottom: 13rem;
+    min-height: 90vh;
+}
+</style>

@@ -1,4 +1,7 @@
 <script setup>
+defineProps({
+    id: { type: String, default: '' },
+});
 const navigateToDashboard = () => {
     // Use router.push('/dashboard') if using vue-router
     window.location.href = '#';
@@ -8,7 +11,7 @@ const videoSource = '/CIMS/public/video/WelcomeBackground.mp4';
 </script>
 
 <template>
-    <section class="hero-wrapper">
+    <section class="hero-wrapper" :id="id">
         <video autoplay muted loop playsinline class="video-bg">
             <source :src="videoSource" type="video/mp4" />
             Your browser does not support the video tag.
@@ -23,12 +26,18 @@ const videoSource = '/CIMS/public/video/WelcomeBackground.mp4';
                             <h1
                                 class="display-4 fw-bolder text-md-start text-center"
                                 id="welcomeTextHeader"
+                                data-aos="fade-right"
+                                data-aos-duration="2000"
+                                data-aos-easing="linear"
                             >
                                 One Console. Every Asset. Absolute Control.
                             </h1>
 
                             <p
                                 class="fs-4 text-md-start text-group mb-4 text-wrap text-center text-white"
+                                data-aos="fade-right"
+                                data-aos-duration="2000"
+                                data-aos-easing="linear"
                             >
                                 CIMS unifies your fragmented IT infrastructure
                                 into a single, intelligent management layer.
@@ -40,6 +49,9 @@ const videoSource = '/CIMS/public/video/WelcomeBackground.mp4';
                                 class="btn btn-primary btn-lg fw-bold mb-3 px-4 py-3 shadow-sm"
                                 type="button"
                                 @click="navigateToDashboard"
+                                data-aos="fade-right"
+                                data-aos-duration="1800"
+                                data-aos-easing="linear"
                             >
                                 Launch Dashboard
                             </button>

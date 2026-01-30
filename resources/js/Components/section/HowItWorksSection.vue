@@ -1,29 +1,42 @@
 <script setup>
+defineProps({
+    id: { type: String, default: '' },
+});
 const stepCard = [
     {
         stepNumber: 1,
         description: 'Discover our products',
         icon: 'bi bi-search',
+        aosDuration: '1500',
     },
     {
         stepNumber: 2,
         description: 'Discover our products',
         icon: 'bi bi-cart-plus',
+        aosDuration: '2000',
     },
     {
         stepNumber: 3,
         description: 'Discover our products',
         icon: 'bi bi-credit-card',
+        aosDuration: '2500',
     },
     {
         stepNumber: 4,
         description: 'Discover our products',
         icon: 'bi bi-truck',
+        aosDuration: '3000',
     },
 ];
 </script>
 <template>
-    <section class="steps-section bg-light mx-0 my-4 rounded-md p-5">
+    <section
+        class="steps-section bg-light mx-0 my-4 rounded-md p-5"
+        :id="id"
+        data-aos="fade-down"
+        data-aos-ease="linear"
+        data-aos-duration="1800"
+    >
         <div class="container-fluid">
             <h2 class="fw-bold mb-5 text-center">How It Works</h2>
             <div class="row">
@@ -31,6 +44,9 @@ const stepCard = [
                     class="col-md-3 mb-md-0 mb-4"
                     v-for="step in stepCard"
                     :key="step.stepNumber"
+                    data-aos="fade-up"
+                    data-aos-ease="ease-in-sine"
+                    :data-aos-duration="aosDuration"
                 >
                     <div class="step-item text-center">
                         <div class="step-icon mb-3">

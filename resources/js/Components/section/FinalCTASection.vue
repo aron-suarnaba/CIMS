@@ -1,6 +1,16 @@
-<script setup></script>
+<script setup>
+defineProps({
+    id: { type: String, default: '' },
+});
+</script>
 <template>
-    <section class="py-5">
+    <section
+        class="py-5"
+        :id="id"
+        data-aos="fade-up"
+        data-aos-ease="linear"
+        data-aos-duration="1800"
+    >
         <div class="container">
             <div class="rounded-5 bg-light border p-5 text-center shadow-sm">
                 <h2 class="fw-bold text-dark display-6 mb-3">

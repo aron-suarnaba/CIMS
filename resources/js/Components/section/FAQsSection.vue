@@ -1,8 +1,17 @@
-<script setup></script>
+<script setup>
+defineProps({
+    id: { type: String, default: '' },
+});
+</script>
 <template>
-    <section class="container">
+    <section class="container" :id="id">
         <div class="row justify-content-center">
-            <div class="col-md-8">
+            <div
+                class="col-md-8"
+                data-aos="fade-left"
+                data-aos-ease="linear"
+                data-aos-duration="1800"
+            >
                 <h2 class="mb-4">Frequently Asked Questions</h2>
                 <div class="accordion" id="faqAccordion">
                     <div class="accordion-item">

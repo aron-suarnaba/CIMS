@@ -2,11 +2,10 @@
 import { ref } from 'vue';
 
 const appName = ref('CIMS');
-// const currentYear = ref(new Date().getFullYear());
 </script>
 
 <template>
-    <footer class="border-top app-footer bg-white py-5">
+    <footer class="app-footer bg-white py-5">
         <div class="container pt-4">
             <div class="row">
                 <div class="col-12 col-md-4 mb-md-0 mb-4">
