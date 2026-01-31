@@ -395,7 +395,7 @@ const deleteItem = (id) => {
                                         >
                                             {{
                                                 phone.phone?.issued_to ||
-                                                'Unassigned'
+                                                'Not yet issued'
                                             }}
                                         </span>
                                     </td>

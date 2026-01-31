@@ -48,6 +48,9 @@ Route::middleware('auth')->group(function () {
             Route::post('/{phone}/issue', [PhoneController::class, 'issue'])->name('phone.issue');
             Route::post('/{phone}/return', [PhoneController::class, 'return'])->name('phone.return');
             Route::delete('/{phone}', [PhoneController::class, 'destroy'])->name('phone.destroy');
+
+            //Generate Report
+            Route::get('/{phone}/logsheet', [PhoneController::class, 'generateLogsheetReport'])->name('phone.logsheet');
         });
 
         // Your existing transaction store (if used for logging)

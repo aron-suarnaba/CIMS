@@ -111,7 +111,7 @@ const selectedReturnAcc = ref([]);
 // Everything about the history table variable declaration
 const historySearch = ref('');
 const currentPage = ref(1);
-const itemsPerPage = 10;
+const itemsPerPage = 3;
 
 const filteredHistory = computed(() => {
     if (!props.phone.transactions) return [];
@@ -185,7 +185,6 @@ const updateForm = useForm({
 });
 
 // Listeners
-
 watch(selectedAcc, (newVal) => {
     form.issued_accessories = newVal.join(', ');
 });
@@ -193,28 +192,10 @@ watch(selectedReturnAcc, (newVal) => {
     returnform.returned_accessories = newVal.join(', ');
 });
 
-const openIssueModal = () => {
-    const modalElement = document.getElementById('IssuePhoneModal');
-    if (!modalElement) return;
-
-    const modal = window.bootstrap.Modal.getOrCreateInstance(modalElement, {
-        backdrop: true,
-        keyboard: true,
-    });
-
-    modal.show();
-};
-
-//Submission
+// Submit logic for the issue
 const submit = () => {
     form.post(route('phone.issue', props.phone.id), {
         onSuccess: () => {
-            // const modalElement = document.getElementById('IssuePhoneModal');
-            // // No 'window' prefix needed here
-            // const modalInstance =
-            //     bootstrap.Modal.getOrCreateInstance(modalElement);
-            // modalInstance.hide();
-
             const closeButton = document.querySelector(
                 '#IssuePhoneModal [data-bs-dismiss="modal"]',
             );
@@ -225,6 +206,7 @@ const submit = () => {
     });
 };
 
+// Submit logic for the return
 const returnSubmit = () => {
     returnform.post(route('phone.return', props.phone.id), {
         onSuccess: () => {
@@ -241,7 +223,7 @@ const returnSubmit = () => {
     });
 };
 
-
+// Submit logic for the update
 const updateSubmit = () => {
     updateForm.put(route('phone.update', props.phone.id), {
         onSuccess: () => {
@@ -255,8 +237,8 @@ const updateSubmit = () => {
     });
 };
 
+// Logic to open Update Modals
 const openUpdateModal = (phone) => {
-    // 1. Map the phone data to the form fields
     updateForm.id = phone.id;
     updateForm.brand = phone.brand;
     updateForm.model = phone.model;
@@ -265,13 +247,10 @@ const openUpdateModal = (phone) => {
     updateForm.serial_number = phone.serial_number;
     updateForm.status = phone.status;
 
-    // 2. Clear any previous validation errors
     updateForm.clearErrors();
 
-    // 3. Open Modal safely
     const modalElement = document.getElementById('UpdatePhoneModal');
     if (modalElement) {
-        // Use the global bootstrap instance defined in app.js
         const modalInstance =
             window.bootstrap.Modal.getOrCreateInstance(modalElement);
         modalInstance.show();
@@ -279,6 +258,21 @@ const openUpdateModal = (phone) => {
         console.error('Modal element #UpdatePhoneModal not found');
     }
 };
+
+// Logic to open Issue Modals
+const openIssueModal = () => {
+    const modalElement = document.getElementById('IssuePhoneModal');
+    if (!modalElement) return;
+
+    const modal = window.bootstrap.Modal.getOrCreateInstance(modalElement, {
+        backdrop: true,
+        keyboard: true,
+    });
+
+    modal.show();
+};
+
+// Logic to open Return Modals
 const openReturnModal = () => {
     const modalElement = document.getElementById('ReturnPhoneModal');
     if (!modalElement) {
@@ -293,6 +287,13 @@ const openReturnModal = () => {
     });
 
     modal.show();
+};
+
+const generateLogsheet = (id) => {
+    window.open(
+        `/CIMS/public/AssetAndInventoryManagement/Phone/${id}/logsheet`,
+        '_blank',
+    );
 };
 </script>
 
@@ -310,34 +311,54 @@ const openReturnModal = () => {
                 <!-- Navigation Menu -->
                 <div class="col-12">
                     <div class="card mb-4 border-0 bg-transparent shadow-none">
-                        <div
-                            class="card-body d-flex justify-content-between align-items-center"
-                        >
-                            <BackButton
-                                @click.prevent="
-                                    router.get(route('phone.index'))
-                                "
-                            />
-                            <div class="shadow-sm">
-                                <button
-                                    v-if="
-                                        props.phone.status === 'available' ||
-                                        props.phone.status === 'returned'
-                                    "
-                                    class="btn btn-primary"
-                                    @click="openIssueModal"
+                        <div class="card-body">
+                            <div
+                                class="row d-flex justify-content-between align-items-center"
+                            >
+                                <div class="col-sm-12 col-md-6 mb-3">
+                                    <BackButton
+                                        @click.prevent="
+                                            router.get(route('phone.index'))
+                                        "
+                                    />
+                                </div>
+                                <div
+                                    class="col-sm-12 col-md-6 d-flex justify-content-end align-items-center mb-3 gap-2"
                                 >
-                                    <i class="bi bi-plus-circle me-1"></i> Issue
-                                    Asset
-                                </button>
-                                <button
-                                    v-else-if="props.phone.status === 'issued'"
-                                    class="btn btn-warning"
-                                    @click="openReturnModal"
-                                >
-                                    <i class="bi bi-arrow-return-left me-1"></i>
-                                    Process Return
-                                </button>
+                                    <button
+                                        v-if="
+                                            props.phone.status ===
+                                                'available' ||
+                                            props.phone.status === 'returned'
+                                        "
+                                        class="btn btn-primary"
+                                        @click="openIssueModal"
+                                    >
+                                        <i class="bi bi-plus-circle me-1"></i>
+                                        Issue Asset
+                                    </button>
+                                    <button
+                                        v-else-if="
+                                            props.phone.status === 'issued'
+                                        "
+                                        class="btn btn-warning"
+                                        @click="openReturnModal"
+                                    >
+                                        <i
+                                            class="bi bi-arrow-return-left me-1"
+                                        ></i>
+                                        Process Return
+                                    </button>
+                                    <button
+                                        @click="
+                                            generateLogsheet(props.phone.id)
+                                        "
+                                        class="btn btn-secondary"
+                                    >
+                                        <i class="bi bi-receipt me-1"></i>
+                                        Generate Logsheet
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -825,7 +846,9 @@ const openReturnModal = () => {
                                     of {{ filteredHistory.length }} entries
                                 </div>
                                 <nav>
-                                    <ul class="pagination pagination-sm mb-0">
+                                    <ul
+                                        class="pagination pagination-sm mb-0 gap-2"
+                                    >
                                         <li
                                             class="page-item"
                                             :class="{

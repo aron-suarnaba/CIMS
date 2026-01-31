@@ -15,7 +15,7 @@ import logo from '/public/img/logo.png';
                     alt="AdminLTE Logo"
                     class="brand-image rounded-circle opacity-75 shadow"
                 />
-                <span class="brand-text">{{ title }}</span>
+                <span class="brand-text fw-bold text-primary">{{ title }}</span>
             </a>
         </div>
         <div class="sidebar-wrapper" data-overlayscrollbars="host">

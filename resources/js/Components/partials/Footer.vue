@@ -11,7 +11,8 @@ const appName = ref('CIMS');
                 <div class="col-12 col-md-4 mb-md-0 mb-4">
                     <h4 class="fw-bold text-primary mb-3">{{ appName }}</h4>
                     <p class="text-secondary small pr-md-5">
-                        Centralized Infrastructure Management System.<br />
+                        Unified Centralized IT Infrastructure Management
+                        System.<br />
                         Modern tools for the modern IT professional.
                     </p>
                     <div class="d-flex align-items-center mt-3 gap-2">

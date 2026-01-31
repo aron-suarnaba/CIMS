@@ -57,9 +57,7 @@ const navItem = [
 
                 <ul class="nav nav-pills">
                     <li class="nav-item" v-for="nav in navItem" :key="nav.id">
-                        <a :href="nav.url" class="nav-link">{{
-                            nav.name
-                        }}</a>
+                        <a :href="nav.url" class="nav-link">{{ nav.name }}</a>
                     </li>
                 </ul>
             </header>

@@ -7,13 +7,14 @@ use App\Models\PhoneTransaction;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\DB;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class PhoneController extends Controller
 {
+
     /**
      * Display a listing of the smartphone device in the Phone.vue
      */
-
     public function index(Request $request)
     {
         $filterBrand = $request->get('brand');
@@ -154,10 +155,8 @@ class PhoneController extends Controller
             'remarks' => 'nullable|string|max:255',
         ]);
 
-        // 2. Add the foreign key (serial_num or phone_id)
         $validated['serial_num'] = $phone->serial_num;
 
-        // 3. Create the Transaction
         PhoneTransaction::create($validated);
 
         $phone->update([
@@ -168,6 +167,7 @@ class PhoneController extends Controller
         return redirect()->back()->with('success', 'The device has been issued successfully to ' . $validated['issued_to']);
     }
 
+    // This controller is for the storing data of phone issuance modals
     public function return(Request $request, Phone $phone)
     {
         $validated = $request->validate([
@@ -259,5 +259,28 @@ class PhoneController extends Controller
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Failed to delete asset.');
         }
+    }
+
+    /**
+     * Generate a pdf report for the company phone logsheet
+     */
+    public function generateLogsheetReport(Phone $phone)
+    {
+        $phone->load('currentTransaction');
+
+        $data = [
+            'phone' => $phone,
+            'current' => $phone->currentTransaction,
+            'date' => now()->format('d/m/Y'),
+        ];
+
+        $pdf = Pdf::loadView('reports.CompanyPhoneLogsheet', $data);
+
+        // 2. Options (Optional: change paper size per PDF)
+        $pdf->setPaper('legal', 'landscape');
+
+        // 3. Output
+        // Use ->stream() to show in browser, or ->download() to force download
+        return $pdf->stream("Phone-{$phone->serial_num}-logsheet.pdf");
     }
 }
