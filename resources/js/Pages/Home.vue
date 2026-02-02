@@ -1,41 +1,37 @@
 <script setup>
-import Breadcrumb from '@/Components/Breadcrumb.vue';
 import HomeLayout from '@/Layouts/HomeLayout.vue';
-import { reactive } from 'vue';
+import axios from 'axios';
+import { markRaw, onMounted, ref } from 'vue';
 
 defineOptions({ layout: HomeLayout });
 
-const myBreadcrumb = [{ label: 'CIMS Dashboard' }];
-
-// 1. ASSET PROCUREMENT TREND
-const chartOption = reactive({
+// --- CHARTS CONFIGURATION ---
+const chartOption = markRaw({
     chart: { id: 'cims-procurement', type: 'bar', toolbar: { show: false } },
     xaxis: { categories: ['Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'] },
     colors: ['#0d6efd'],
     title: { text: 'Monthly Procurement', align: 'center' },
 });
-const chartSeries = reactive([
+const chartSeries = markRaw([
     { name: 'New Assets', data: [45, 52, 38, 24, 60, 15] },
 ]);
 
-// 2. ASSET DISTRIBUTION
-const donutChartOption = reactive({
+const donutChartOption = markRaw({
     chart: { id: 'cims-distribution', type: 'donut' },
     labels: ['Laptops', 'Desktops', 'Servers', 'Network', 'Monitors', 'Other'],
     colors: ['#0d6efd', '#6610f2', '#6f42c1', '#d63384', '#fd7e14', '#20c997'],
     title: { text: 'Asset Composition', align: 'center' },
     legend: { position: 'bottom', horizontalAlign: 'center' },
 });
-const donutChartSeries = reactive([120, 85, 15, 45, 150, 30]);
+const donutChartSeries = markRaw([120, 85, 15, 45, 150, 30]);
 
-// 3. OPERATIONAL COST RANGE
-const rangeAreaChartOption = reactive({
+const rangeAreaChartOption = markRaw({
     chart: { id: 'cims-costs', type: 'rangeArea', toolbar: { show: false } },
     stroke: { curve: 'smooth' },
     title: { text: 'Maintenance Variance', align: 'center' },
     xaxis: { categories: ['Sep', 'Oct', 'Nov', 'Dec'] },
 });
-const rangeAreaChartSeries = reactive([
+const rangeAreaChartSeries = markRaw([
     {
         name: 'Cost Range',
         data: [
@@ -47,8 +43,7 @@ const rangeAreaChartSeries = reactive([
     },
 ]);
 
-// 4. LICENSE COMPLIANCE
-const radialChartOption = reactive({
+const radialChartOption = markRaw({
     chart: { id: 'cims-compliance', type: 'radialBar' },
     plotOptions: {
         radialBar: {
@@ -62,79 +57,142 @@ const radialChartOption = reactive({
     labels: ['Compliance'],
     colors: ['#20c997'],
 });
-const radialChartSeries = reactive([88]);
+const radialChartSeries = markRaw([88]);
+
+// --- NEWS API LOGIC ---
+const articles = ref([]);
+const isNewsLoading = ref(true);
+
+const fetchNewsFromBackend = async () => {
+    try {
+        const response = await axios.get('/CIMS/public/api/news/tech');
+        articles.value = response.data.slice(0, 3); // Top 4 keeps the grid balanced
+    } catch (error) {
+        console.error('Could not load news:', error);
+    } finally {
+        isNewsLoading.value = false;
+    }
+};
+
+onMounted(() => {
+    fetchNewsFromBackend();
+});
 </script>
 
 <template>
-    <div class="app-content-header mb-4 py-3">
+    <div class="app-content px-3 mt-4">
         <div class="container-fluid">
-            <Breadcrumb :breadcrumbs="myBreadcrumb" />
-        </div>
-    </div>
 
-    <div class="app-content px-3">
-        <div class="container-fluid">
+            <!-- This row is for the 4 main dashboard components -->
             <div class="row row-cols-1 row-cols-md-2 row-cols-xl-4 g-4">
-                <div class="col">
+                <div
+                    class="col"
+                    v-for="(chart, idx) in [
+                        { type: 'bar', opt: chartOption, ser: chartSeries },
+                        {
+                            type: 'donut',
+                            opt: donutChartOption,
+                            ser: donutChartSeries,
+                        },
+                        {
+                            type: 'rangeArea',
+                            opt: rangeAreaChartOption,
+                            ser: rangeAreaChartSeries,
+                        },
+                        {
+                            type: 'radialBar',
+                            opt: radialChartOption,
+                            ser: radialChartSeries,
+                        },
+                    ]"
+                    :key="idx"
+                >
                     <div class="card h-100 overflow-hidden border-0 shadow-sm">
                         <div
                             class="card-body d-flex align-items-center justify-content-center p-3"
                         >
                             <apexchart
-                                type="bar"
+                                :type="chart.type"
                                 width="100%"
                                 height="320"
-                                :options="chartOption"
-                                :series="chartSeries"
+                                :options="chart.opt"
+                                :series="chart.ser"
                             />
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <div class="col">
-                    <div class="card h-100 overflow-hidden border-0 shadow-sm">
-                        <div
-                            class="card-body d-flex align-items-center justify-content-center p-3"
-                        >
-                            <apexchart
-                                type="donut"
-                                width="100%"
-                                height="320"
-                                :options="donutChartOption"
-                                :series="donutChartSeries"
-                            />
-                        </div>
+            <div class="row mt-5">
+                <div class="col-12 col-lg-10">
+                    <div class="bg-light h-100 rounded p-3 shadow-sm">
+                        <h4 class="fw-bold">Asset Statistics</h4>
+                        <p class="text-muted">
+                            Main dashboard content goes here...
+                        </p>
                     </div>
                 </div>
 
-                <div class="col">
-                    <div class="card h-100 overflow-hidden border-0 shadow-sm">
+                <!-- This column is for the news updates -->
+                <div class="col-12 col-lg-2 mt-lg-0 mt-4">
+                    <div
+                        class="d-flex justify-content-between align-items-center mb-3"
+                    >
+                        <h4 class="fw-bold mb-0">IT Updates</h4>
                         <div
-                            class="card-body d-flex align-items-center justify-content-center p-3"
-                        >
-                            <apexchart
-                                type="rangeArea"
-                                width="100%"
-                                height="320"
-                                :options="rangeAreaChartOption"
-                                :series="rangeAreaChartSeries"
-                            />
-                        </div>
+                            v-if="isNewsLoading"
+                            class="spinner-border spinner-border-sm text-primary"
+                        ></div>
                     </div>
-                </div>
 
-                <div class="col">
-                    <div class="card h-100 overflow-hidden border-0 shadow-sm">
+                    <div class="row g-3">
                         <div
-                            class="card-body d-flex align-items-center justify-content-center p-3"
+                            v-for="article in articles"
+                            :key="article.url"
+                            class="col-12"
                         >
-                            <apexchart
-                                type="radialBar"
-                                width="100%"
-                                height="320"
-                                :options="radialChartOption"
-                                :series="radialChartSeries"
-                            />
+                            <div
+                                class="card h-100 news-card border-0 shadow-sm"
+                            >
+                                <img
+                                    :src="
+                                        article.urlToImage ||
+                                        'https://via.placeholder.com/300x150?text=CIMS+News'
+                                    "
+                                    class="card-img-top"
+                                    style="height: 120px; object-fit: cover"
+                                />
+
+                                <div class="card-body d-flex flex-column">
+                                    <small class="text-primary fw-bold mb-1">{{
+                                        article.source.name
+                                    }}</small>
+                                    <h6
+                                        class="card-title fw-bold text-truncate-2 mb-2"
+                                        style="font-size: 0.9rem"
+                                    >
+                                        {{ article.title }}
+                                    </h6>
+                                    <a
+                                        :href="article.url"
+                                        target="_blank"
+                                        class="btn btn-sm btn-outline-primary w-100 mt-auto"
+                                    >
+                                        Read More
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div
+                            v-if="!isNewsLoading && articles.length === 0"
+                            class="col-12 py-3 text-center"
+                        >
+                            <div
+                                class="alert alert-info small border-0 shadow-sm"
+                            >
+                                No news articles found.
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -144,11 +202,20 @@ const radialChartSeries = reactive([88]);
 </template>
 
 <style scoped>
-/* Optional: ensures cards don't feel too cramped on smaller screens */
-.card {
+.news-card {
     transition: transform 0.2s ease-in-out;
 }
-.card:hover {
+
+.news-card:hover {
     transform: translateY(-5px);
+}
+
+.text-truncate-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    min-height: 2.8em;
+    /* Keeps titles aligned even if one is shorter */
 }
 </style>

@@ -19,6 +19,7 @@
         'Open Sans',
         'Helvetica Neue',
         sans-serif;
+    touch-action: manipulation;
 }
 .clickable-card {
     cursor: pointer;
