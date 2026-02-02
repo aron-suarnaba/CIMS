@@ -43,20 +43,7 @@ const navCard = [
                         @click.prevent="router.get(route('dashboard'))"
                     />
                 </div>
-                <div class="col-sm-12 col-md-4 mb-2">
-                    <div class="input-group">
-                        <label for="AssetSearchInput" class="input-group-text"
-                            ><i class="bi bi-search"></i
-                        ></label>
-                        <input
-                            id="AssetSearchInput"
-                            type="text"
-                            class="form-control"
-                            placeholder="Search"
-                            autofocus="false"
-                        />
-                    </div>
-                </div>
+                <div class="col-sm-12 col-md-4 mb-2"></div>
             </div>
             <div class="row mb-3 mt-5">
                 <div
