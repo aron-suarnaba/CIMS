@@ -17,16 +17,13 @@ class PhoneTransaction extends Model
         'date_issued',
         'issued_by',
         'issued_accessories',
-        'it_ack_issued',
-        'purch_ack_issued',
         'date_returned',
         'returned_to',
         'returned_by',
         'returnee_department',
         'returned_accessories',
-        'it_ack_returned',
-        'purch_ack_returned',
-        'remarks'
+        'cashout',
+        'remarks',
     ];
 
     public function phone()

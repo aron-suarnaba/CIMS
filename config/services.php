@@ -1,7 +1,6 @@
 <?php
 
 return [
-
     /*
     |--------------------------------------------------------------------------
     | Third Party Services
@@ -35,4 +34,12 @@ return [
         ],
     ],
 
+    'fortigate' => [
+        'base_url' => env('FORTIGATE_IP'),
+        'token' => env('FORTIGATE_TOKEN'),
+    ],
+
+    'new_api' => [
+        'key' => env('NEWS_API_KEY'),
+    ]
 ];

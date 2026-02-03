@@ -6,7 +6,10 @@ import { defineConfig } from 'vite';
 export default defineConfig({
     plugins: [
         laravel({
-            input: 'resources/js/app.js',
+            input: [
+                'resources/js/app.js',
+                'resources/css/app.css',
+            ],
             refresh: true,
         }),
         vue({
@@ -22,6 +25,14 @@ export default defineConfig({
         alias: {
             '@': path.resolve(__dirname, 'resources/js'),
             'ziggy-js': path.resolve(__dirname, 'vendor/tightenco/ziggy/dist/vue.m'),
+        },
+    },
+    server: {
+        proxy: {
+            '/api': {
+                target: 'http://localhost',
+                changeOrigin: true,
+            },
         },
     },
 });

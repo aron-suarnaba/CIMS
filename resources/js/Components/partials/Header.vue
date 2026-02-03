@@ -1,48 +1,64 @@
 <script setup>
-import { ref } from 'vue';
 import { Link } from '@inertiajs/vue3';
+import { ref } from 'vue';
 
 // Use absolute paths for images in Laravel public folder
-const logo = ref('./img/logo.png'); 
+const logo = ref('./img/logo.png');
 
-// Note: You don't actually need to wrap these in ref() 
+// Note: You don't actually need to wrap these in ref()
 // unless you plan on changing the strings dynamically.
 const HomePath = route('welcome');
-const LoginPath = route('login');
+
+const navItem = [
+    {
+        name: 'Home',
+        url: '#mainSection',
+    },
+    {
+        name: 'Login',
+        url: 'login',
+    },
+    {
+        name: 'Features',
+        url: '#featureSection',
+    },
+    {
+        name: 'Proof',
+        url: '#proofSection',
+    },
+    {
+        name: 'How It Works',
+        url: '#howItWorksSection',
+    },
+    {
+        name: 'FAQs',
+        url: '#faqsSection',
+    },
+    {
+        name: 'CTA',
+        url: '#ctaSection',
+    },
+];
 </script>
 
 <template>
     <div class="app-header">
         <div class="container-fluid">
-            <header class="d-flex justify-content-center mb-4 flex-wrap px-5 pt-4">
+            <header
+                class="d-flex justify-content-center mb-4 flex-wrap px-5 pt-4"
+            >
                 <Link
                     :href="HomePath"
                     class="d-flex align-items-center mb-md-0 me-md-auto link-body-emphasis text-decoration-none mb-3"
                 >
-                    <img
-                        :src="logo"
-                        alt="logo"
-                        id="logo"
-                        class="rounded-circle me-2 shadow"
-                    />
-                    <span class="fs-4">CIMS</span>
+                    <img :src="logo" alt="logo" id="logo" class="me-2" />
+                    <span class="fs-4 fw-bold text-primary">CIMS</span>
                 </Link>
 
                 <ul class="nav nav-pills">
-                    <li class="nav-item">
-                        <Link
-                            :href="HomePath"
-                            class="nav-link active"
-                            aria-current="page"
-                        >Home</Link>
+                    <li class="nav-item" v-for="nav in navItem" :key="nav.id">
+                        <a :href="nav.url" class="nav-link">{{ nav.name }}</a>
                     </li>
-                    <li class="nav-item">
-                        <Link :href="LoginPath" class="nav-link">Login</Link>
-                    </li>
-                    <li class="nav-item"><a href="#" class="nav-link">Features</a></li>
-                    <li class="nav-item"><a href="#" class="nav-link">Pricing</a></li>
-                    <li class="nav-item"><a href="#" class="nav-link">FAQs</a></li>
-                    <li class="nav-item"><a href="#" class="nav-link">About</a></li>
                 </ul>
             </header>
         </div>

@@ -15,14 +15,14 @@ return new class extends Migration {
             $table->string('brand');
             $table->string('model');
             $table->string('serial_num')->unique();
-            $table->string('imei_one')->unique();
+            $table->string('imei_one')->unique()->nullable();
             $table->string('imei_two')->nullable();
             $table->string('ram');
             $table->string('rom');
             $table->string('purchase_date')->nullable();
             $table->string('sim_no')->nullable();
-            $table->boolean('cashout');
-            $table->string('status')->default('available'); // available, issued, maintenance
+            $table->string('status')->default('available');
+            $table->string('remarks')->nullable();
             $table->timestamps();
         });
 
@@ -34,15 +34,14 @@ return new class extends Migration {
             $table->foreign('serial_num')
                   ->references('serial_num')
                   ->on('phones')
-                  ->cascade('cascade')
+                  ->onDelete('cascade')
                   ->onUpdate('cascade');
             $table->string('issued_to');
             $table->string('department');
             $table->date('date_issued');
             $table->string('issued_by');
             $table->text('issued_accessories')->nullable();
-            $table->boolean('it_ack_issued')->default(false);
-            $table->boolean('purch_ack_issued')->default(false);
+            $table->boolean('cashout')->default(false);
 
             // Return Info (Starts as Null)
             $table->date('date_returned')->nullable();
@@ -50,10 +49,7 @@ return new class extends Migration {
             $table->string('returned_by')->nullable();
             $table->string('returnee_department')->nullable();
             $table->text('returned_accessories')->nullable();
-            $table->boolean('it_ack_returned')->default(false);
-            $table->boolean('purch_ack_returned')->default(false);
 
-            $table->string('remarks')->nullable();
             $table->timestamps();
         });
     }

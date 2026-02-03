@@ -10,10 +10,16 @@ import Footer from '@/Components/partials/Footer.vue';
 
         <Sidebar />
 
-        <main class="app-main" id="main">
+        <main class="app-main bg-body-tertiary" id="main">
             <slot />
         </main>
 
         <Footer />
     </div>
 </template>
+<style scoped>
+#main{
+    padding-bottom: 13rem;
+    min-height: 90vh;
+}
+</style>

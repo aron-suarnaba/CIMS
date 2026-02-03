@@ -21,7 +21,6 @@ class PhoneFactory extends Factory
             'ram' => $this->faker->randomElement(['3GB', '4GB', '8GB', '12GB', '16GB', '24GB']),
             'rom' => $this->faker->randomElement([ '16GB', '32GB', '64GB', '128GB', '256GB']),
             'sim_no' => $this->faker->numerify('###########'),
-            'cashout' => true,
             'purchase_date' => $this->faker->date(),
             'status' => 'available',
         ];

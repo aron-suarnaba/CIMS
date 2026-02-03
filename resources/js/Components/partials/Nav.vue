@@ -1,5 +1,9 @@
 <script setup>
-import { router } from '@inertiajs/vue3';
+import { Link, router } from '@inertiajs/vue3';
+import avatarPath from '/public/img/avatar.png';
+import { useDateFormatter } from '@/composables/useDateFormatter';
+
+const { formatDate } = useDateFormatter();
 
 const toggleSidebar = () => {
     const body = document.body;
@@ -12,14 +16,14 @@ const toggleSidebar = () => {
     }
 };
 
+
 const handleLogout = () => {
     router.post(route('logout'));
 };
-import avatarPath from '/public/img/avatar.png';
 </script>
 <template>
     <nav
-        class="app-header navbar navbar-expand bg-primary bg-gradient"
+        class="app-header navbar navbar-expand bg-primary text-white"
         data-bs-theme="dark"
         id="navigation"
         tabindex="-1"
@@ -61,7 +65,6 @@ import avatarPath from '/public/img/avatar.png';
                 <li class="nav-item dropdown">
                     <a class="nav-link" data-bs-toggle="dropdown" href="#">
                         <i class="bi bi-chat-text"></i>
-                        <span class="navbar-badge badge text-bg-danger">3</span>
                     </a>
                     <div
                         class="dropdown-menu dropdown-menu-lg dropdown-menu-end"
@@ -76,9 +79,6 @@ import avatarPath from '/public/img/avatar.png';
                 <li class="nav-item dropdown">
                     <a class="nav-link" data-bs-toggle="dropdown" href="#">
                         <i class="bi bi-bell-fill"></i>
-                        <span class="navbar-badge badge text-bg-warning"
-                            >15</span
-                        >
                     </a>
                     <div
                         class="dropdown-menu dropdown-menu-lg dropdown-menu-end"
@@ -118,21 +118,47 @@ import avatarPath from '/public/img/avatar.png';
                             class="user-image rounded-circle shadow"
                             alt="User Image"
                         />
-                        <span class="d-none d-md-inline">Alexander Pierce</span>
+                        <span class="d-none d-md-inline"
+                            >{{ $page.props.auth.user.first_name || 'Error' }}
+                            {{
+                                $page.props.auth.user.last_name || 'Error'
+                            }}</span
+                        >
                     </a>
                     <ul
                         class="dropdown-menu dropdown-menu-lg dropdown-menu-end"
                     >
-                        <li class="user-header text-bg-primary d-flex">
+                        <li
+                            class="user-header text-bg-primary d-flex flex-column align-items-center justify-content-center my-auto gap-2 p-4"
+                        >
                             <img
                                 :src="avatarPath"
                                 class="rounded-circle shadow"
                                 alt="User Image"
                             />
-                            <p>
-                                Alexander Pierce - Web Developer
-                                <small>Member since Nov. 2023</small>
-                            </p>
+                            <div
+                                class="d-flex flex-column align-items-center justify-content-center text-center"
+                            >
+                                <h3 class="mb-0">
+                                    {{ $page.props.auth.user.first_name || '' }}
+                                    {{ $page.props.auth.user.last_name || '' }}
+                                </h3>
+                                <span class="text-muted fs-6 mb-2 text-wrap"
+                                    >{{ $page.props.auth.user.position || '' }}
+                                    at
+                                    {{
+                                        $page.props.auth.user.department || ''
+                                    }}</span
+                                >
+                                <small
+                                    >Member since
+                                    {{
+                                        formatDate(
+                                            $page.props.auth.user.created_at,
+                                        ) || '2015'
+                                    }}</small
+                                >
+                            </div>
                         </li>
                         <li class="user-body">
                             <div class="row">
@@ -148,8 +174,15 @@ import avatarPath from '/public/img/avatar.png';
                             </div>
                         </li>
                         <li class="user-footer">
-                            <a href="#" class="btn btn-default btn-flat"
-                                >Profile</a
+                            <Link
+                                :href="
+                                    route(
+                                        'user.index',
+                                        $page.props.auth.user.employee_id,
+                                    )
+                                "
+                                class="btn btn-body-tertiary btn-flat"
+                                >Profile</Link
                             >
                             <button
                                 type="button"

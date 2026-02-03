@@ -1,14 +1,16 @@
 <script setup>
-import HomeLayout from '@/Layouts/HomeLayout.vue';
-import { router } from '@inertiajs/vue3';
 import BackButton from '@/Components/BackButton.vue';
-import Modals from '@/Components/Modals.vue';
-import { useForm } from '@inertiajs/vue3';
 import Breadcrumb from '@/Components/Breadcrumb.vue';
+import Modals from '@/Components/Modals.vue';
+import { useDateFormatter } from '@/composables/useDateFormatter';
+import HomeLayout from '@/Layouts/HomeLayout.vue';
+import { router, useForm } from '@inertiajs/vue3';
 import Swal from 'sweetalert2';
-import { ref, watch, computed } from 'vue';
+import { computed, ref, watch } from 'vue';
 
 defineOptions({ layout: HomeLayout });
+
+const { formatDate } = useDateFormatter();
 
 const props = defineProps({
     phone: {
@@ -62,19 +64,8 @@ const getPhoneImagePath = (phone) => {
     return defaultPath;
 };
 
-// Function for date formatting
-const formatDate = (dateString, locale = 'en-US') => {
-    if (!dateString) return '';
-    const date = new Date(dateString);
-
-    return new Intl.DateTimeFormat(locale, {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-    }).format(date);
-};
-
-const deleteItem = (serial_num) => {
+// Deleting function
+const deleteItem = (id) => {
     Swal.fire({
         title: 'Confirm Delete Asset?',
         text: 'All the data including the table history, issuance, return information, etc., will be deleted.',
@@ -85,7 +76,7 @@ const deleteItem = (serial_num) => {
         confirmButtonText: 'Yes, delete it!',
     }).then((result) => {
         if (result.isConfirmed) {
-            router.delete(route('phone.destroy', serial_num), {
+            router.delete(route('phone.destroy', id), {
                 onBefore: () => {
                     Swal.fire({
                         title: 'Processing...',
@@ -94,6 +85,16 @@ const deleteItem = (serial_num) => {
                             Swal.showLoading();
                         },
                     });
+                },
+                onSuccess: () => {
+                    Swal.fire({
+                        title: 'Deleted!',
+                        text: 'The asset record has been deleted.',
+                        icon: 'success',
+                    });
+                },
+                onFinish: () => {
+                    if (!Swal.isVisible()) return;
                 },
                 onError: () => {
                     Swal.close();
@@ -110,7 +111,7 @@ const selectedReturnAcc = ref([]);
 // Everything about the history table variable declaration
 const historySearch = ref('');
 const currentPage = ref(1);
-const itemsPerPage = 10;
+const itemsPerPage = 3;
 
 const filteredHistory = computed(() => {
     if (!props.phone.transactions) return [];
@@ -136,11 +137,18 @@ const totalPages = computed(() => {
     return Math.ceil(filteredHistory.value.length / itemsPerPage);
 });
 
+const nextPage = () => {
+    if (currentPage.value < totalPages.value) currentPage.value++;
+};
+
+const prevPage = () => {
+    if (currentPage.value > 1) currentPage.value--;
+};
+
 watch(historySearch, () => {
     currentPage.value = 1;
 });
 
-// Forms
 // Form for Issuance
 const form = useForm({
     issued_by: '',
@@ -148,8 +156,8 @@ const form = useForm({
     department: '',
     date_issued: new Date().toISOString().substr(0, 10),
     issued_accessories: '',
-    it_ack_issued: false,
-    purch_ack_issued: false,
+    cashout: false,
+    remarks: '',
 });
 
 // Form for return
@@ -159,13 +167,24 @@ const returnform = useForm({
     returnee_department: '',
     date_returned: new Date().toISOString().substr(0, 10),
     returned_accessories: '',
-    it_ack_returned: false,
-    purch_ack_returned: false,
     remarks: '',
 });
 
-// Listeners
+// Form for update
+const updateForm = useForm({
+    brand: props.phone.brand || '',
+    model: props.phone.model || '',
+    serial_num: props.phone.serial_num || '',
+    imei_one: props.phone.imei_one || '',
+    imei_two: props.phone.imei_two || '',
+    ram: props.phone.ram || '',
+    rom: props.phone.rom || '',
+    sim_no: props.phone.sim_no || '',
+    purchase_date: props.phone.purchase_date || '',
+    remarks: props.phone.remarks || '',
+});
 
+// Listeners
 watch(selectedAcc, (newVal) => {
     form.issued_accessories = newVal.join(', ');
 });
@@ -173,31 +192,23 @@ watch(selectedReturnAcc, (newVal) => {
     returnform.returned_accessories = newVal.join(', ');
 });
 
-//Submission
+// Submit logic for the issue
 const submit = () => {
-    form.post(route('phone.issue', props.phone.serial_num), {
+    form.post(route('phone.issue', props.phone.id), {
         onSuccess: () => {
-            form.reset();
-            selectedAcc.value = [];
-
             const closeButton = document.querySelector(
                 '#IssuePhoneModal [data-bs-dismiss="modal"]',
             );
             if (closeButton) {
                 closeButton.click();
             }
-
-            // const modalElement = document.getElementById('IssuePhoneModal');
-
-            // const modalInstance =  bootstrap.Modal.getInstance(modalElement);
-            // if(modalInstance){
-            //     modalInstance.hide();
-            // }
         },
     });
 };
+
+// Submit logic for the return
 const returnSubmit = () => {
-    returnform.post(route('phone.return', props.phone.serial_num), {
+    returnform.post(route('phone.return', props.phone.id), {
         onSuccess: () => {
             returnform.reset();
             selectedReturnAcc.value = [];
@@ -211,61 +222,152 @@ const returnSubmit = () => {
         },
     });
 };
+
+// Submit logic for the update
+const updateSubmit = () => {
+    updateForm.put(route('phone.update', props.phone.id), {
+        onSuccess: () => {
+            const closeButton = document.querySelector(
+                '#UpdatePhoneModal [data-bs-dismiss="modal"]',
+            );
+            if (closeButton) {
+                closeButton.click();
+            }
+        },
+    });
+};
+
+// Logic to open Update Modals
+const openUpdateModal = (phone) => {
+    updateForm.id = phone.id;
+    updateForm.brand = phone.brand;
+    updateForm.model = phone.model;
+    updateForm.imei_one = phone.imei_one;
+    updateForm.imei_two = phone.imei_two;
+    updateForm.serial_number = phone.serial_number;
+    updateForm.status = phone.status;
+
+    updateForm.clearErrors();
+
+    const modalElement = document.getElementById('UpdatePhoneModal');
+    if (modalElement) {
+        const modalInstance =
+            window.bootstrap.Modal.getOrCreateInstance(modalElement);
+        modalInstance.show();
+    } else {
+        console.error('Modal element #UpdatePhoneModal not found');
+    }
+};
+
+// Logic to open Issue Modals
+const openIssueModal = () => {
+    const modalElement = document.getElementById('IssuePhoneModal');
+    if (!modalElement) return;
+
+    const modal = window.bootstrap.Modal.getOrCreateInstance(modalElement, {
+        backdrop: true,
+        keyboard: true,
+    });
+
+    modal.show();
+};
+
+// Logic to open Return Modals
+const openReturnModal = () => {
+    const modalElement = document.getElementById('ReturnPhoneModal');
+    if (!modalElement) {
+        console.error('ReturnPhoneModal not found');
+        return;
+    }
+
+    const modal = window.bootstrap.Modal.getOrCreateInstance(modalElement, {
+        backdrop: true,
+        keyboard: true,
+        focus: true,
+    });
+
+    modal.show();
+};
+
+const generateLogsheet = (id) => {
+    window.open(
+        `/CIMS/public/AssetAndInventoryManagement/Phone/${id}/logsheet`,
+        '_blank',
+    );
+};
 </script>
 
 <template>
-    <div class="app-content-header border-bottom bg-white py-3">
+    <div class="app-content-header py-3">
         <!-- Breadcrumb -->
         <div class="container">
             <Breadcrumb :breadcrumbs="myBreadcrumb" />
         </div>
     </div>
 
-    <div class="app-content mt-4">
-        <div class="container-fluid">
+    <div class="app-content mb-5">
+        <div class="container-fluid px-3">
             <div class="row g-4">
                 <!-- Navigation Menu -->
                 <div class="col-12">
-                    <div class="card bg-light mb-4 border-0 shadow-sm">
-                        <div
-                            class="card-body d-flex justify-content-between align-items-center"
-                        >
-                            <BackButton
-                                @click.prevent="
-                                    router.get(route('phone.index'))
-                                "
-                            />
-                            <div class="btn-group shadow-sm">
-                                <button
-                                    v-if="
-                                        props.phone.status === 'available' ||
-                                        props.phone.status === 'returned'
-                                    "
-                                    class="btn btn-primary"
-                                    data-bs-toggle="modal"
-                                    data-bs-target="#IssuePhoneModal"
+                    <div class="card mb-4 border-0 bg-transparent shadow-none">
+                        <div class="card-body">
+                            <div
+                                class="row d-flex justify-content-between align-items-center"
+                            >
+                                <div class="col-sm-12 col-md-6 mb-3">
+                                    <BackButton
+                                        @click.prevent="
+                                            router.get(route('phone.index'))
+                                        "
+                                    />
+                                </div>
+                                <div
+                                    class="col-sm-12 col-md-6 d-flex justify-content-end align-items-center mb-3 gap-2"
                                 >
-                                    <i class="bi bi-person-plus me-1"></i> Issue
-                                    Asset
-                                </button>
-                                <button
-                                    v-else-if="props.phone.status === 'issued'"
-                                    class="btn btn-warning"
-                                    data-bs-toggle="modal"
-                                    data-bs-target="#ReturnPhoneModal"
-                                >
-                                    <i class="bi bi-arrow-return-left me-1"></i>
-                                    Process Return
-                                </button>
+                                    <button
+                                        v-if="
+                                            props.phone.status ===
+                                                'available' ||
+                                            props.phone.status === 'returned'
+                                        "
+                                        class="btn btn-primary"
+                                        @click="openIssueModal"
+                                    >
+                                        <i class="bi bi-plus-circle me-1"></i>
+                                        Issue Asset
+                                    </button>
+                                    <button
+                                        v-else-if="
+                                            props.phone.status === 'issued'
+                                        "
+                                        class="btn btn-warning"
+                                        @click="openReturnModal"
+                                    >
+                                        <i
+                                            class="bi bi-arrow-return-left me-1"
+                                        ></i>
+                                        Process Return
+                                    </button>
+                                    <button
+                                        @click="
+                                            generateLogsheet(props.phone.id)
+                                        "
+                                        class="btn btn-secondary"
+                                    >
+                                        <i class="bi bi-receipt me-1"></i>
+                                        Generate Logsheet
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="row g-4">
+            <div class="row g-3">
                 <!-- Asset Details -->
-                <div class="col-sm-12 col-xl-4 col-lg-5">
+                <div class="col-sm-12 col-xl-3 col-lg-4">
                     <div class="card border-0 shadow-sm">
                         <div class="card-header bg-dark py-3 text-white">
                             <h5 class="fw-bold mb-0">Device Specifications</h5>
@@ -297,7 +399,12 @@ const returnSubmit = () => {
                                         },
                                     ]"
                                 >
-                                    Status: {{ props.phone.status }}
+                                    {{
+                                        props.phone.status
+                                            .charAt(0)
+                                            .toUpperCase() +
+                                        props.phone.status.slice(1)
+                                    }}
                                 </span>
                             </div>
 
@@ -310,6 +417,14 @@ const returnSubmit = () => {
                                     >
                                     <span class="fw-bold">{{
                                         props.phone.serial_num
+                                    }}</span>
+                                </li>
+                                <li
+                                    class="list-group-item d-flex justify-content-between"
+                                >
+                                    <span class="text-muted">Sim Number</span>
+                                    <span class="fw-bold">{{
+                                        props.phone.sim_no
                                     }}</span>
                                 </li>
                                 <li
@@ -348,27 +463,38 @@ const returnSubmit = () => {
                                         'N/A'
                                     }}</span>
                                 </li>
+                                <li
+                                    class="list-group-item d-flex justify-content-between"
+                                >
+                                    <span class="text-muted">Remarks</span>
+                                    <span>{{
+                                        props.phone.remarks || 'N/A'
+                                    }}</span>
+                                </li>
                             </ul>
                         </div>
                         <div
-                            class="card-footer border-0 bg-transparent pb-3 text-center"
+                            class="card-footer d-flex justify-content-around align-items-center border-0 bg-transparent pb-3 text-center"
                         >
                             <button
-                                class="btn btn-outline-danger btn-sm w-100"
-                                @click.prevent="
-                                    deleteItem(props.phone.serial_num)
-                                "
+                                class="btn btn-outline-danger"
+                                @click.prevent="deleteItem(props.phone.id)"
                             >
-                                <i class="bi bi-trash me-1"></i> Delete Asset
-                                Record
+                                <i class="bi bi-trash me-1"></i> Delete
+                            </button>
+                            <button
+                                class="btn btn-outline-warning"
+                                @click="openUpdateModal(props.phone)"
+                            >
+                                <i class="bi bi-pencil me-1"></i> Update
                             </button>
                         </div>
                     </div>
                 </div>
 
-                <!-- Issuance Card -->
-                <div class="col-sm-12 col-xl-8 col-lg-7">
-                    <div class="card mb-4 border-0 shadow-sm">
+                <div class="col-sm-12 col-xl-9 col-lg-8 g-">
+                    <!-- Issuance Card -->
+                    <div class="card mb-3 border-0 shadow-sm">
                         <div
                             class="card-header bg-primary d-flex justify-content-start align-items-center text-white"
                         >
@@ -377,13 +503,13 @@ const returnSubmit = () => {
                         </div>
                         <div class="card-body">
                             <div
-                                class="row g-3"
+                                class="row g-3 py-3"
                                 v-if="
-                                    props.phone?.status === 'issued' ||
-                                    props.phone.status === 'returned'
+                                    props.phone?.status === 'available' ||
+                                    props.phone.status === 'issued'
                                 "
                             >
-                                <div class="col-md-6 border-end">
+                                <div class="col-md-4 border-end">
                                     <label
                                         class="small text-muted text-uppercase fw-bold"
                                         >Recipient Info</label
@@ -405,7 +531,7 @@ const returnSubmit = () => {
                                         }}
                                     </p>
                                 </div>
-                                <div class="col-md-6 px-md-4">
+                                <div class="col-md-4 border-end">
                                     <label
                                         class="small text-muted text-uppercase fw-bold"
                                         >Issuance Logistics</label
@@ -427,84 +553,20 @@ const returnSubmit = () => {
                                         }}
                                     </p>
                                 </div>
-                                <div class="col-12 mt-4">
-                                    <div
-                                        class="bg-light d-flex align-items-center flex-wrap gap-4 rounded p-3"
+                                <div class="col-md-4 px-md-4">
+                                    <label
+                                        class="small text-muted text-uppercase fw-bold"
                                     >
-                                        <div class="d-flex align-items-center">
-                                            <i
-                                                class="bi bi-headphones text-primary me-2"
-                                            ></i>
-                                            <strong>Accessories:</strong>
-                                            <span class="text-muted ms-2">{{
-                                                props.phone_transaction
-                                                    ?.issued_accessories ||
-                                                'None'
-                                            }}</span>
-                                        </div>
-                                        <div
-                                            class="vr d-none d-md-block mx-2"
-                                        ></div>
-                                        <div
-                                            class="d-flex align-items-center flex-wrap"
-                                        >
-                                            <div class="g-1">
-                                                <i
-                                                    class="bi bi-check-lg me-1"
-                                                ></i>
-                                                <strong
-                                                    >Acknowledgement:</strong
-                                                >
-                                            </div>
-                                            <span
-                                                class="badge text-dark ms-2 border text-white"
-                                                :class="
-                                                    props.phone_transaction
-                                                        ?.it_ack_issued
-                                                        ? 'bg-success'
-                                                        : 'bg-danger'
-                                                "
-                                                >IT:
-                                                {{
-                                                    props.phone_transaction
-                                                        ?.it_ack_issued
-                                                        ? 'Yes'
-                                                        : 'No'
-                                                }}
-                                                <i
-                                                    :class="
-                                                        props.phone_transaction
-                                                            ?.it_ack_issued
-                                                            ? 'bi bi-check-circle-fill'
-                                                            : 'bi-x-circle-fill'
-                                                    "
-                                                ></i>
-                                            </span>
-                                            <span
-                                                class="badge text-dark ms-2 border text-white"
-                                                :class="
-                                                    props.phone_transaction
-                                                        ?.purch_ack_issued
-                                                        ? 'bg-success'
-                                                        : 'bg-danger'
-                                                "
-                                                >Purchasing:
-                                                {{
-                                                    props.phone_transaction
-                                                        ?.purch_ack_issued
-                                                        ? 'Yes'
-                                                        : 'No'
-                                                }}
-                                                <i
-                                                    :class="
-                                                        props.phone_transaction
-                                                            ?.it_ack_issued
-                                                            ? 'bi bi-check-circle-fill'
-                                                            : 'bi-x-circle-fill'
-                                                    "
-                                                ></i>
-                                            </span>
-                                        </div>
+                                        <i
+                                            class="bi bi-headphones text-primary me-2"
+                                        ></i
+                                        >Accessories:</label
+                                    >
+                                    <div class="d-flex align-items-center">
+                                        <span class="text-muted fw-bold ms-2">{{
+                                            props.phone_transaction
+                                                ?.issued_accessories || 'None'
+                                        }}</span>
                                     </div>
                                 </div>
                             </div>
@@ -517,7 +579,7 @@ const returnSubmit = () => {
                     </div>
 
                     <!-- Return Details -->
-                    <div class="card mb-4 border-0 shadow-sm">
+                    <div class="card mb-3 border-0 shadow-sm">
                         <div
                             class="card-header bg-warning d-flex justify-content-start align-items-center text-dark"
                         >
@@ -526,7 +588,7 @@ const returnSubmit = () => {
                         </div>
                         <div
                             class="card-body"
-                            v-if="props.phone?.status === 'returned'"
+                            v-if="props.phone?.status === 'available'"
                         >
                             <div class="row g-3">
                                 <div class="col-md-4 border-end">
@@ -565,12 +627,6 @@ const returnSubmit = () => {
                                             'Not yet returned'
                                         }}
                                     </p>
-                                </div>
-                                <div class="col-md-4 px-md-4">
-                                    <label
-                                        class="small text-muted text-uppercase fw-bold"
-                                        >Issuance Logistics</label
-                                    >
                                     <p class="mb-1">
                                         <strong>Date:</strong>
                                         {{
@@ -580,117 +636,21 @@ const returnSubmit = () => {
                                             ) || 'Not yet returned'
                                         }}
                                     </p>
+                                </div>
+                                <div class="col-md-4 px-md-4">
+                                    <label class="small text-uppercase fw-bold">
+                                        <i
+                                            class="bi bi-headphones text-primary me-2"
+                                        ></i
+                                        >Accessories:</label
+                                    >
+
                                     <p class="mb-0">
-                                        <strong>By:</strong>
-                                        {{
+                                        <span class="text-muted ms-2">{{
                                             props.phone_transaction
-                                                ?.issued_by ||
-                                            'Not yet returned'
-                                        }}
+                                                ?.returned_accessories || 'None'
+                                        }}</span>
                                     </p>
-                                </div>
-
-                                <div class="col-12 mt-4">
-                                    <div
-                                        class="bg-light d-flex align-items-center flex-wrap gap-4 rounded p-3"
-                                    >
-                                        <div class="d-flex align-items-center">
-                                            <i
-                                                class="bi bi-headphones text-primary me-2"
-                                            ></i>
-                                            <strong>Accessories:</strong>
-                                            <span class="text-muted ms-2">{{
-                                                props.phone_transaction
-                                                    ?.returned_accessories ||
-                                                'None'
-                                            }}</span>
-                                        </div>
-                                        <div
-                                            class="vr d-none d-md-block mx-2"
-                                        ></div>
-                                        <div
-                                            class="d-flex align-items-center flex-wrap"
-                                        >
-                                            <strong>Acknowledgement:</strong>
-
-                                            <span
-                                                class="badge ms-2 border text-white"
-                                                :class="
-                                                    props.phone_transaction
-                                                        ?.it_ack_returned
-                                                        ? 'bg-success'
-                                                        : 'bg-danger'
-                                                "
-                                            >
-                                                IT:
-                                                {{
-                                                    props.phone_transaction
-                                                        ?.it_ack_returned
-                                                        ? 'Yes'
-                                                        : 'No'
-                                                }}
-                                                <i
-                                                    class="bi ms-1"
-                                                    :class="
-                                                        props.phone_transaction
-                                                            ?.it_ack_returned
-                                                            ? 'bi-check-circle-fill'
-                                                            : 'bi-x-circle-fill'
-                                                    "
-                                                ></i>
-                                            </span>
-
-                                            <span
-                                                class="badge ms-2 border text-white"
-                                                :class="
-                                                    props.phone_transaction
-                                                        ?.purch_ack_returned
-                                                        ? 'bg-success'
-                                                        : 'bg-danger'
-                                                "
-                                            >
-                                                Purchasing:
-                                                {{
-                                                    props.phone_transaction
-                                                        ?.purch_ack_returned
-                                                        ? 'Yes'
-                                                        : 'No'
-                                                }}
-                                                <i
-                                                    class="bi ms-1"
-                                                    :class="
-                                                        props.phone_transaction
-                                                            ?.purch_ack_returned
-                                                            ? 'bi-check-circle-fill'
-                                                            : 'bi-x-circle-fill'
-                                                    "
-                                                ></i>
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-12 mt-4">
-                                    <div
-                                        class="card bg-light border-0 shadow-sm"
-                                    >
-                                        <div class="card-body">
-                                            <h5
-                                                class="card-title fw-bold text-secondary d-flex align-items-center mb-3 me-2"
-                                            >
-                                                <i class="bi bi-sticky me-2"></i
-                                                >Remarks
-                                            </h5>
-                                            <p
-                                                class="card-text text-dark d-flex align-items-center"
-                                            >
-                                                {{
-                                                    props.phone_transaction
-                                                        ?.remarks ||
-                                                    'No remarks provided for this issuance.'
-                                                }}
-                                            </p>
-                                        </div>
-                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -709,269 +669,232 @@ const returnSubmit = () => {
                             </span>
                         </div>
                     </div>
-                </div>
 
-                <!-- Table -->
-                <div class="row g-4 mb-5">
-                    <div class="col-12">
-                        <div class="card border-0 shadow-sm">
-                            <div class="card-header bg-white py-3">
-                                <div
-                                    class="row d-flex justify-content-between align-items-center"
-                                >
-                                    <div class="col-sm-12 col-md-8 mt-2">
-                                        <h5 class="fw-bold text-primary mb-0">
-                                            <i
-                                                class="bi bi-clock-history me-2"
-                                            ></i
-                                            >Asset Transaction History
-                                        </h5>
-                                    </div>
-                                    <div class="col-sm-12 col-md-4 my-2">
-                                        <div class="search-box">
-                                            <div
-                                                class="input-group input-group-sm"
+                    <!-- Table -->
+                    <div class="card mb-3 border-0 shadow-sm">
+                        <div class="card-header bg-white py-3">
+                            <div
+                                class="row d-flex justify-content-between align-items-center"
+                            >
+                                <div class="col-sm-12 col-md-8 mt-2">
+                                    <h5 class="fw-bold text-primary mb-0">
+                                        <i class="bi bi-clock-history me-2"></i
+                                        >Asset Transaction History
+                                    </h5>
+                                </div>
+                                <div class="col-sm-12 col-md-4 my-2">
+                                    <div class="search-box">
+                                        <div class="input-group input-group-sm">
+                                            <span
+                                                class="input-group-text bg-light border-end-0"
                                             >
-                                                <span
-                                                    class="input-group-text bg-light border-end-0"
-                                                >
-                                                    <i
-                                                        class="bi bi-search text-muted"
-                                                    ></i>
-                                                </span>
-                                                <input
-                                                    type="text"
-                                                    v-model="historySearch"
-                                                    class="form-control bg-light border-start-0"
-                                                    placeholder="Search history..."
-                                                />
-                                            </div>
+                                                <i
+                                                    class="bi bi-search text-muted"
+                                                ></i>
+                                            </span>
+                                            <input
+                                                type="text"
+                                                v-model="historySearch"
+                                                class="form-control bg-light border-start-0"
+                                                placeholder="Search history..."
+                                            />
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="card-body p-0">
-                                <div class="table-responsive">
-                                    <table
-                                        class="table-hover mb-0 table align-middle"
-                                    >
-                                        <thead class="table-light">
-                                            <tr
-                                                class="fs-7 text-uppercase text-muted border-top-0"
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table
+                                    class="table-hover mb-0 table align-middle"
+                                >
+                                    <thead class="table-light">
+                                        <tr
+                                            class="fs-7 text-uppercase text-muted border-top-0 text-wrap"
+                                        >
+                                            <th class="ps-3" scope="col">
+                                                Date Issued
+                                            </th>
+                                            <th scope="col">Issued To</th>
+                                            <th scope="col">Issued By</th>
+                                            <th scope="col">Issued Acc.</th>
+                                            <th scope="col">Date Returned</th>
+                                            <th scope="col">Returned By</th>
+                                            <th scope="col">Returned To</th>
+                                            <th scope="col" class="pe-3">
+                                                Returned Acc.
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr
+                                            class="fs-7"
+                                            v-for="tx in paginatedHistory"
+                                            :key="tx.id"
+                                        >
+                                            <td
+                                                class="fw-medium mb-0 text-nowrap ps-3"
                                             >
-                                                <th class="ps-3" scope="col">
-                                                    Date Issued
-                                                </th>
-                                                <th scope="col">Issued To</th>
-                                                <th scope="col">Issued By</th>
-                                                <th scope="col">Issued Acc.</th>
-                                                <th scope="col">
-                                                    Date Returned
-                                                </th>
-                                                <th scope="col">Returned By</th>
-                                                <th scope="col">Returned To</th>
-                                                <th scope="col" class="pe-3">
-                                                    Returned Acc.
-                                                </th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr
-                                                class="fs-7"
-                                                v-for="tx in paginatedHistory"
-                                                :key="tx.id"
+                                                {{ formatDate(tx.date_issued) }}
+                                            </td>
+
+                                            <td>
+                                                <div class="fw-bold text-dark">
+                                                    {{ tx.issued_to }}
+                                                </div>
+                                                <div
+                                                    class="text-muted small ps-2"
+                                                >
+                                                    {{ tx.department }}
+                                                </div>
+                                            </td>
+
+                                            <td>
+                                                <div class="fw-bold text-dark">
+                                                    {{ tx.issued_by }}
+                                                </div>
+                                            </td>
+
+                                            <td
+                                                class="small text-wrap"
+                                                style="max-width: 150px"
                                             >
-                                                <td
-                                                    class="fw-medium mb-0 text-nowrap ps-3"
+                                                {{
+                                                    tx.issued_accessories || '—'
+                                                }}
+                                            </td>
+
+                                            <td class="text-nowrap">
+                                                <span
+                                                    v-if="tx.date_returned"
+                                                    class="fw-medium mb-0 text-nowrap ps-2"
                                                 >
                                                     {{
                                                         formatDate(
-                                                            tx.date_issued,
+                                                            tx.date_returned,
                                                         )
                                                     }}
-                                                </td>
-
-                                                <td>
-                                                    <div
-                                                        class="fw-bold text-dark"
-                                                    >
-                                                        {{ tx.issued_to }}
-                                                    </div>
-                                                    <div
-                                                        class="text-muted small ps-2"
-                                                    >
-                                                        {{ tx.department }}
-                                                    </div>
-                                                </td>
-
-                                                <td>
-                                                    <div
-                                                        class="fw-bold text-dark"
-                                                    >
-                                                        {{ tx.issued_by }}
-                                                    </div>
-                                                </td>
-
-                                                <td
-                                                    class="small text-wrap"
-                                                    style="max-width: 150px"
+                                                </span>
+                                                <span
+                                                    v-else
+                                                    class="badge rounded-pill bg-warning text-dark"
+                                                    >In Use</span
                                                 >
-                                                    {{
-                                                        tx.issued_accessories ||
-                                                        '—'
-                                                    }}
-                                                </td>
+                                            </td>
 
-                                                <td class="text-nowrap">
-                                                    <span
-                                                        v-if="tx.date_returned"
-                                                        class="fw-medium mb-0 text-nowrap ps-2"
-                                                    >
-                                                        {{
-                                                            formatDate(
-                                                                tx.date_returned,
-                                                            )
-                                                        }}
-                                                    </span>
-                                                    <span
-                                                        v-else
-                                                        class="badge rounded-pill bg-warning text-dark"
-                                                        >In Use</span
-                                                    >
-                                                </td>
-
-                                                <td>
-                                                    <div
-                                                        class="fw-bold text-dark"
-                                                    >
-                                                        {{
-                                                            tx.returned_by ||
-                                                            '—'
-                                                        }}
-                                                    </div>
-                                                    <div
-                                                        class="text-muted small ps-2"
-                                                    >
-                                                        {{
-                                                            tx.returnee_department
-                                                        }}
-                                                    </div>
-                                                </td>
-                                                <td>
-                                                    <div
-                                                        class="fw-bold text-dark"
-                                                    >
-                                                        {{ tx.returned_to }}
-                                                    </div>
-                                                </td>
-
-                                                <td
-                                                    class="small text-muted text-wrap pe-3"
-                                                    style="max-width: 150px"
+                                            <td>
+                                                <div class="fw-bold text-dark">
+                                                    {{ tx.returned_by || '—' }}
+                                                </div>
+                                                <div
+                                                    class="text-muted small ps-2"
                                                 >
-                                                    {{
-                                                        tx.returned_accessories ||
-                                                        '—'
-                                                    }}
-                                                </td>
-                                            </tr>
-                                            <tr
-                                                v-if="
-                                                    filteredHistory.length === 0
-                                                "
+                                                    {{ tx.returnee_department }}
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="fw-bold text-dark">
+                                                    {{ tx.returned_to }}
+                                                </div>
+                                            </td>
+
+                                            <td
+                                                class="small text-muted text-wrap pe-3"
+                                                style="max-width: 150px"
                                             >
-                                                <td
-                                                    colspan="8"
-                                                    class="text-muted py-4 text-center"
-                                                >
-                                                    No transaction
-                                                    {{
-                                                        historySearch
-                                                            ? 'No matches found for "' +
-                                                              historySearch +
-                                                              '"'
-                                                            : 'No transaction history found.'
-                                                    }}
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
+                                                {{
+                                                    tx.returned_accessories ||
+                                                    '—'
+                                                }}
+                                            </td>
+                                        </tr>
+                                        <tr v-if="filteredHistory.length === 0">
+                                            <td
+                                                colspan="8"
+                                                class="text-muted py-4 text-center"
+                                            >
+                                                {{
+                                                    historySearch
+                                                        ? 'No matches found for "' +
+                                                          historySearch +
+                                                          '"'
+                                                        : 'No transaction history found.'
+                                                }}
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
                             </div>
+                        </div>
+                        <div
+                            class="card-footer border-top-0 bg-white py-3"
+                            v-if="totalPages > 1"
+                        >
                             <div
-                                class="card-footer border-top-0 bg-white py-3"
-                                v-if="totalPages > 1"
+                                class="d-flex justify-content-between align-items-center"
                             >
-                                <div
-                                    class="d-flex justify-content-between align-items-center"
-                                >
-                                    <div class="text-muted small">
-                                        Showing
-                                        {{
-                                            (currentPage - 1) * itemsPerPage + 1
-                                        }}
-                                        to
-                                        {{
-                                            Math.min(
-                                                currentPage * itemsPerPage,
-                                                filteredHistory.length,
-                                            )
-                                        }}
-                                        of {{ filteredHistory.length }} entries
-                                    </div>
-                                    <nav>
-                                        <ul
-                                            class="pagination pagination-sm mb-0"
-                                        >
-                                            <li
-                                                class="page-item"
-                                                :class="{
-                                                    disabled: currentPage === 1,
-                                                }"
-                                            >
-                                                <button
-                                                    class="page-link"
-                                                    @click="currentPage--"
-                                                >
-                                                    Previous
-                                                </button>
-                                            </li>
-
-                                            <li
-                                                v-for="page in totalPages"
-                                                :key="page"
-                                                class="page-item"
-                                                :class="{
-                                                    active:
-                                                        currentPage === page,
-                                                }"
-                                            >
-                                                <button
-                                                    class="page-link"
-                                                    @click="currentPage = page"
-                                                >
-                                                    {{ page }}
-                                                </button>
-                                            </li>
-
-                                            <li
-                                                class="page-item"
-                                                :class="{
-                                                    disabled:
-                                                        currentPage ===
-                                                        totalPages,
-                                                }"
-                                            >
-                                                <button
-                                                    class="page-link"
-                                                    @click="currentPage++"
-                                                >
-                                                    Next
-                                                </button>
-                                            </li>
-                                        </ul>
-                                    </nav>
+                                <div class="text-muted small">
+                                    Showing
+                                    {{ (currentPage - 1) * itemsPerPage + 1 }}
+                                    to
+                                    {{
+                                        Math.min(
+                                            currentPage * itemsPerPage,
+                                            filteredHistory.length,
+                                        )
+                                    }}
+                                    of {{ filteredHistory.length }} entries
                                 </div>
+                                <nav>
+                                    <ul
+                                        class="pagination pagination-sm mb-0 gap-2"
+                                    >
+                                        <li
+                                            class="page-item"
+                                            :class="{
+                                                disabled: currentPage === 1,
+                                            }"
+                                        >
+                                            <button
+                                                class="page-link"
+                                                @click="prevPage"
+                                            >
+                                                Previous
+                                            </button>
+                                        </li>
+
+                                        <li
+                                            v-for="page in totalPages"
+                                            :key="page"
+                                            class="page-item"
+                                            :class="{
+                                                active: currentPage === page,
+                                            }"
+                                        >
+                                            <button
+                                                class="page-link"
+                                                @click="currentPage = page"
+                                            >
+                                                {{ page }}
+                                            </button>
+                                        </li>
+
+                                        <li
+                                            class="page-item"
+                                            :class="{
+                                                disabled:
+                                                    currentPage === totalPages,
+                                            }"
+                                        >
+                                            <button
+                                                class="page-link"
+                                                @click="nextPage"
+                                            >
+                                                Next
+                                            </button>
+                                        </li>
+                                    </ul>
+                                </nav>
                             </div>
                         </div>
                     </div>
@@ -991,7 +914,7 @@ const returnSubmit = () => {
                 <div class="row mb-3">
                     <div class="col-md-6">
                         <label for="issued_to" class="form-label"
-                            >Issued To</label
+                            >Issued To<i class="text-danger">*</i></label
                         >
                         <input
                             type="text"
@@ -1003,7 +926,7 @@ const returnSubmit = () => {
                     </div>
                     <div class="col-md-6">
                         <label for="issued_by" class="form-label"
-                            >Issued By</label
+                            >Issued By<i class="text-danger">*</i></label
                         >
                         <input
                             type="text"
@@ -1018,7 +941,7 @@ const returnSubmit = () => {
                 <div class="row mb-3">
                     <div class="col-md-6">
                         <label for="department" class="form-label"
-                            >Department</label
+                            >Department<i class="text-danger">*</i></label
                         >
                         <input
                             type="text"
@@ -1030,7 +953,7 @@ const returnSubmit = () => {
                     </div>
                     <div class="col-md-6">
                         <label for="date_issued" class="form-label"
-                            >Date Issued</label
+                            >Date Issued<i class="text-danger">*</i></label
                         >
                         <input
                             type="date"
@@ -1044,46 +967,10 @@ const returnSubmit = () => {
 
                 <div class="mb-3">
                     <label class="form-label text-muted small fw-bold"
-                        >Acknowledgement</label
+                        >Select Accessories<i class="text-danger">*</i></label
                     >
                     <div
-                        class="d-flex justify-content-around gap-4 rounded border p-2"
-                    >
-                        <div class="form-check">
-                            <input
-                                type="checkbox"
-                                v-model="form.it_ack_issued"
-                                id="ITAcknowledgement"
-                                class="form-check-input"
-                            />
-                            <label
-                                for="ITAcknowledgement"
-                                class="form-check-label"
-                                >IT Dept</label
-                            >
-                        </div>
-                        <div class="form-check">
-                            <input
-                                type="checkbox"
-                                v-model="form.purch_ack_issued"
-                                id="PurchAcknowledgement"
-                                class="form-check-input"
-                            />
-                            <label
-                                for="PurchAcknowledgement"
-                                class="form-check-label"
-                                >Purchasing</label
-                            >
-                        </div>
-                    </div>
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label text-muted small fw-bold"
-                        >Select Accessories</label
-                    >
-                    <div
-                        class="d-flex justify-content-between gap-2 rounded border p-2"
+                        class="d-flex justify-content-around gap-2 rounded border p-2"
                     >
                         <div class="form-check">
                             <input
@@ -1113,18 +1000,6 @@ const returnSubmit = () => {
                                 >Headphones</label
                             >
                         </div>
-                        <div class="form-check">
-                            <input
-                                class="form-check-input"
-                                type="checkbox"
-                                value="Case"
-                                v-model="selectedAcc"
-                                id="caseCheckInput"
-                            />
-                            <label class="form-check-label" for="caseCheckInput"
-                                >Case</label
-                            >
-                        </div>
                     </div>
                 </div>
 
@@ -1138,6 +1013,54 @@ const returnSubmit = () => {
                         class="form-control"
                         rows="2"
                         placeholder="e.g. Charger, USB-C Cable"
+                    ></textarea>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label d-block text-muted small fw-bold"
+                        >Cashout Status<i class="text-danger">*</i></label
+                    >
+
+                    <div
+                        class="d-flex justify-content-center align-items-center gap-2 rounded border py-2"
+                    >
+                        <div class="form-check form-check-inline mb-2">
+                            <input
+                                class="form-check-input"
+                                type="radio"
+                                id="with_cashout"
+                                value="1"
+                                v-model="form.cashout"
+                            />
+                            <label class="form-check-label" for="with_cashout"
+                                >With Cashout</label
+                            >
+                        </div>
+
+                        <div class="form-check form-check-inline">
+                            <input
+                                class="form-check-input"
+                                type="radio"
+                                id="without_cashout"
+                                value="0"
+                                v-model="form.cashout"
+                            />
+                            <label
+                                class="form-check-label"
+                                for="without_cashout"
+                                >Without Cashout</label
+                            >
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="issueRemarks" class="form-label">Remarks</label>
+                    <textarea
+                        v-model="form.remarks"
+                        id="issueRemarks"
+                        rows="3"
+                        class="form-control"
                     ></textarea>
                 </div>
             </form>
@@ -1223,40 +1146,6 @@ const returnSubmit = () => {
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label">Acknowledgement</label>
-                    <div
-                        class="d-flex justify-content-around align-items-center g-2 rounded border p-2"
-                    >
-                        <div class="form-check">
-                            <input
-                                type="checkbox"
-                                v-model="returnform.it_ack_returned"
-                                id="ITReturnAcknowledgement"
-                                class="form-check-input"
-                            />
-                            <label
-                                for="ITReturnAcknowledgement"
-                                class="form-check-label"
-                                >IT</label
-                            >
-                        </div>
-                        <div class="form-check">
-                            <input
-                                type="checkbox"
-                                v-model="returnform.purch_ack_returned"
-                                id="PurchReturnAcknowledgement"
-                                class="form-check-input"
-                            />
-                            <label
-                                for="PurchReturnAcknowledgement"
-                                class="form-check-label"
-                                >Purchasing</label
-                            >
-                        </div>
-                    </div>
-                </div>
-
-                <div class="mb-3">
                     <label class="form-label">Select Accessories</label>
                     <div
                         class="d-flex justify-content-around align-items-center rounded border p-2"
@@ -1287,20 +1176,6 @@ const returnSubmit = () => {
                                 class="form-check-label"
                                 for="headphonesReturnCheckInput"
                                 >Headphones</label
-                            >
-                        </div>
-                        <div class="form-check">
-                            <input
-                                class="form-check-input"
-                                type="checkbox"
-                                value="Case"
-                                v-model="selectedReturnAcc"
-                                id="caseReturnCheckInput"
-                            />
-                            <label
-                                class="form-check-label"
-                                for="caseReturnCheckInput"
-                                >Case</label
                             >
                         </div>
                     </div>
@@ -1347,10 +1222,171 @@ const returnSubmit = () => {
                 :disabled="returnform.processing"
             >
                 <span
-                    v-if="form.processing"
+                    v-if="returnform.processing"
                     class="spinner-border spinner-border-sm me-1"
                 ></span>
                 Return
+            </button>
+        </template>
+    </Modals>
+
+    <!-- Update Modal -->
+    <Modals
+        id="UpdatePhoneModal"
+        title="Update Phone Asset"
+        header-class="bg-warning text-white bg-gradient"
+    >
+        <template #body>
+            <form @submit.prevent="updateSubmit" id="updateForm">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="update_brand" class="form-label"
+                            >Brand</label
+                        >
+                        <input
+                            type="text"
+                            id="update_brand"
+                            v-model="updateForm.brand"
+                            class="form-control"
+                            required
+                        />
+                    </div>
+                    <div class="col-md-6">
+                        <label for="update_model" class="form-label"
+                            >Model</label
+                        >
+                        <input
+                            type="text"
+                            id="update_model"
+                            v-model="updateForm.model"
+                            class="form-control"
+                            required
+                        />
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="update_serial_num" class="form-label"
+                            >Serial Number</label
+                        >
+                        <input
+                            type="text"
+                            id="update_serial_num"
+                            v-model="updateForm.serial_num"
+                            class="form-control"
+                            required
+                        />
+                    </div>
+                    <div class="col-md-6">
+                        <label for="update_sim_no" class="form-label"
+                            >SIM Number</label
+                        >
+                        <input
+                            type="text"
+                            id="update_sim_no"
+                            v-model="updateForm.sim_no"
+                            class="form-control"
+                        />
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="update_imei_one" class="form-label"
+                            >IMEI One</label
+                        >
+                        <input
+                            type="text"
+                            id="update_imei_one"
+                            v-model="updateForm.imei_one"
+                            class="form-control"
+                            required
+                        />
+                    </div>
+                    <div class="col-md-6">
+                        <label for="update_imei_two" class="form-label"
+                            >IMEI Two</label
+                        >
+                        <input
+                            type="text"
+                            id="update_imei_two"
+                            v-model="updateForm.imei_two"
+                            class="form-control"
+                        />
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="update_ram" class="form-label">RAM</label>
+                        <input
+                            type="text"
+                            id="update_ram"
+                            v-model="updateForm.ram"
+                            class="form-control"
+                            required
+                        />
+                    </div>
+                    <div class="col-md-6">
+                        <label for="update_rom" class="form-label">ROM</label>
+                        <input
+                            type="text"
+                            id="update_rom"
+                            v-model="updateForm.rom"
+                            class="form-control"
+                            required
+                        />
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="update_purchase_date" class="form-label"
+                            >Purchase Date</label
+                        >
+                        <input
+                            type="date"
+                            id="update_purchase_date"
+                            v-model="updateForm.purchase_date"
+                            class="form-control"
+                        />
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="update_remarks" class="form-label"
+                        >Remarks</label
+                    >
+                    <textarea
+                        v-model="updateForm.remarks"
+                        id="update_remarks"
+                        rows="3"
+                        class="form-control"
+                    ></textarea>
+                </div>
+            </form>
+        </template>
+
+        <template #footer>
+            <button
+                type="button"
+                class="btn btn-secondary"
+                data-bs-dismiss="modal"
+            >
+                Cancel
+            </button>
+            <button
+                type="submit"
+                class="btn btn-warning"
+                form="updateForm"
+                :disabled="updateForm.processing"
+            >
+                <span
+                    v-if="updateForm.processing"
+                    class="spinner-border spinner-border-sm me-1"
+                ></span>
+                Update Asset
             </button>
         </template>
     </Modals>

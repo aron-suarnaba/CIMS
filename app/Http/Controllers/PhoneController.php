@@ -6,88 +6,104 @@ use App\Models\Phone;
 use App\Models\PhoneTransaction;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class PhoneController extends Controller
 {
+
     /**
      * Display a listing of the smartphone device in the Phone.vue
      */
-
     public function index(Request $request)
     {
         $filterBrand = $request->get('brand');
         $sort = $request->get('sort', 'date_modified');
+        $search = $request->get('search');
 
         $perPage = 12;
-        $page = $request->integer('page', 1);
-        $offset = ($page - 1) * $perPage;
+        $page = max((int) $request->get('page', 1), 1);
+        $start = (($page - 1) * $perPage) + 1;
+        $end = $page * $perPage;
 
-        /** Base query (NO pagination yet) */
-        $query = Phone::query()
-            ->when($filterBrand, function ($query, $filterBrand) {
-                $query->where('brand', 'LIKE', '%' . $filterBrand . '%');
-            })
-            ->with('currentTransaction');
+        // Explicitly prefix columns with 'p.' to avoid ambiguity during JOINs
+        $orderBy = match ($sort) {
+            'name' => 'p.brand ASC, p.model ASC, p.id ASC',
+            'availability' => "
+        CASE
+            WHEN p.status = 'available' THEN 1
+            WHEN p.status = 'issued' THEN 2
+            WHEN p.status = 'return' THEN 3
+            ELSE 4
+        END ASC, p.id DESC
+        ",
+            default => 'p.updated_at DESC, p.id DESC',
+        };
 
-        /** Sorting */
-        switch ($sort) {
-            case 'name':
-                $query->orderBy('brand', 'asc')
-                    ->orderBy('model', 'asc');
-                break;
+        $where = "WHERE 1 = 1";
+        $bindings = [];
 
-            case 'availability':
-                $query->orderByRaw("
-                CASE
-                    WHEN status = 'available' THEN 1
-                    WHEN status = 'issued' THEN 2
-                    WHEN status = 'returned' THEN 3
-                    ELSE 4
-                END
-            ");
-                break;
-
-            case 'date_modified':
-            default:
-                $query->orderBy('updated_at', 'desc');
-                break;
+        if ($filterBrand) {
+            $where .= " AND brand LIKE ?";
+            $bindings[] = "%{$filterBrand}%";
         }
 
-        /** Total count (clone query to avoid mutation) */
-        $total = (clone $query)->count();
+        if ($search) {
+            $where .= " AND (
+            brand LIKE ?
+            OR model LIKE ?
+            OR p.serial_num LIKE ?
+            OR status LIKE ?
+        )";
+            array_push($bindings, "%{$search}%", "%{$search}%", "%{$search}%", "%{$search}%");
+        }
 
-        /** Get paginated IDs using ROW_NUMBER (SQL Server 2008 safe) */
-        $ids = DB::table(DB::raw("(
-        SELECT id,
-               ROW_NUMBER() OVER (ORDER BY updated_at DESC) AS row_num
-        FROM phones
-    ) AS t"))
-            ->whereBetween('row_num', [$offset + 1, $offset + $perPage])
-            ->pluck('id');
+        $total = DB::selectOne("SELECT COUNT(*) AS total FROM phones p $where", $bindings)->total;
 
-        /** Fetch actual models with relationships */
-        $phones = $query->whereIn('id', $ids)->get();
+        /*
+        |--------------------------------------------------------------------------
+        | JOINED QUERY
+        | We join phone_transactions where date_returned is NULL to get the active user
+        |--------------------------------------------------------------------------
+        */
+        $phonesRaw = DB::select("
+        SELECT *
+        FROM (
+            SELECT
+                p.*,
+                t.department as trans_dept,
+                t.date_issued as trans_date,
+                ROW_NUMBER() OVER (ORDER BY $orderBy) AS row_num
+            FROM phones p
+            LEFT JOIN phone_transactions t ON p.serial_num = t.serial_num
+                 AND t.date_returned IS NULL
+            $where
+        ) AS numbered
+        WHERE row_num BETWEEN ? AND ?
+        ORDER BY row_num
+    ", [...$bindings, $start, $end]);
 
-        /** Create paginator */
-        $phones = new LengthAwarePaginator(
-            $phones,
-            $total,
-            $perPage,
-            $page,
-            [
-                'path' => $request->url(),
-                'query' => $request->query(),
-            ]
-        );
+        $formattedData = array_map(function ($phone) {
+            $phone->current_transaction = $phone->trans_dept ? [
+                'department' => $phone->trans_dept,
+                'date_issued' => $phone->trans_date,
+            ] : null;
+            return $phone;
+        }, $phonesRaw);
 
-        return Inertia::render('AssetInventoryManagement/Phone', [
-            'phones' => $phones,
-            'filters' => $request->only(['brand', 'sort']),
+        return Inertia::render('AssetInventoryManagement/PhoneList', [
+            'phones' => [
+                'data' => $formattedData,
+                'current_page' => $page,
+                'per_page' => $perPage,
+                'total' => $total,
+                'from' => $start <= $total ? $start : null,
+                'to' => min($end, $total),
+                'last_page' => (int) ceil($total / $perPage),
+            ],
+            'filters' => $request->only(['brand', 'sort', 'search']),
         ]);
     }
-
 
     /**
      * Show the form for creating a new smartphone device.
@@ -103,15 +119,16 @@ class PhoneController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'brand' => 'required|string',
-            'model' => 'required|string',
-            'serial_num' => 'required|string|unique:phones,serial_num',
-            'imei_one' => 'required|string|unique:phones,imei_one',
-            'imei_two' => 'nullable|string',
-            'ram' => 'required|string',
-            'rom' => 'required|string',
-            'sim_no' => 'nullable|string',
-            'cashout' => 'required|boolean',
+            'brand' => 'required|string|max:255',
+            'model' => 'required|string|max:255',
+            'serial_num' => 'required|string|max:255|unique:phones,serial_num',
+            'imei_one' => 'nullable|string|max:255|unique:phones,imei_one',
+            'imei_two' => 'nullable|string|max:255|unique:phones,imei_two',
+            'ram' => 'required|string|max:255',
+            'rom' => 'required|string|max:255',
+            'sim_no' => 'nullable|string|max:255',
+            'purchase_date' => 'nullable|date',
+            'remarks' => 'nullable|string',
         ]);
 
         $validated['status'] = 'available';
@@ -130,27 +147,27 @@ class PhoneController extends Controller
         // 1. Validate Transaction Data
         $validated = $request->validate([
             'issued_to' => 'required|string|max:255',
+            'issued_by' => 'nullable|string|max:255',
             'department' => 'required|string|max:255',
             'date_issued' => 'required|date',
-            'issued_by' => 'nullable|string|max:255',
             'issued_accessories' => 'nullable|string',
-            'it_ack_issued' => 'required|boolean',
-            'purch_ack_issued' => 'required|boolean', // Ensure this exists in your DB or handle it
+            'cashout' => 'required|boolean',
+            'remarks' => 'nullable|string|max:255',
         ]);
 
-        // 2. Add the foreign key (serial_num or phone_id)
         $validated['serial_num'] = $phone->serial_num;
 
-        // 3. Create the Transaction
         PhoneTransaction::create($validated);
 
-        // 4. Update the Phone Status
         $phone->update([
-            'status' => 'issued'
+            'status' => 'issued',
+            'remarks' => $validated['remarks'] ?? $phone->remarks,
         ]);
 
         return redirect()->back()->with('success', 'The device has been issued successfully to ' . $validated['issued_to']);
     }
+
+    // This controller is for the storing data of phone issuance modals
     public function return(Request $request, Phone $phone)
     {
         $validated = $request->validate([
@@ -159,8 +176,6 @@ class PhoneController extends Controller
             'returnee_department' => 'required|string|max:255',
             'date_returned' => 'required|date',
             'returned_accessories' => 'nullable|string',
-            'it_ack_returned' => 'required|boolean',
-            'purch_ack_returned' => 'required|boolean',
             'remarks' => 'nullable|string|max:255',
         ]);
 
@@ -171,7 +186,10 @@ class PhoneController extends Controller
 
         if ($transaction) {
 
-            $phone->update(['status' => 'available']);
+            $phone->update([
+                'status' => 'available',
+                'remarks' => $validated['remarks'] ?? $phone->remarks,
+            ]);
 
             $transaction->update($validated);
 
@@ -209,7 +227,25 @@ class PhoneController extends Controller
      */
     public function update(Request $request, Phone $phone)
     {
-        //
+        $validated = $request->validate([
+            'brand' => 'required|string|max:255',
+            'model' => 'required|string|max:255',
+            'serial_num' => 'required|string|max:255|unique:phones,serial_num,' . $phone->id,
+            'imei_one' => 'required|string|max:255|unique:phones,imei_one,' . $phone->id,
+            'imei_two' => 'nullable|string|max:255|unique:phones,imei_two,' . $phone->id,
+            'ram' => 'required|string|max:255',
+            'rom' => 'required|string|max:255',
+            'sim_no' => 'nullable|string|max:255',
+            'purchase_date' => 'nullable|date',
+            'remarks' => 'nullable|string',
+        ]);
+
+        try {
+            $phone->update($validated);
+            return redirect()->back()->with('success', 'Phone asset updated successfully');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Failed to update phone asset.');
+        }
     }
 
     /**
@@ -217,13 +253,34 @@ class PhoneController extends Controller
      */
     public function destroy(Phone $phone)
     {
-
         try {
-            // $phone->delete();
-            $phone = \DB::table('phone')->where('serial_num', )->delete();
-            return redirect()->back()->with('success', 'Asset record and all related history have been deleted');
+            $phone->delete();
+            return redirect()->route('phone.index')->with('success', 'Asset record and all related history have been deleted');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Failed to delete asset.');
         }
+    }
+
+    /**
+     * Generate a pdf report for the company phone logsheet
+     */
+    public function generateLogsheetReport(Phone $phone)
+    {
+        $phone->load('currentTransaction');
+
+        $data = [
+            'phone' => $phone,
+            'current' => $phone->currentTransaction()->latest()->first(),
+            'date' => now()->format('d/m/Y'),
+        ];
+
+        $pdf = Pdf::loadView('reports.CompanyPhoneLogsheet', $data);
+
+        // 2. Options (Optional: change paper size per PDF)
+        $pdf->setPaper('legal', 'landscape');
+
+        // 3. Output
+        // Use ->stream() to show in browser, or ->download() to force download
+        return $pdf->stream("Phone-{$phone->serial_num}-logsheet.pdf");
     }
 }

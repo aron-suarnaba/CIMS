@@ -35,9 +35,9 @@ class Phone extends Model
         'ram',
         'rom',
         'sim_no',
-        'cashout',
         'purchase_date',
         'status',
+        'remarks',
     ];
 
     /**
@@ -51,10 +51,7 @@ class Phone extends Model
         'purchase_date' => 'date',
     ];
 
-    public function getRouteKeyName()
-    {
-        return 'serial_num';
-    }
+    // Use default id for routing (no custom getRouteKeyName needed)
 
     public function transactions()
     {
