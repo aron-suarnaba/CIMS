@@ -1,15 +1,11 @@
 import vue from '@vitejs/plugin-vue';
 import laravel from 'laravel-vite-plugin';
-import path from 'path';
 import { defineConfig } from 'vite';
 
 export default defineConfig({
     plugins: [
         laravel({
-            input: [
-                'resources/js/app.js',
-                'resources/css/app.css',
-            ],
+            input: ['resources/js/app.js'],
             refresh: true,
         }),
         vue({
@@ -23,16 +19,7 @@ export default defineConfig({
     ],
     resolve: {
         alias: {
-            '@': path.resolve(__dirname, 'resources/js'),
-            'ziggy-js': path.resolve(__dirname, 'vendor/tightenco/ziggy/dist/vue.m'),
-        },
-    },
-    server: {
-        proxy: {
-            '/api': {
-                target: 'http://localhost',
-                changeOrigin: true,
-            },
+            vue: 'vue/dist/vue.esm-bundler.js',
         },
     },
 });

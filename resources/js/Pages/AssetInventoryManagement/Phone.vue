@@ -162,6 +162,19 @@ const getPhoneImagePath = (phone) => {
 
     return defaultPath;
 };
+
+const brandsOption = [
+    'iphone',
+    'apple',
+    'oppo',
+    'redmi',
+    'samsung',
+    'vivo',
+    'realme',
+    'xiaomi',
+    'honor',
+    'techno',
+];
 </script>
 
 <template>
@@ -333,6 +346,22 @@ const getPhoneImagePath = (phone) => {
                             class="form-control"
                             required
                         />
+                        <select
+                            class="form-select"
+                            aria-label="Brand"
+                            id="brandInput"
+                            v-model="addForm.brand"
+                            required
+                        >
+                            <option selected>Select Brand</option>
+                            <option
+                                :value="brand"
+                                :key="brand"
+                                v-for="brand in brandsOption"
+                            >
+                                {{ brand.charAt(1) + brand.slice(1) }}
+                            </option>
+                        </select>
                     </div>
                     <div class="col-sm-12 col-md-6">
                         <label for="modelInput" class="form-label">Model</label>

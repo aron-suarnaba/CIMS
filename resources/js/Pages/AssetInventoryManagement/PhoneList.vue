@@ -219,6 +219,20 @@ const deleteItem = (id) => {
         }
     });
 };
+
+const brandsOption = [
+    'iphone',
+    'apple',
+    'oppo',
+    'redmi',
+    'samsung',
+    'vivo',
+    'realme',
+    'xiaomi',
+    'honor',
+    'techno',
+    'other',
+];
 </script>
 
 <template>
@@ -715,16 +729,27 @@ const deleteItem = (id) => {
             <form @submit.prevent="submitAddForm" id="addPhoneForm">
                 <div class="row d-flex align-items-center mb-3">
                     <div class="col-sm-12 col-md-6">
-                        <label for="brandInput" class="form-label"
-                            >Brand<i class="text-danger">*</i></label
-                        >
-                        <input
-                            type="text"
+                        <label for="brandInput" class="form-label">Brand</label>
+
+                        <select
+                            class="form-select"
+                            aria-label="Brand"
                             id="brandInput"
                             v-model="addForm.brand"
-                            class="form-control"
                             required
-                        />
+                        >
+                            <option selected disabled>Select Brand</option>
+                            <option
+                                :value="brand"
+                                :key="brand"
+                                v-for="brand in brandsOption"
+                            >
+                                {{
+                                    brand.charAt(0).toUpperCase() +
+                                    brand.slice(1)
+                                }}
+                            </option>
+                        </select>
                     </div>
                     <div class="col-sm-12 col-md-6">
                         <label for="modelInput" class="form-label"

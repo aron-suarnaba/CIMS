@@ -503,7 +503,7 @@ const generateLogsheet = (id) => {
                         </div>
                         <div class="card-body">
                             <div
-                                class="row g-3 py-3"
+                                class="row g-3"
                                 v-if="
                                     props.phone?.status === 'available' ||
                                     props.phone.status === 'issued'
@@ -536,6 +536,12 @@ const generateLogsheet = (id) => {
                                         class="small text-muted text-uppercase fw-bold"
                                         >Issuance Logistics</label
                                     >
+                                    <p class="fw-bold fs-5 text-dark mb-1">
+                                        {{
+                                            props.phone_transaction
+                                                ?.issued_by || 'Not yet issued'
+                                        }}
+                                    </p>
                                     <p class="mb-1">
                                         <strong>Date:</strong>
                                         {{
@@ -543,13 +549,6 @@ const generateLogsheet = (id) => {
                                                 props.phone_transaction
                                                     ?.date_issued,
                                             ) || 'Not yet issued'
-                                        }}
-                                    </p>
-                                    <p class="mb-0">
-                                        <strong>By:</strong>
-                                        {{
-                                            props.phone_transaction
-                                                ?.issued_by || 'Not yet issued'
                                         }}
                                     </p>
                                 </div>
@@ -638,15 +637,17 @@ const generateLogsheet = (id) => {
                                     </p>
                                 </div>
                                 <div class="col-md-4 px-md-4">
-                                    <label class="small text-uppercase fw-bold">
+                                    <label
+                                        class="small text-muted text-uppercase fw-bold"
+                                    >
                                         <i
                                             class="bi bi-headphones text-primary me-2"
                                         ></i
                                         >Accessories:</label
                                     >
 
-                                    <p class="mb-0">
-                                        <span class="text-muted ms-2">{{
+                                    <p class="d-flex align-items-center">
+                                        <span class="text-muted fw-bold ms-2">{{
                                             props.phone_transaction
                                                 ?.returned_accessories || 'None'
                                         }}</span>
@@ -655,7 +656,7 @@ const generateLogsheet = (id) => {
                             </div>
                         </div>
                         <div
-                            class="card-body bg-light py-5 text-center"
+                            class="card-body py-5 text-center"
                             v-else-if="props.phone.status === 'issued'"
                         >
                             <span class="fw-bold fs-5 text-dark text-muted mb-1"
@@ -663,7 +664,7 @@ const generateLogsheet = (id) => {
                                 returned).
                             </span>
                         </div>
-                        <div class="card-body bg-light py-5 text-center" v-else>
+                        <div class="card-body py-5 text-center" v-else>
                             <span class="fw-bold fs-5 text-dark text-muted mb-1"
                                 >The asset is not yet issued.
                             </span>

@@ -12,9 +12,9 @@ const chartOption = markRaw({
     colors: ['#0d6efd'],
     title: { text: 'Monthly Procurement', align: 'center' },
 });
-const chartSeries = ref(markRaw([
-    { name: 'New Assets', data: [45, 52, 38, 24, 60, 15] },
-]));
+const chartSeries = ref(
+    markRaw([{ name: 'New Assets', data: [45, 52, 38, 24, 60, 15] }]),
+);
 
 const donutChartOption = markRaw({
     chart: { id: 'cims-distribution', type: 'donut' },
@@ -31,17 +31,19 @@ const rangeAreaChartOption = markRaw({
     title: { text: 'Maintenance Variance', align: 'center' },
     xaxis: { categories: ['Sep', 'Oct', 'Nov', 'Dec'] },
 });
-const rangeAreaChartSeries = ref(markRaw([
-    {
-        name: 'Cost Range',
-        data: [
-            { x: 'Sep', y: [500, 1200] },
-            { x: 'Oct', y: [800, 1500] },
-            { x: 'Nov', y: [1200, 3000] },
-            { x: 'Dec', y: [400, 900] },
-        ],
-    },
-]));
+const rangeAreaChartSeries = ref(
+    markRaw([
+        {
+            name: 'Cost Range',
+            data: [
+                { x: 'Sep', y: [500, 1200] },
+                { x: 'Oct', y: [800, 1500] },
+                { x: 'Nov', y: [1200, 3000] },
+                { x: 'Dec', y: [400, 900] },
+            ],
+        },
+    ]),
+);
 
 const radialChartOption = markRaw({
     chart: { id: 'cims-compliance', type: 'radialBar' },
