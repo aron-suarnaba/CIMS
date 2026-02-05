@@ -132,8 +132,8 @@ const getPhoneImagePath = (phone) => {
 
 const myBreadcrumb = [
     { label: 'Dashboard', url: route('dashboard') },
-    { label: 'Asset Inventory', url: route('AssetAndInventoryManagement') },
-    { label: 'Phone Assets' },
+    { label: 'Asset & Inventory', url: route('AssetAndInventoryManagement') },
+    { label: 'Phone Units' },
 ];
 
 const sortOption = [

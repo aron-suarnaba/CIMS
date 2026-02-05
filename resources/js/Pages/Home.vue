@@ -121,7 +121,7 @@ onUnmounted(() => {
 
 <template>
     <div class="app-content mt-4 px-3">
-        <div class="container-fluid">
+        <div class="container">
             <!-- ROW 1 -->
             <div class="row mb-4">
                 <!-- CLOCK DISPLAY -->

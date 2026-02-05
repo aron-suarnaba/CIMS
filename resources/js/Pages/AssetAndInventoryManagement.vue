@@ -12,8 +12,8 @@ const navigateTo = (url) => {
 };
 
 const myBreadcrumb = [
-    { label: 'Home', url: route('dashboard') },
-    { label: 'Inventory' },
+    { label: 'Dashboard', url: route('dashboard') },
+    { label: 'Asset & Inventory' },
 ];
 
 // Added more categories to fill out the UI
