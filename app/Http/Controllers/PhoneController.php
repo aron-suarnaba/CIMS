@@ -270,7 +270,7 @@ class PhoneController extends Controller
 
         $data = [
             'phone' => $phone,
-            'current' => $phone->currentTransaction()->latest()->first(),
+            'current' => $phone->currentTransaction()->first(),
             'date' => now()->format('d/m/Y'),
         ];
 

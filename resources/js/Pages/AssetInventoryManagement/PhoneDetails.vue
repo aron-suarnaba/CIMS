@@ -26,10 +26,10 @@ const props = defineProps({
 
 // Function for breadcrumb
 const myBreadcrumb = [
-    { label: 'Home', url: route('dashboard') },
-    { label: 'Inventory', url: route('AssetAndInventoryManagement') },
-    { label: 'Smartphone Asset', url: route('phone.index') },
-    { label: 'Smartphone Asset Details' },
+    { label: 'Dashboard', url: route('dashboard') },
+    { label: 'Asset & Inventory', url: route('AssetAndInventoryManagement') },
+    { label: 'Phone Units', url: route('phone.index') },
+    { label: 'Details' },
 ];
 
 // Function for the phone image path
@@ -290,10 +290,7 @@ const openReturnModal = () => {
 };
 
 const generateLogsheet = (id) => {
-    window.open(
-        `/CIMS/public/AssetAndInventoryManagement/Phone/${id}/logsheet`,
-        '_blank',
-    );
+    window.open(`/AssetAndInventoryManagement/Phone/${id}/logsheet`, '_blank');
 };
 </script>
 
@@ -306,7 +303,7 @@ const generateLogsheet = (id) => {
     </div>
 
     <div class="app-content mb-5">
-        <div class="container-fluid px-3">
+        <div class="container px-3">
             <div class="row g-4">
                 <!-- Navigation Menu -->
                 <div class="col-12">
@@ -680,7 +677,7 @@ const generateLogsheet = (id) => {
                                 <div class="col-sm-12 col-md-8 mt-2">
                                     <h5 class="fw-bold text-primary mb-0">
                                         <i class="bi bi-clock-history me-2"></i
-                                        >Asset Transaction History
+                                        >Phone Assignment History
                                     </h5>
                                 </div>
                                 <div class="col-sm-12 col-md-4 my-2">

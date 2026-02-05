@@ -33,7 +33,7 @@ const gotoPage = (url) => {
 const myBreadcrumb = [
     { label: 'Dashboard', url: route('dashboard') },
     {
-        label: 'Asset Inventory and Management',
+        label: 'Asset & Inventory',
         url: route('AssetAndInventoryManagement'),
     },
     { label: 'Phone Asset' },
