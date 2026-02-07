@@ -17,9 +17,12 @@ const props = defineProps({
         type: Object,
         required: true,
     },
-    phone_transaction: {
+    phone_issuance: {
         type: [Object, null],
-        required: true,
+        default: null,
+    },
+    phone_return: {
+        type: [Object, null],
         default: null,
     },
 });
@@ -114,17 +117,24 @@ const currentPage = ref(1);
 const itemsPerPage = 3;
 
 const filteredHistory = computed(() => {
-    if (!props.phone.transactions) return [];
+    if (!props.phone.issuances) return [];
     const searchTerm = historySearch.value.toLowerCase();
 
-    return props.phone.transactions.filter((tx) => {
-        return (
-            (tx.issued_to?.toLowerCase() || '').includes(searchTerm) ||
-            (tx.issued_by?.toLowerCase() || '').includes(searchTerm) ||
-            (tx.returned_by?.toLowerCase() || '').includes(searchTerm) ||
-            (tx.department?.toLowerCase() || '').includes(searchTerm)
-        );
-    });
+    return props.phone.issuances
+        .map((issuance) => ({
+            ...issuance,
+            return: issuance.return,
+        }))
+        .filter((record) => {
+            return (
+                (record.issued_to?.toLowerCase() || '').includes(searchTerm) ||
+                (record.issued_by?.toLowerCase() || '').includes(searchTerm) ||
+                (record.return?.returned_by?.toLowerCase() || '').includes(
+                    searchTerm,
+                ) ||
+                (record.department?.toLowerCase() || '').includes(searchTerm)
+            );
+        });
 });
 
 const paginatedHistory = computed(() => {
@@ -513,8 +523,8 @@ const generateLogsheet = (id) => {
                                     >
                                     <p class="fw-bold fs-5 text-dark mb-1">
                                         {{
-                                            props.phone_transaction
-                                                ?.issued_to || 'Not yet issued'
+                                            props.phone_issuance?.issued_to ||
+                                            'Not yet issued'
                                         }}
                                     </p>
                                     <p class="text-secondary small mb-0">
@@ -523,8 +533,8 @@ const generateLogsheet = (id) => {
                                             >Department:
                                         </span>
                                         {{
-                                            props.phone_transaction
-                                                ?.department || 'Not yet issued'
+                                            props.phone_issuance?.department ||
+                                            'Not yet issued'
                                         }}
                                     </p>
                                 </div>
@@ -535,15 +545,15 @@ const generateLogsheet = (id) => {
                                     >
                                     <p class="fw-bold fs-5 text-dark mb-1">
                                         {{
-                                            props.phone_transaction
-                                                ?.issued_by || 'Not yet issued'
+                                            props.phone_issuance?.issued_by ||
+                                            'Not yet issued'
                                         }}
                                     </p>
                                     <p class="mb-1">
                                         <strong>Date:</strong>
                                         {{
                                             formatDate(
-                                                props.phone_transaction
+                                                props.phone_issuance
                                                     ?.date_issued,
                                             ) || 'Not yet issued'
                                         }}
@@ -560,7 +570,7 @@ const generateLogsheet = (id) => {
                                     >
                                     <div class="d-flex align-items-center">
                                         <span class="text-muted fw-bold ms-2">{{
-                                            props.phone_transaction
+                                            props.phone_issuance
                                                 ?.issued_accessories || 'None'
                                         }}</span>
                                     </div>
@@ -594,8 +604,7 @@ const generateLogsheet = (id) => {
                                     >
                                     <p class="fw-bold fs-5 text-dark mb-1">
                                         {{
-                                            props.phone_transaction
-                                                ?.returned_by ||
+                                            props.phone_return?.returned_by ||
                                             'Not yet returned'
                                         }}
                                     </p>
@@ -605,7 +614,7 @@ const generateLogsheet = (id) => {
                                             >Department:
                                         </span>
                                         {{
-                                            props.phone_transaction
+                                            props.phone_return
                                                 ?.returnee_department ||
                                             'Not yet returned'
                                         }}
@@ -618,8 +627,7 @@ const generateLogsheet = (id) => {
                                     >
                                     <p class="fw-bold fs-5 text-dark mb-1">
                                         {{
-                                            props.phone_transaction
-                                                ?.returned_to ||
+                                            props.phone_return?.returned_to ||
                                             'Not yet returned'
                                         }}
                                     </p>
@@ -627,7 +635,7 @@ const generateLogsheet = (id) => {
                                         <strong>Date:</strong>
                                         {{
                                             formatDate(
-                                                props.phone_transaction
+                                                props.phone_return
                                                     ?.date_returned,
                                             ) || 'Not yet returned'
                                         }}
@@ -645,7 +653,7 @@ const generateLogsheet = (id) => {
 
                                     <p class="d-flex align-items-center">
                                         <span class="text-muted fw-bold ms-2">{{
-                                            props.phone_transaction
+                                            props.phone_return
                                                 ?.returned_accessories || 'None'
                                         }}</span>
                                     </p>
@@ -708,7 +716,7 @@ const generateLogsheet = (id) => {
                                 >
                                     <thead class="table-light">
                                         <tr
-                                            class="fs-7 text-uppercase text-muted border-top-0 text-wrap"
+                                            class="fs-8 tet-center text-uppercase text-muted border-top-0 text-wrap"
                                         >
                                             <th class="ps-3" scope="col">
                                                 Date Issued
@@ -726,7 +734,7 @@ const generateLogsheet = (id) => {
                                     </thead>
                                     <tbody>
                                         <tr
-                                            class="fs-7"
+                                            class="fs-8 text-center"
                                             v-for="tx in paginatedHistory"
                                             :key="tx.id"
                                         >
@@ -764,12 +772,15 @@ const generateLogsheet = (id) => {
 
                                             <td class="text-nowrap">
                                                 <span
-                                                    v-if="tx.date_returned"
+                                                    v-if="
+                                                        tx.return?.date_returned
+                                                    "
                                                     class="fw-medium mb-0 text-nowrap ps-2"
                                                 >
                                                     {{
                                                         formatDate(
-                                                            tx.date_returned,
+                                                            tx.return
+                                                                .date_returned,
                                                         )
                                                     }}
                                                 </span>
@@ -782,17 +793,23 @@ const generateLogsheet = (id) => {
 
                                             <td>
                                                 <div class="fw-bold text-dark">
-                                                    {{ tx.returned_by || '—' }}
+                                                    {{
+                                                        tx.return
+                                                            ?.returned_by || '—'
+                                                    }}
                                                 </div>
                                                 <div
                                                     class="text-muted small ps-2"
                                                 >
-                                                    {{ tx.returnee_department }}
+                                                    {{
+                                                        tx.return
+                                                            ?.returnee_department
+                                                    }}
                                                 </div>
                                             </td>
                                             <td>
                                                 <div class="fw-bold text-dark">
-                                                    {{ tx.returned_to }}
+                                                    {{ tx.return?.returned_to }}
                                                 </div>
                                             </td>
 
@@ -801,7 +818,8 @@ const generateLogsheet = (id) => {
                                                 style="max-width: 150px"
                                             >
                                                 {{
-                                                    tx.returned_accessories ||
+                                                    tx.return
+                                                        ?.returned_accessories ||
                                                     '—'
                                                 }}
                                             </td>

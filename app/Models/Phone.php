@@ -53,6 +53,35 @@ class Phone extends Model
 
     // Use default id for routing (no custom getRouteKeyName needed)
 
+    /**
+     * Get all issuances for this phone
+     */
+    public function issuances()
+    {
+        return $this->hasMany(PhoneIssuance::class, 'serial_num', 'serial_num');
+    }
+
+    /**
+     * Get the current active issuance (without return)
+     */
+    public function currentIssuance()
+    {
+        return $this->hasOne(PhoneIssuance::class, 'serial_num', 'serial_num')
+            ->whereDoesntHave('return')
+            ->latest();
+    }
+
+    /**
+     * Get all returns for this phone through issuances
+     */
+    public function returns()
+    {
+        return PhoneReturn::whereIn('phone_issuance_id',
+            $this->issuances()->pluck('id')
+        );
+    }
+
+    // Legacy support for backward compatibility with old phone_transactions table
     public function transactions()
     {
         return $this->hasMany(PhoneTransaction::class, 'serial_num', 'serial_num');

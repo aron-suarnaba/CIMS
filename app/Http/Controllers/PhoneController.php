@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Phone;
 use App\Models\PhoneTransaction;
+use App\Models\PhoneIssuance;
+use App\Models\PhoneReturn;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\DB;
@@ -63,7 +65,7 @@ class PhoneController extends Controller
         /*
         |--------------------------------------------------------------------------
         | JOINED QUERY
-        | We join phone_transactions where date_returned is NULL to get the active user
+        | We join phone_issuances where there's no associated return to get the active user
         |--------------------------------------------------------------------------
         */
         $phonesRaw = DB::select("
@@ -71,12 +73,15 @@ class PhoneController extends Controller
         FROM (
             SELECT
                 p.*,
-                t.department as trans_dept,
-                t.date_issued as trans_date,
+                pi.department as trans_dept,
+                pi.date_issued as trans_date,
                 ROW_NUMBER() OVER (ORDER BY $orderBy) AS row_num
             FROM phones p
-            LEFT JOIN phone_transactions t ON p.serial_num = t.serial_num
-                 AND t.date_returned IS NULL
+            LEFT JOIN phone_issuances pi ON p.serial_num = pi.serial_num
+                 AND NOT EXISTS (
+                    SELECT 1 FROM phone_returns pr
+                    WHERE pr.phone_issuance_id = pi.id
+                 )
             $where
         ) AS numbered
         WHERE row_num BETWEEN ? AND ?
@@ -157,7 +162,8 @@ class PhoneController extends Controller
 
         $validated['serial_num'] = $phone->serial_num;
 
-        PhoneTransaction::create($validated);
+        // Create issuance record
+        PhoneIssuance::create($validated);
 
         $phone->update([
             'status' => 'issued',
@@ -167,7 +173,7 @@ class PhoneController extends Controller
         return redirect()->back()->with('success', 'The device has been issued successfully to ' . $validated['issued_to']);
     }
 
-    // This controller is for the storing data of phone issuance modals
+    // This controller is for the storing data of phone return modals
     public function return(Request $request, Phone $phone)
     {
         $validated = $request->validate([
@@ -179,26 +185,32 @@ class PhoneController extends Controller
             'remarks' => 'nullable|string|max:255',
         ]);
 
-        $transaction = PhoneTransaction::where('serial_num', $phone->serial_num)
-            ->whereNull('date_returned')
+        // Find the active issuance (one without a return record)
+        $issuance = PhoneIssuance::where('serial_num', $phone->serial_num)
+            ->whereDoesntHave('return')
             ->latest()
             ->first();
 
-        if ($transaction) {
+        if ($issuance) {
+            // Create return record linked to the issuance
+            PhoneReturn::create([
+                'phone_issuance_id' => $issuance->id,
+                'returned_to' => $validated['returned_to'],
+                'returned_by' => $validated['returned_by'],
+                'returnee_department' => $validated['returnee_department'],
+                'date_returned' => $validated['date_returned'],
+                'returned_accessories' => $validated['returned_accessories'],
+            ]);
 
             $phone->update([
                 'status' => 'available',
                 'remarks' => $validated['remarks'] ?? $phone->remarks,
             ]);
 
-            $transaction->update($validated);
-
             return redirect()->back()->with('success', 'The device has been returned successfully.');
-
         }
 
         return redirect()->back()->withErrors(['error' => 'No active issuance found for this device.']);
-
     }
 
     /**
@@ -206,11 +218,15 @@ class PhoneController extends Controller
      */
     public function show(Phone $phone)
     {
-        $phone->load(['currentTransaction', 'transactions']);
+        $phone->load(['issuances.return']);
+
+        $currentIssuance = $phone->currentIssuance()->first();
+        $currentReturn = $currentIssuance?->return;
 
         return Inertia::render('AssetInventoryManagement/PhoneDetails', [
             'phone' => $phone,
-            'phone_transaction' => $phone->transactions()->latest()->first(),
+            'phone_issuance' => $currentIssuance,
+            'phone_return' => $currentReturn,
         ]);
     }
 
@@ -266,11 +282,11 @@ class PhoneController extends Controller
      */
     public function generateLogsheetReport(Phone $phone)
     {
-        $phone->load('currentTransaction');
+        $phone->load('currentIssuance');
 
         $data = [
             'phone' => $phone,
-            'current' => $phone->currentTransaction()->first(),
+            'current' => $phone->currentIssuance()->first(),
             'date' => now()->format('d/m/Y'),
         ];
 
