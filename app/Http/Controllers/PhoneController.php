@@ -129,8 +129,8 @@ class PhoneController extends Controller
             'serial_num' => 'required|string|max:255|unique:phones,serial_num',
             'imei_one' => 'nullable|string|max:255|unique:phones,imei_one',
             'imei_two' => 'nullable|string|max:255|unique:phones,imei_two',
-            'ram' => 'required|string|max:255',
-            'rom' => 'required|string|max:255',
+            'ram' => 'required|integer',
+            'rom' => 'required|integer',
             'sim_no' => 'nullable|string|max:255',
             'purchase_date' => 'nullable|date',
             'remarks' => 'nullable|string',
@@ -282,21 +282,18 @@ class PhoneController extends Controller
      */
     public function generateLogsheetReport(Phone $phone)
     {
-        $phone->load('currentIssuance');
+        // Load the history of transactions/issuances
+        $transactions = $phone->issuances()->with('return')->get();
 
         $data = [
             'phone' => $phone,
-            'current' => $phone->currentIssuance()->first(),
+            'transactions' => $transactions,
             'date' => now()->format('d/m/Y'),
         ];
 
         $pdf = Pdf::loadView('reports.CompanyPhoneLogsheet', $data);
-
-        // 2. Options (Optional: change paper size per PDF)
         $pdf->setPaper('legal', 'landscape');
 
-        // 3. Output
-        // Use ->stream() to show in browser, or ->download() to force download
         return $pdf->stream("Phone-{$phone->serial_num}-logsheet.pdf");
     }
 }

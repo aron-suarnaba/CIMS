@@ -17,8 +17,8 @@ return new class extends Migration {
             $table->string('serial_num')->unique();
             $table->string('imei_one')->unique()->nullable();
             $table->string('imei_two')->nullable();
-            $table->string('ram');
-            $table->string('rom');
+            $table->integer('ram');
+            $table->integer('rom');
             $table->string('purchase_date')->nullable();
             $table->string('sim_no')->nullable();
             $table->string('status')->default('available');

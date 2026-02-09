@@ -300,7 +300,11 @@ const openReturnModal = () => {
 };
 
 const generateLogsheet = (id) => {
-    window.open(`/AssetAndInventoryManagement/Phone/${id}/logsheet`, '_blank');
+    window.open(
+        `
+        /AssetAndInventoryManagement/Phone/${id}/logsheet`,
+        '_blank',
+    );
 };
 </script>
 
@@ -374,7 +378,7 @@ const generateLogsheet = (id) => {
 
             <div class="row g-3">
                 <!-- Asset Details -->
-                <div class="col-sm-12 col-xl-3 col-lg-4">
+                <div class="col-sm-12 col-xl-4 col-lg-5">
                     <div class="card border-0 shadow-sm">
                         <div class="card-header bg-dark py-3 text-white">
                             <h5 class="fw-bold mb-0">Device Specifications</h5>
@@ -431,7 +435,7 @@ const generateLogsheet = (id) => {
                                 >
                                     <span class="text-muted">Sim Number</span>
                                     <span class="fw-bold">{{
-                                        props.phone.sim_no
+                                        props.phone.sim_no || 'N/A'
                                     }}</span>
                                 </li>
                                 <li
@@ -455,9 +459,12 @@ const generateLogsheet = (id) => {
                                 >
                                     <span class="text-muted">RAM / ROM</span>
                                     <span
-                                        >{{ props.phone.ram || 'N/A' }} /
-                                        {{ props.phone.rom || 'N/A' }}</span
-                                    >
+                                        >{{
+                                            props.phone.ram + ' GB' || 'N/A'
+                                        }}
+                                        /
+                                        {{ props.phone.rom + ' GB' || 'N/A' }}
+                                    </span>
                                 </li>
                                 <li
                                     class="list-group-item d-flex justify-content-between"
@@ -499,7 +506,7 @@ const generateLogsheet = (id) => {
                     </div>
                 </div>
 
-                <div class="col-sm-12 col-xl-9 col-lg-8 g-">
+                <div class="col-sm-12 col-xl-8 col-lg-7">
                     <!-- Issuance Card -->
                     <div class="card mb-3 border-0 shadow-sm">
                         <div
@@ -716,7 +723,7 @@ const generateLogsheet = (id) => {
                                 >
                                     <thead class="table-light">
                                         <tr
-                                            class="fs-8 tet-center text-uppercase text-muted border-top-0 text-wrap"
+                                            class="fs-8 text-uppercase text-muted border-top-0 text-wrap text-center"
                                         >
                                             <th class="ps-3" scope="col">
                                                 Date Issued
