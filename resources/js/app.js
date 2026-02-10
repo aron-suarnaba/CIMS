@@ -1,13 +1,23 @@
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faHouse, faUser } from '@fortawesome/free-solid-svg-icons';
+import { faHouse, faLock, faUser } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { createInertiaApp, router, usePage } from '@inertiajs/vue3';
+import Aura from '@primeuix/themes/aura';
 import 'admin-lte/dist/js/adminlte.min.js';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
 import * as bootstrap from 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
+import { InputText } from 'primevue';
+import Badge from 'primevue/badge';
+import Breadcrumb from 'primevue/breadcrumb';
+import Button from 'primevue/button';
+import Card from 'primevue/card';
+import PrimeVue from 'primevue/config';
+import InputGroup from 'primevue/inputgroup';
+import InputGroupAddon from 'primevue/inputgroupaddon';
 import Swal from 'sweetalert2';
+import Tag from 'primevue/tag';
 import { createApp, h, watch } from 'vue';
 import VueApexCharts from 'vue3-apexcharts';
 import { ZiggyVue } from '../../vendor/tightenco/ziggy';
@@ -17,7 +27,7 @@ window.bootstrap = bootstrap;
 
 const appName = import.meta.env.VITE_APP_NAME || 'CIMS';
 
-library.add(faUser, faHouse);
+library.add(faUser, faHouse, faLock);
 
 AOS.init({
     duration: 1700,
@@ -48,7 +58,20 @@ createInertiaApp({
             .use(plugin)
             .use(ZiggyVue)
             .use(VueApexCharts)
-            .component('font-awesome-icon', FontAwesomeIcon);
+            .use(PrimeVue, {
+                theme: {
+                    preset: Aura,
+                },
+            })
+            .component('font-awesome-icon', FontAwesomeIcon)
+            .component('Button', Button)
+            .component('InputGroup', InputGroup)
+            .component('InputGroupAddon', InputGroupAddon)
+            .component('InputText', InputText)
+            .component('Card', Card)
+            .component('Breadcrumb', Breadcrumb)
+            .component('Tag', Tag)
+            .component('Badge', Badge);
         const page = usePage();
         router.on('invalid', (event) => {
             if (event.detail.response.status === 419) {

@@ -35,6 +35,26 @@ const myBreadcrumb = [
     { label: 'Details' },
 ];
 
+// This maps your database values to PrimeVue theme colors
+const getStatusSeverity = (status) => {
+    switch (status) {
+        case 'available':
+            return 'success'; // Green
+        case 'issued':
+            return 'info'; // Blue
+        case 'returned':
+            return 'warn'; // Orange/Yellow
+        default:
+            return 'secondary';
+    }
+};
+
+// This handles the Capitalization
+const formatStatus = (status) => {
+    if (!status) return '';
+    return status.charAt(0).toUpperCase() + status.slice(1);
+};
+
 // Function for the phone image path
 const getPhoneImagePath = (phone) => {
     const defaultPath = '../../img/phone/default.png';
@@ -302,6 +322,7 @@ const openReturnModal = () => {
 const generateLogsheet = (id) => {
     window.open(
         `
+        /CIMS/public
         /AssetAndInventoryManagement/Phone/${id}/logsheet`,
         '_blank',
     );
@@ -375,11 +396,10 @@ const generateLogsheet = (id) => {
                     </div>
                 </div>
             </div>
-
             <div class="row g-3">
                 <!-- Asset Details -->
                 <div class="col-sm-12 col-xl-4 col-lg-5">
-                    <div class="card border-0 shadow-sm">
+                    <!-- <div class="card border-0 shadow-sm">
                         <div class="card-header bg-dark py-3 text-white">
                             <h5 class="fw-bold mb-0">Device Specifications</h5>
                         </div>
@@ -459,9 +479,7 @@ const generateLogsheet = (id) => {
                                 >
                                     <span class="text-muted">RAM / ROM</span>
                                     <span
-                                        >{{
-                                            props.phone.ram + ' GB' || 'N/A'
-                                        }}
+                                        >{{ props.phone.ram + ' GB' || 'N/A' }}
                                         /
                                         {{ props.phone.rom + ' GB' || 'N/A' }}
                                     </span>
@@ -503,7 +521,126 @@ const generateLogsheet = (id) => {
                                 <i class="bi bi-pencil me-1"></i> Update
                             </button>
                         </div>
-                    </div>
+                    </div> -->
+
+                    <Card v-bind="$attrs" class="asset-card">
+                        <template #header>
+                            <div class="card-header bg-dark py-3 text-white">
+                                <h5 class="fw-bold mb-0 text-center">
+                                    <slot name="header-title"
+                                        >Device Specifications</slot
+                                    >
+                                </h5>
+                            </div>
+                        </template>
+
+                        <template #content>
+                            <div class="mb-4 text-center">
+                                <img
+                                    :src="getPhoneImagePath(props.phone)"
+                                    class="img-fluid bg-light rounded p-3"
+                                    style="max-height: 220px"
+                                    :alt="props.phone.model"
+                                />
+                                <h3 class="fw-bold mb-2 mt-3">
+                                    {{ props.phone.brand }}
+                                    {{ props.phone.model }}
+                                </h3>
+                                <Tag
+                                    :severity="
+                                        getStatusSeverity(props.phone.status)
+                                    "
+                                    :value="formatStatus(props.phone.status)"
+                                    class="px-3 py-1"
+                                />
+                            </div>
+
+                            <ul class="list-group list-group-flush border-top">
+                                <li
+                                    class="list-group-item d-flex justify-content-between"
+                                >
+                                    <span class="text-muted"
+                                        >Serial Number</span
+                                    >
+                                    <span class="fw-bold">{{
+                                        props.phone.serial_num
+                                    }}</span>
+                                </li>
+                                <li
+                                    class="list-group-item d-flex justify-content-between"
+                                >
+                                    <span class="text-muted">Sim Number</span>
+                                    <span class="fw-bold">{{
+                                        props.phone.sim_no || 'N/A'
+                                    }}</span>
+                                </li>
+                                <li
+                                    class="list-group-item d-flex justify-content-between"
+                                >
+                                    <span class="text-muted">IMEI 1</span>
+                                    <span class="font-monospace small">{{
+                                        props.phone.imei_one || 'N/A'
+                                    }}</span>
+                                </li>
+                                <li
+                                    class="list-group-item d-flex justify-content-between"
+                                >
+                                    <span class="text-muted">IMEI 2</span>
+                                    <span class="font-monospace small">{{
+                                        props.phone.imei_two || 'N/A'
+                                    }}</span>
+                                </li>
+                                <li
+                                    class="list-group-item d-flex justify-content-between"
+                                >
+                                    <span class="text-muted">RAM / ROM</span>
+                                    <span
+                                        >{{ props.phone.ram + ' GB' || 'N/A' }}
+                                        /
+                                        {{ props.phone.rom + ' GB' || 'N/A' }}
+                                    </span>
+                                </li>
+                                <li
+                                    class="list-group-item d-flex justify-content-between"
+                                >
+                                    <span class="text-muted"
+                                        >Purchase Date</span
+                                    >
+                                    <span>{{
+                                        formatDate(props.phone.created_at) ||
+                                        'N/A'
+                                    }}</span>
+                                </li>
+                                <li
+                                    class="list-group-item d-flex justify-content-between"
+                                >
+                                    <span class="text-muted">Remarks</span>
+                                    <span>{{
+                                        props.phone.remarks || 'N/A'
+                                    }}</span>
+                                </li>
+                            </ul>
+                        </template>
+
+                        <template #footer>
+                            <div
+                                class="d-flex justify-content-around align-items-center border-0 bg-transparent pb-3 text-center"
+                            >
+                                <Button
+                                    severity="danger"
+                                    label="Delete"
+                                    icon="bi bi-trash"
+                                    @click.prevent="deleteItem(props.phone.id)"
+                                />
+                                <Button
+                                    severity="warn"
+                                    label="Update"
+                                    icon="bi bi-pencil"
+                                    @click="openUpdateModal(props.phone)"
+                                />
+                            </div>
+                        </template>
+                    </Card>
                 </div>
 
                 <div class="col-sm-12 col-xl-8 col-lg-7">

@@ -38,61 +38,59 @@ const submit = () => {
 
                             <form @submit.prevent="submit">
                                 <div class="mb-3">
-                                    <div class="input-group">
-                                        <input
+                                    <InputGroup>
+                                        <InputText
                                             v-model="form.email"
                                             type="email"
-                                            id="email"
-                                            class="form-control"
-                                            :class="{
-                                                'is-invalid': form.errors.email,
-                                            }"
                                             placeholder="Email"
+                                            :class="{
+                                                'p-invalid': form.errors.email,
+                                            }"
                                             required
                                             autofocus
                                         />
-                                        <div class="input-group-text">
-                                            <span class="bi bi-envelope"></span>
-                                        </div>
-                                    </div>
-                                    <div
+                                        <InputGroupAddon>
+                                            <font-awesome-icon
+                                                icon="fa-solid fa-user"
+                                            />
+                                        </InputGroupAddon>
+                                    </InputGroup>
+                                    <small
                                         v-if="form.errors.email"
-                                        class="invalid-feedback d-block"
+                                        class="p-error d-block mt-1"
                                     >
                                         {{ form.errors.email }}
-                                    </div>
+                                    </small>
                                 </div>
 
                                 <div class="mb-3">
-                                    <div class="input-group">
-                                        <input
+                                    <InputGroup>
+                                        <InputText
                                             v-model="form.password"
                                             type="password"
-                                            id="password"
-                                            class="form-control"
+                                            placeholder="Password"
                                             :class="{
-                                                'is-invalid':
+                                                'p-invalid':
                                                     form.errors.password,
                                             }"
-                                            placeholder="Password"
                                             required
                                         />
-                                        <div class="input-group-text">
-                                            <span
-                                                class="bi bi-lock-fill"
-                                            ></span>
-                                        </div>
-                                    </div>
-                                    <div
+                                        <InputGroupAddon>
+                                            <font-awesome-icon
+                                                icon="fa-solid fa-lock"
+                                            />
+                                        </InputGroupAddon>
+                                    </InputGroup>
+                                    <small
                                         v-if="form.errors.password"
-                                        class="invalid-feedback d-block"
+                                        class="p-error d-block mt-1"
                                     >
                                         {{ form.errors.password }}
-                                    </div>
+                                    </small>
                                 </div>
 
                                 <div class="row align-items-center mb-3">
-                                    <div class="col-8">
+                                    <div class="col-7">
                                         <div class="form-check">
                                             <input
                                                 v-model="form.remember"
@@ -103,22 +101,18 @@ const submit = () => {
                                             <label
                                                 class="form-check-label"
                                                 for="remember"
-                                                >Remember Me</label
                                             >
+                                                Remember Me
+                                            </label>
                                         </div>
                                     </div>
-                                    <div class="col-4">
-                                        <button
+                                    <div class="col-5">
+                                        <Button
                                             type="submit"
-                                            class="btn btn-primary w-100"
-                                            :disabled="form.processing"
+                                            label="Sign In"
+                                            :loading="form.processing"
                                         >
-                                            {{
-                                                form.processing
-                                                    ? '...'
-                                                    : 'Sign In'
-                                            }}
-                                        </button>
+                                        </Button>
                                     </div>
                                 </div>
                             </form>
