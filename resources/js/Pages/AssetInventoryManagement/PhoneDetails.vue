@@ -6,7 +6,7 @@ import { useDateFormatter } from '@/composables/useDateFormatter';
 import HomeLayout from '@/Layouts/HomeLayout.vue';
 import { router, useForm } from '@inertiajs/vue3';
 import Swal from 'sweetalert2';
-import { computed, ref, watch } from 'vue';
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 
 defineOptions({ layout: HomeLayout });
 
@@ -306,6 +306,18 @@ const generateLogsheet = (id) => {
         '_blank',
     );
 };
+
+onMounted(() => {
+    window.Echo.channel('inventory').listen('.AssetUpdated', (e) => {
+        console.log('Update received:', e.message);
+
+        router.reload({ only: ['phones'] });
+    });
+});
+
+onUnmounted(() => {
+    window.Echo.leave('inventory');
+});
 </script>
 
 <template>
@@ -459,9 +471,7 @@ const generateLogsheet = (id) => {
                                 >
                                     <span class="text-muted">RAM / ROM</span>
                                     <span
-                                        >{{
-                                            props.phone.ram + ' GB' || 'N/A'
-                                        }}
+                                        >{{ props.phone.ram + ' GB' || 'N/A' }}
                                         /
                                         {{ props.phone.rom + ' GB' || 'N/A' }}
                                     </span>
