@@ -1,10 +1,8 @@
 <script setup>
 import BackButton from '@/Components/BackButton.vue';
-import Breadcrumb from '@/Components/Breadcrumb.vue';
-import Modals from '@/Components/Modals.vue';
 import { useDateFormatter } from '@/composables/useDateFormatter';
 import HomeLayout from '@/Layouts/HomeLayout.vue';
-import { router, useForm } from '@inertiajs/vue3';
+import { Link, router, useForm } from '@inertiajs/vue3';
 import Swal from 'sweetalert2';
 import { computed, ref, watch } from 'vue';
 
@@ -28,12 +26,23 @@ const props = defineProps({
 });
 
 // Function for breadcrumb
-const myBreadcrumb = [
-    { label: 'Dashboard', url: route('dashboard') },
-    { label: 'Asset & Inventory', url: route('AssetAndInventoryManagement') },
-    { label: 'Phone Units', url: route('phone.index') },
+// const myBreadcrumb = [
+//     { label: 'Dashboard', url: route('dashboard') },
+//     { label: 'Asset & Inventory', url: route('AssetAndInventoryManagement') },
+//     { label: 'Phone Units', url: route('phone.index') },
+//     { label: 'Details' },
+// ];
+
+const home = ref({
+    icon: 'bi bi-house-door',
+    route: 'dashboard',
+});
+
+const items = ref([
+    { label: 'Asset & Inventory', route: 'AssetAndInventoryManagement' },
+    { label: 'Phone Units', route: 'phone.index' },
     { label: 'Details' },
-];
+]);
 
 // This maps your database values to PrimeVue theme colors
 const getStatusSeverity = (status) => {
@@ -133,7 +142,7 @@ const selectedReturnAcc = ref([]);
 
 // Everything about the history table variable declaration
 const historySearch = ref('');
-const currentPage = ref(1);
+const currentPage = ref(0);
 const itemsPerPage = 3;
 
 const filteredHistory = computed(() => {
@@ -158,25 +167,17 @@ const filteredHistory = computed(() => {
 });
 
 const paginatedHistory = computed(() => {
-    const start = (currentPage.value - 1) * itemsPerPage;
+    const start = currentPage.value * itemsPerPage;
     const end = start + itemsPerPage;
     return filteredHistory.value.slice(start, end);
 });
 
-const totalPages = computed(() => {
-    return Math.ceil(filteredHistory.value.length / itemsPerPage);
-});
-
-const nextPage = () => {
-    if (currentPage.value < totalPages.value) currentPage.value++;
-};
-
-const prevPage = () => {
-    if (currentPage.value > 1) currentPage.value--;
-};
+// const totalRecords = computed(() => {
+//     return filteredHistory.value.length;
+// });
 
 watch(historySearch, () => {
-    currentPage.value = 1;
+    currentPage.value = 0;
 });
 
 // Form for Issuance
@@ -184,7 +185,7 @@ const form = useForm({
     issued_by: '',
     issued_to: '',
     department: '',
-    date_issued: new Date().toISOString().substr(0, 10),
+    date_issued: new Date(),
     issued_accessories: '',
     cashout: false,
     remarks: '',
@@ -214,6 +215,11 @@ const updateForm = useForm({
     remarks: props.phone.remarks || '',
 });
 
+// Modal visibility state
+const showIssueModal = ref(false);
+const showReturnModal = ref(false);
+const showUpdateModal = ref(false);
+
 // Listeners
 watch(selectedAcc, (newVal) => {
     form.issued_accessories = newVal.join(', ');
@@ -222,16 +228,14 @@ watch(selectedReturnAcc, (newVal) => {
     returnform.returned_accessories = newVal.join(', ');
 });
 
+// const visible = ref(false);
+
 // Submit logic for the issue
 const submit = () => {
     form.post(route('phone.issue', props.phone.id), {
         onSuccess: () => {
-            const closeButton = document.querySelector(
-                '#IssuePhoneModal [data-bs-dismiss="modal"]',
-            );
-            if (closeButton) {
-                closeButton.click();
-            }
+            showIssueModal.value = false; // Must match the ref used in the template
+            form.reset();
         },
     });
 };
@@ -242,13 +246,7 @@ const returnSubmit = () => {
         onSuccess: () => {
             returnform.reset();
             selectedReturnAcc.value = [];
-
-            const closeButton = document.querySelector(
-                '#ReturnPhoneModal [data-bs-dismiss="modal"]',
-            );
-            if (closeButton) {
-                closeButton.click();
-            }
+            showReturnModal.value = false;
         },
     });
 };
@@ -257,12 +255,7 @@ const returnSubmit = () => {
 const updateSubmit = () => {
     updateForm.put(route('phone.update', props.phone.id), {
         onSuccess: () => {
-            const closeButton = document.querySelector(
-                '#UpdatePhoneModal [data-bs-dismiss="modal"]',
-            );
-            if (closeButton) {
-                closeButton.click();
-            }
+            showUpdateModal.value = false;
         },
     });
 };
@@ -273,50 +266,26 @@ const openUpdateModal = (phone) => {
     updateForm.brand = phone.brand;
     updateForm.model = phone.model;
     updateForm.imei_one = phone.imei_one;
-    updateForm.imei_two = phone.imei_two;
+updateForm.imei_two = phone.imei_two;
     updateForm.serial_number = phone.serial_number;
     updateForm.status = phone.status;
 
     updateForm.clearErrors();
-
-    const modalElement = document.getElementById('UpdatePhoneModal');
-    if (modalElement) {
-        const modalInstance =
-            window.bootstrap.Modal.getOrCreateInstance(modalElement);
-        modalInstance.show();
-    } else {
-        console.error('Modal element #UpdatePhoneModal not found');
-    }
+    showUpdateModal.value = true;
 };
 
 // Logic to open Issue Modals
 const openIssueModal = () => {
-    const modalElement = document.getElementById('IssuePhoneModal');
-    if (!modalElement) return;
-
-    const modal = window.bootstrap.Modal.getOrCreateInstance(modalElement, {
-        backdrop: true,
-        keyboard: true,
-    });
-
-    modal.show();
+    form.reset();
+    selectedAcc.value = [];
+    showIssueModal.value = true;
 };
 
 // Logic to open Return Modals
 const openReturnModal = () => {
-    const modalElement = document.getElementById('ReturnPhoneModal');
-    if (!modalElement) {
-        console.error('ReturnPhoneModal not found');
-        return;
-    }
-
-    const modal = window.bootstrap.Modal.getOrCreateInstance(modalElement, {
-        backdrop: true,
-        keyboard: true,
-        focus: true,
-    });
-
-    modal.show();
+    returnform.reset();
+    selectedReturnAcc.value = [];
+    showReturnModal.value = true;
 };
 
 const generateLogsheet = (id) => {
@@ -333,7 +302,31 @@ const generateLogsheet = (id) => {
     <div class="app-content-header py-3">
         <!-- Breadcrumb -->
         <div class="container">
-            <Breadcrumb :breadcrumbs="myBreadcrumb" />
+            <!-- <Breadcrumb :breadcrumbs="myBreadcrumb" /> -->
+
+            <template>
+                <div class="card d-flex justify-content-center">
+                    <Breadcrumb :home="home" :model="items" class="border-0 bg-transparent p-0">
+                        <template #item="{ item }">
+                            <Link v-if="item.route" :href="route(item.route)"
+                                class="text-decoration-none d-flex align-items-center">
+                                <span :class="[item.icon, 'text-primary me-2']" v-if="item.icon" />
+                                <span class="text-primary fw-bold">{{
+                                    item.label
+                                    }}</span>
+                            </Link>
+
+                            <span v-else class="text-muted fw-normal ms-2">
+                                {{ item.label }}
+                            </span>
+                        </template>
+
+                        <template #separator>
+                            <span class="text-secondary mx-2">/</span>
+                        </template>
+                    </Breadcrumb>
+                </div>
+            </template>
         </div>
     </div>
 
@@ -344,49 +337,30 @@ const generateLogsheet = (id) => {
                 <div class="col-12">
                     <div class="card mb-4 border-0 bg-transparent shadow-none">
                         <div class="card-body">
-                            <div
-                                class="row d-flex justify-content-between align-items-center"
-                            >
+                            <div class="row d-flex justify-content-between align-items-center">
                                 <div class="col-sm-12 col-md-6 mb-3">
-                                    <BackButton
-                                        @click.prevent="
-                                            router.get(route('phone.index'))
-                                        "
-                                    />
+                                    <BackButton @click.prevent="
+                                        router.get(route('phone.index'))
+                                        " />
                                 </div>
                                 <div
-                                    class="col-sm-12 col-md-6 d-flex justify-content-end align-items-center mb-3 gap-2"
-                                >
-                                    <button
-                                        v-if="
-                                            props.phone.status ===
-                                                'available' ||
-                                            props.phone.status === 'returned'
-                                        "
-                                        class="btn btn-primary"
-                                        @click="openIssueModal"
-                                    >
-                                        <i class="bi bi-plus-circle me-1"></i>
-                                        Issue Asset
-                                    </button>
-                                    <button
-                                        v-else-if="
-                                            props.phone.status === 'issued'
-                                        "
-                                        class="btn btn-warning"
-                                        @click="openReturnModal"
-                                    >
-                                        <i
-                                            class="bi bi-arrow-return-left me-1"
-                                        ></i>
+                                    class="col-sm-12 col-md-6 d-flex justify-content-end align-items-center mb-3 gap-2">
+                                    <Button v-if="
+                                        ['available', 'returned'].includes(
+                                            props.phone.status,
+                                        )
+                                    " label="Issue Asset" icon="bi bi-plus-circle" severity="info"
+                                        @click="showIssueModal = true" />
+
+                                    <button v-else-if="
+                                        props.phone.status === 'issued'
+                                    " class="btn btn-warning" @click="openReturnModal">
+                                        <i class="bi bi-arrow-return-left me-1"></i>
                                         Process Return
                                     </button>
-                                    <button
-                                        @click="
-                                            generateLogsheet(props.phone.id)
-                                        "
-                                        class="btn btn-secondary"
-                                    >
+                                    <button @click="
+                                        generateLogsheet(props.phone.id)
+                                        " class="btn btn-secondary">
                                         <i class="bi bi-receipt me-1"></i>
                                         Generate Logsheet
                                     </button>
@@ -527,117 +501,78 @@ const generateLogsheet = (id) => {
                         <template #header>
                             <div class="card-header bg-dark py-3 text-white">
                                 <h5 class="fw-bold mb-0 text-center">
-                                    <slot name="header-title"
-                                        >Device Specifications</slot
-                                    >
+                                    <slot name="header-title">Device Specifications</slot>
                                 </h5>
                             </div>
                         </template>
 
                         <template #content>
                             <div class="mb-4 text-center">
-                                <img
-                                    :src="getPhoneImagePath(props.phone)"
-                                    class="img-fluid bg-light rounded p-3"
-                                    style="max-height: 220px"
-                                    :alt="props.phone.model"
-                                />
+                                <img :src="getPhoneImagePath(props.phone)" class="img-fluid bg-light rounded p-3"
+                                    style="max-height: 220px" :alt="props.phone.model" />
                                 <h3 class="fw-bold mb-2 mt-3">
                                     {{ props.phone.brand }}
                                     {{ props.phone.model }}
                                 </h3>
-                                <Tag
-                                    :severity="
-                                        getStatusSeverity(props.phone.status)
-                                    "
-                                    :value="formatStatus(props.phone.status)"
-                                    class="px-3 py-1"
-                                />
+                                <Tag :severity="getStatusSeverity(props.phone.status)
+                                    " :value="formatStatus(props.phone.status)" class="px-3 py-1" />
                             </div>
 
                             <ul class="list-group list-group-flush border-top">
-                                <li
-                                    class="list-group-item d-flex justify-content-between"
-                                >
-                                    <span class="text-muted"
-                                        >Serial Number</span
-                                    >
+                                <li class="list-group-item d-flex justify-content-between">
+                                    <span class="text-muted">Serial Number</span>
                                     <span class="fw-bold">{{
                                         props.phone.serial_num
-                                    }}</span>
+                                        }}</span>
                                 </li>
-                                <li
-                                    class="list-group-item d-flex justify-content-between"
-                                >
+                                <li class="list-group-item d-flex justify-content-between">
                                     <span class="text-muted">Sim Number</span>
                                     <span class="fw-bold">{{
                                         props.phone.sim_no || 'N/A'
-                                    }}</span>
+                                        }}</span>
                                 </li>
-                                <li
-                                    class="list-group-item d-flex justify-content-between"
-                                >
+                                <li class="list-group-item d-flex justify-content-between">
                                     <span class="text-muted">IMEI 1</span>
                                     <span class="font-monospace small">{{
                                         props.phone.imei_one || 'N/A'
-                                    }}</span>
+                                        }}</span>
                                 </li>
-                                <li
-                                    class="list-group-item d-flex justify-content-between"
-                                >
+                                <li class="list-group-item d-flex justify-content-between">
                                     <span class="text-muted">IMEI 2</span>
                                     <span class="font-monospace small">{{
                                         props.phone.imei_two || 'N/A'
-                                    }}</span>
+                                        }}</span>
                                 </li>
-                                <li
-                                    class="list-group-item d-flex justify-content-between"
-                                >
+                                <li class="list-group-item d-flex justify-content-between">
                                     <span class="text-muted">RAM / ROM</span>
-                                    <span
-                                        >{{ props.phone.ram + ' GB' || 'N/A' }}
+                                    <span>{{ props.phone.ram + ' GB' || 'N/A' }}
                                         /
                                         {{ props.phone.rom + ' GB' || 'N/A' }}
                                     </span>
                                 </li>
-                                <li
-                                    class="list-group-item d-flex justify-content-between"
-                                >
-                                    <span class="text-muted"
-                                        >Purchase Date</span
-                                    >
+                                <li class="list-group-item d-flex justify-content-between">
+                                    <span class="text-muted">Purchase Date</span>
                                     <span>{{
                                         formatDate(props.phone.created_at) ||
                                         'N/A'
-                                    }}</span>
+                                        }}</span>
                                 </li>
-                                <li
-                                    class="list-group-item d-flex justify-content-between"
-                                >
+                                <li class="list-group-item d-flex justify-content-between">
                                     <span class="text-muted">Remarks</span>
                                     <span>{{
                                         props.phone.remarks || 'N/A'
-                                    }}</span>
+                                        }}</span>
                                 </li>
                             </ul>
                         </template>
 
                         <template #footer>
                             <div
-                                class="d-flex justify-content-around align-items-center border-0 bg-transparent pb-3 text-center"
-                            >
-                                <Button
-                                    severity="danger"
-                                    label="Delete"
-                                    icon="bi bi-trash"
-                                    @click.prevent="deleteItem(props.phone.id)"
-                                />
-                                <Button
-                                    severity="warn"
-                                    label="Update"
-                                    icon="bi bi-pencil"
-                                    @click="openUpdateModal(props.phone)"
-                                />
+                                class="d-flex justify-content-around align-items-center border-0 bg-transparent pb-3 text-center">
+                                <Button severity="danger" label="Delete" icon="bi bi-trash"
+                                    @click.prevent="deleteItem(props.phone.id)" />
+                                <Button severity="warn" label="Update" icon="bi bi-pencil"
+                                    @click="openUpdateModal(props.phone)" />
                             </div>
                         </template>
                     </Card>
@@ -646,25 +581,17 @@ const generateLogsheet = (id) => {
                 <div class="col-sm-12 col-xl-8 col-lg-7">
                     <!-- Issuance Card -->
                     <div class="card mb-3 border-0 shadow-sm">
-                        <div
-                            class="card-header bg-primary d-flex justify-content-start align-items-center text-white"
-                        >
+                        <div class="card-header bg-primary d-flex justify-content-start align-items-center text-white">
                             <i class="bi bi-send-check fs-4 me-3"></i>
                             <h5 class="fw-bold mb-0">Current Issuance</h5>
                         </div>
                         <div class="card-body">
-                            <div
-                                class="row g-3"
-                                v-if="
-                                    props.phone?.status === 'available' ||
-                                    props.phone.status === 'issued'
-                                "
-                            >
+                            <div class="row g-3" v-if="
+                                props.phone?.status === 'available' ||
+                                props.phone.status === 'issued'
+                            ">
                                 <div class="col-md-4 border-end">
-                                    <label
-                                        class="small text-muted text-uppercase fw-bold"
-                                        >Recipient Info</label
-                                    >
+                                    <label class="small text-muted text-uppercase fw-bold">Recipient Info</label>
                                     <p class="fw-bold fs-5 text-dark mb-1">
                                         {{
                                             props.phone_issuance?.issued_to ||
@@ -673,8 +600,7 @@ const generateLogsheet = (id) => {
                                     </p>
                                     <p class="text-secondary small mb-0">
                                         <i class="bi bi-building me-1"></i>
-                                        <span class="fw-bold"
-                                            >Department:
+                                        <span class="fw-bold">Department:
                                         </span>
                                         {{
                                             props.phone_issuance?.department ||
@@ -683,10 +609,7 @@ const generateLogsheet = (id) => {
                                     </p>
                                 </div>
                                 <div class="col-md-4 border-end">
-                                    <label
-                                        class="small text-muted text-uppercase fw-bold"
-                                        >Issuance Logistics</label
-                                    >
+                                    <label class="small text-muted text-uppercase fw-bold">Issuance Logistics</label>
                                     <p class="fw-bold fs-5 text-dark mb-1">
                                         {{
                                             props.phone_issuance?.issued_by ||
@@ -704,14 +627,8 @@ const generateLogsheet = (id) => {
                                     </p>
                                 </div>
                                 <div class="col-md-4 px-md-4">
-                                    <label
-                                        class="small text-muted text-uppercase fw-bold"
-                                    >
-                                        <i
-                                            class="bi bi-headphones text-primary me-2"
-                                        ></i
-                                        >Accessories:</label
-                                    >
+                                    <label class="small text-muted text-uppercase fw-bold">
+                                        <i class="bi bi-headphones text-primary me-2"></i>Accessories:</label>
                                     <div class="d-flex align-items-center">
                                         <span class="text-muted fw-bold ms-2">{{
                                             props.phone_issuance
@@ -721,31 +638,21 @@ const generateLogsheet = (id) => {
                                 </div>
                             </div>
                             <div class="card-body py-5 text-center" v-else>
-                                <span class="fw-bold fs-5 text-muted"
-                                    >The asset is not yet issued.</span
-                                >
+                                <span class="fw-bold fs-5 text-muted">The asset is not yet issued.</span>
                             </div>
                         </div>
                     </div>
 
                     <!-- Return Details -->
                     <div class="card mb-3 border-0 shadow-sm">
-                        <div
-                            class="card-header bg-warning d-flex justify-content-start align-items-center text-dark"
-                        >
+                        <div class="card-header bg-warning d-flex justify-content-start align-items-center text-dark">
                             <i class="bi bi-reply-fill fs-4 me-2"></i>
                             <h5 class="fw-bold mb-0">Return Details</h5>
                         </div>
-                        <div
-                            class="card-body"
-                            v-if="props.phone?.status === 'available'"
-                        >
+                        <div class="card-body" v-if="props.phone?.status === 'available'">
                             <div class="row g-3">
                                 <div class="col-md-4 border-end">
-                                    <label
-                                        class="small text-muted text-uppercase fw-bold"
-                                        >Recipient Info</label
-                                    >
+                                    <label class="small text-muted text-uppercase fw-bold">Recipient Info</label>
                                     <p class="fw-bold fs-5 text-dark mb-1">
                                         {{
                                             props.phone_return?.returned_by ||
@@ -754,8 +661,7 @@ const generateLogsheet = (id) => {
                                     </p>
                                     <p class="text-secondary small mb-0">
                                         <i class="bi bi-building me-1"></i>
-                                        <span class="fw-bold"
-                                            >Department:
+                                        <span class="fw-bold">Department:
                                         </span>
                                         {{
                                             props.phone_return
@@ -765,10 +671,7 @@ const generateLogsheet = (id) => {
                                     </p>
                                 </div>
                                 <div class="col-md-4 border-end">
-                                    <label
-                                        class="small text-muted text-uppercase fw-bold"
-                                        >Return To:</label
-                                    >
+                                    <label class="small text-muted text-uppercase fw-bold">Return To:</label>
                                     <p class="fw-bold fs-5 text-dark mb-1">
                                         {{
                                             props.phone_return?.returned_to ||
@@ -786,14 +689,8 @@ const generateLogsheet = (id) => {
                                     </p>
                                 </div>
                                 <div class="col-md-4 px-md-4">
-                                    <label
-                                        class="small text-muted text-uppercase fw-bold"
-                                    >
-                                        <i
-                                            class="bi bi-headphones text-primary me-2"
-                                        ></i
-                                        >Accessories:</label
-                                    >
+                                    <label class="small text-muted text-uppercase fw-bold">
+                                        <i class="bi bi-headphones text-primary me-2"></i>Accessories:</label>
 
                                     <p class="d-flex align-items-center">
                                         <span class="text-muted fw-bold ms-2">{{
@@ -804,18 +701,13 @@ const generateLogsheet = (id) => {
                                 </div>
                             </div>
                         </div>
-                        <div
-                            class="card-body py-5 text-center"
-                            v-else-if="props.phone.status === 'issued'"
-                        >
-                            <span class="fw-bold fs-5 text-dark text-muted mb-1"
-                                >The asset is currently deploy (not yet
+                        <div class="card-body py-5 text-center" v-else-if="props.phone.status === 'issued'">
+                            <span class="fw-bold fs-5 text-dark text-muted mb-1">The asset is currently deploy (not yet
                                 returned).
                             </span>
                         </div>
                         <div class="card-body py-5 text-center" v-else>
-                            <span class="fw-bold fs-5 text-dark text-muted mb-1"
-                                >The asset is not yet issued.
+                            <span class="fw-bold fs-5 text-dark text-muted mb-1">The asset is not yet issued.
                             </span>
                         </div>
                     </div>
@@ -823,31 +715,21 @@ const generateLogsheet = (id) => {
                     <!-- Table -->
                     <div class="card mb-3 border-0 shadow-sm">
                         <div class="card-header bg-white py-3">
-                            <div
-                                class="row d-flex justify-content-between align-items-center"
-                            >
+                            <div class="row d-flex justify-content-between align-items-center">
                                 <div class="col-sm-12 col-md-8 mt-2">
                                     <h5 class="fw-bold text-primary mb-0">
-                                        <i class="bi bi-clock-history me-2"></i
-                                        >Phone Assignment History
+                                        <i class="bi bi-clock-history me-2"></i>Phone Assignment History
                                     </h5>
                                 </div>
                                 <div class="col-sm-12 col-md-4 my-2">
                                     <div class="search-box">
                                         <div class="input-group input-group-sm">
-                                            <span
-                                                class="input-group-text bg-light border-end-0"
-                                            >
-                                                <i
-                                                    class="bi bi-search text-muted"
-                                                ></i>
+                                            <span class="input-group-text bg-light border-end-0">
+                                                <i class="bi bi-search text-muted"></i>
                                             </span>
-                                            <input
-                                                type="text"
-                                                v-model="historySearch"
+                                            <input type="text" v-model="historySearch"
                                                 class="form-control bg-light border-start-0"
-                                                placeholder="Search history..."
-                                            />
+                                                placeholder="Search history..." />
                                         </div>
                                     </div>
                                 </div>
@@ -855,13 +737,9 @@ const generateLogsheet = (id) => {
                         </div>
                         <div class="card-body p-0">
                             <div class="table-responsive">
-                                <table
-                                    class="table-hover mb-0 table align-middle"
-                                >
+                                <table class="table-hover mb-0 table align-middle">
                                     <thead class="table-light">
-                                        <tr
-                                            class="fs-8 text-uppercase text-muted border-top-0 text-wrap text-center"
-                                        >
+                                        <tr class="fs-8 text-uppercase text-muted border-top-0 text-wrap text-center">
                                             <th class="ps-3" scope="col">
                                                 Date Issued
                                             </th>
@@ -877,14 +755,8 @@ const generateLogsheet = (id) => {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr
-                                            class="fs-8 text-center"
-                                            v-for="tx in paginatedHistory"
-                                            :key="tx.id"
-                                        >
-                                            <td
-                                                class="fw-medium mb-0 text-nowrap ps-3"
-                                            >
+                                        <tr class="fs-8 text-center" v-for="tx in paginatedHistory" :key="tx.id">
+                                            <td class="fw-medium mb-0 text-nowrap ps-3">
                                                 {{ formatDate(tx.date_issued) }}
                                             </td>
 
@@ -892,9 +764,7 @@ const generateLogsheet = (id) => {
                                                 <div class="fw-bold text-dark">
                                                     {{ tx.issued_to }}
                                                 </div>
-                                                <div
-                                                    class="text-muted small ps-2"
-                                                >
+                                                <div class="text-muted small ps-2">
                                                     {{ tx.department }}
                                                 </div>
                                             </td>
@@ -905,22 +775,16 @@ const generateLogsheet = (id) => {
                                                 </div>
                                             </td>
 
-                                            <td
-                                                class="small text-wrap"
-                                                style="max-width: 150px"
-                                            >
+                                            <td class="small text-wrap" style="max-width: 150px">
                                                 {{
                                                     tx.issued_accessories || '—'
                                                 }}
                                             </td>
 
                                             <td class="text-nowrap">
-                                                <span
-                                                    v-if="
-                                                        tx.return?.date_returned
-                                                    "
-                                                    class="fw-medium mb-0 text-nowrap ps-2"
-                                                >
+                                                <span v-if="
+                                                    tx.return?.date_returned
+                                                " class="fw-medium mb-0 text-nowrap ps-2">
                                                     {{
                                                         formatDate(
                                                             tx.return
@@ -928,11 +792,8 @@ const generateLogsheet = (id) => {
                                                         )
                                                     }}
                                                 </span>
-                                                <span
-                                                    v-else
-                                                    class="badge rounded-pill bg-warning text-dark"
-                                                    >In Use</span
-                                                >
+                                                <span v-else class="badge rounded-pill bg-warning text-dark">In
+                                                    Use</span>
                                             </td>
 
                                             <td>
@@ -942,9 +803,7 @@ const generateLogsheet = (id) => {
                                                             ?.returned_by || '—'
                                                     }}
                                                 </div>
-                                                <div
-                                                    class="text-muted small ps-2"
-                                                >
+                                                <div class="text-muted small ps-2">
                                                     {{
                                                         tx.return
                                                             ?.returnee_department
@@ -957,10 +816,7 @@ const generateLogsheet = (id) => {
                                                 </div>
                                             </td>
 
-                                            <td
-                                                class="small text-muted text-wrap pe-3"
-                                                style="max-width: 150px"
-                                            >
+                                            <td class="small text-muted text-wrap pe-3" style="max-width: 150px">
                                                 {{
                                                     tx.return
                                                         ?.returned_accessories ||
@@ -969,15 +825,12 @@ const generateLogsheet = (id) => {
                                             </td>
                                         </tr>
                                         <tr v-if="filteredHistory.length === 0">
-                                            <td
-                                                colspan="8"
-                                                class="text-muted py-4 text-center"
-                                            >
+                                            <td colspan="8" class="text-muted py-4 text-center">
                                                 {{
                                                     historySearch
                                                         ? 'No matches found for "' +
-                                                          historySearch +
-                                                          '"'
+                                                        historySearch +
+                                                        '"'
                                                         : 'No transaction history found.'
                                                 }}
                                             </td>
@@ -986,13 +839,8 @@ const generateLogsheet = (id) => {
                                 </table>
                             </div>
                         </div>
-                        <div
-                            class="card-footer border-top-0 bg-white py-3"
-                            v-if="totalPages > 1"
-                        >
-                            <div
-                                class="d-flex justify-content-between align-items-center"
-                            >
+                        <div class="card-footer border-top-0 bg-white py-3" v-if="totalPages > 1">
+                            <div class="d-flex justify-content-between align-items-center">
                                 <div class="text-muted small">
                                     Showing
                                     {{ (currentPage - 1) * itemsPerPage + 1 }}
@@ -1006,50 +854,28 @@ const generateLogsheet = (id) => {
                                     of {{ filteredHistory.length }} entries
                                 </div>
                                 <nav>
-                                    <ul
-                                        class="pagination pagination-sm mb-0 gap-2"
-                                    >
-                                        <li
-                                            class="page-item"
-                                            :class="{
-                                                disabled: currentPage === 1,
-                                            }"
-                                        >
-                                            <button
-                                                class="page-link"
-                                                @click="prevPage"
-                                            >
+                                    <ul class="pagination pagination-sm mb-0 gap-2">
+                                        <li class="page-item" :class="{
+                                            disabled: currentPage === 1,
+                                        }">
+                                            <button class="page-link" @click="prevPage">
                                                 Previous
                                             </button>
                                         </li>
 
-                                        <li
-                                            v-for="page in totalPages"
-                                            :key="page"
-                                            class="page-item"
-                                            :class="{
-                                                active: currentPage === page,
-                                            }"
-                                        >
-                                            <button
-                                                class="page-link"
-                                                @click="currentPage = page"
-                                            >
+                                        <li v-for="page in totalPages" :key="page" class="page-item" :class="{
+                                            active: currentPage === page,
+                                        }">
+                                            <button class="page-link" @click="currentPage = page">
                                                 {{ page }}
                                             </button>
                                         </li>
 
-                                        <li
-                                            class="page-item"
-                                            :class="{
-                                                disabled:
-                                                    currentPage === totalPages,
-                                            }"
-                                        >
-                                            <button
-                                                class="page-link"
-                                                @click="nextPage"
-                                            >
+                                        <li class="page-item" :class="{
+                                            disabled:
+                                                currentPage === totalPages,
+                                        }">
+                                            <button class="page-link" @click="nextPage">
                                                 Next
                                             </button>
                                         </li>
@@ -1064,7 +890,7 @@ const generateLogsheet = (id) => {
     </div>
 
     <!-- Issuance Modal -->
-    <Modals
+    <!-- <Modals
         id="IssuePhoneModal"
         title="Issue Phone Asset"
         header-class="bg-primary text-white bg-gradient"
@@ -1243,309 +1069,258 @@ const generateLogsheet = (id) => {
                 Issue Asset
             </button>
         </template>
-    </Modals>
+    </Modals> -->
+
+    <Dialog v-model:visible="showIssueModal" modal :style="{ width: '40vw' }"
+        :breakpoints="{ '1199px': '75vw', '575px': '90vw' }"
+
+        >
+        <!-- Header -->
+        <template #header>
+            <div class="d-flex align-items-center gap-2">
+                <i class="pi pi-mobile fs-5"></i>
+                <span class="fs-5 fw-semibold">Issue Phone Asset</span>
+            </div>
+        </template>
+
+        <!-- Body -->
+        <form id="issueForm" class="container-fluid" @submit.prevent="submit">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">
+                        Issued To <span class="text-danger">*</span>
+                    </label>
+                    <InputText v-model="form.issued_to" class="w-100" required />
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">
+                        Issued By <span class="text-danger">*</span>
+                    </label>
+                    <InputText v-model="form.issued_by" class="w-100" required />
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">
+                        Department <span class="text-danger">*</span>
+                    </label>
+                    <InputText v-model="form.department" class="w-100" required />
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">
+                        Date Issued <span class="text-danger">*</span>
+                    </label>
+                    <Calendar v-model="form.date_issued" showIcon dateFormat="ddMyy" class="w-100" />
+                </div>
+
+                <div class="col-12">
+                    <div class="row d-flex justify-content-center">
+                        <div class="col-6">
+                            <label class="form-label fw-semibold">
+                                Select Accessories <span class="text-danger">*</span>
+                            </label>
+
+                            <div class="d-flex gap-4 rounded border p-3">
+                                <div class="d-flex align-items-center gap-2">
+                                    <Checkbox v-model="selectedAcc" inputId="acc1" value="Charger" />
+                                    <label for="acc1" class="mb-0">Charger</label>
+                                </div>
+
+                                <div class="d-flex align-items-center gap-2">
+                                    <Checkbox v-model="selectedAcc" inputId="acc2" value="Headphones" />
+                                    <label for="acc2" class="mb-0">Headphones</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="d-flex align-items-center flex-column gap-2">
+                                <label class="form-label fw-semibold">
+                                    Other / All Accessories
+                                </label>
+                                <Textarea v-model="form.issued_accessories" rows="1" autoResize class="w-100" />
+                            </div>
+                        </div>
+                    </div>
+
+
+
+                </div>
+
+                <div class="col-12"></div>
+
+                <div class="col-12">
+                    <label class="form-label fw-semibold">
+                        Cashout Status <span class="text-danger">*</span>
+                    </label>
+
+                    <div class="d-flex justify-content-center gap-5 rounded border p-3">
+                        <div class="d-flex align-items-center gap-2">
+                            <RadioButton v-model="form.cashout" inputId="cash1" value="1" />
+                            <label for="cash1" class="mb-0">With Cashout</label>
+                        </div>
+
+                        <div class="d-flex align-items-center gap-2">
+                            <RadioButton v-model="form.cashout" inputId="cash2" value="0" />
+                            <label for="cash2" class="mb-0">Without Cashout</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12">
+                    <label class="form-label fw-semibold">Remarks</label>
+                    <Textarea v-model="form.remarks" rows="3" class="w-100" />
+                </div>
+            </div>
+        </form>
+
+        <!-- Footer -->
+        <template #footer>
+            <Button label="Cancel" severity="secondary" text @click="visible = false" />
+            <Button label="Issue Asset" icon="bi bi-check" form="issueForm" type="submit" :loading="form.processing" />
+        </template>
+    </Dialog>
 
     <!-- Return Modal -->
-    <Modals
-        id="ReturnPhoneModal"
-        title="Return Phone Asset"
-        header-class="bg-warning text-white bg-gradient"
-    >
+    <Modals id="ReturnPhoneModal" title="Return Phone Asset" header-class="bg-warning text-white bg-gradient">
         <template #body>
             <form @submit.prevent="returnSubmit" id="returnForm">
                 <div class="row mb-3">
                     <div class="col-sm-12 col-md-6">
-                        <label for="returned_to" class="form-label"
-                            >Returned To</label
-                        >
-                        <input
-                            type="text"
-                            class="form-control"
-                            id="returned_to"
-                            v-model="returnform.returned_to"
-                        />
+                        <label for="returned_to" class="form-label">Returned To</label>
+                        <input type="text" class="form-control" id="returned_to" v-model="returnform.returned_to" />
                     </div>
                     <div class="col-sm-12 col-md-6">
-                        <label for="date_returned" class="form-label"
-                            >Date Returned</label
-                        >
-                        <input
-                            type="date"
-                            id="date_returned"
-                            v-model="returnform.date_returned"
-                            class="form-control"
-                            required
-                        />
+                        <label for="date_returned" class="form-label">Date Returned</label>
+                        <input type="date" id="date_returned" v-model="returnform.date_returned" class="form-control"
+                            required />
                     </div>
                 </div>
                 <div class="row d-flex justify-content-center mb-3">
                     <div class="col-sm-12 col-md-6">
-                        <label for="returned_by" class="form-label"
-                            >Returned By</label
-                        >
-                        <input
-                            type="text"
-                            id="returned_by"
-                            v-model="returnform.returned_by"
-                            class="form-control"
-                            required
-                        />
+                        <label for="returned_by" class="form-label">Returned By</label>
+                        <input type="text" id="returned_by" v-model="returnform.returned_by" class="form-control"
+                            required />
                     </div>
                     <div class="col-sm-12 col-md-6">
-                        <label for="returnee_department" class="form-label"
-                            >Department</label
-                        >
-                        <input
-                            type="text"
-                            id="returnee_department"
-                            v-model="returnform.returnee_department"
-                            class="form-control"
-                            required
-                        />
+                        <label for="returnee_department" class="form-label">Department</label>
+                        <input type="text" id="returnee_department" v-model="returnform.returnee_department"
+                            class="form-control" required />
                     </div>
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label">Select Accessories</label>
-                    <div
-                        class="d-flex justify-content-around align-items-center rounded border p-2"
-                    >
+                    <div class="d-flex justify-content-around align-items-center rounded border p-2">
                         <div class="form-check">
-                            <input
-                                class="form-check-input"
-                                type="checkbox"
-                                value="Charger"
-                                v-model="selectedReturnAcc"
-                                id="chargerReturnCheckInput"
-                            />
-                            <label
-                                class="form-check-label"
-                                for="chargerReturnCheckInput"
-                                >Charger</label
-                            >
+                            <input class="form-check-input" type="checkbox" value="Charger" v-model="selectedReturnAcc"
+                                id="chargerReturnCheckInput" />
+                            <label class="form-check-label" for="chargerReturnCheckInput">Charger</label>
                         </div>
                         <div class="form-check">
-                            <input
-                                class="form-check-input"
-                                type="checkbox"
-                                value="Headphones"
-                                v-model="selectedReturnAcc"
-                                id="headphonesReturnCheckInput"
-                            />
-                            <label
-                                class="form-check-label"
-                                for="headphonesReturnCheckInput"
-                                >Headphones</label
-                            >
+                            <input class="form-check-input" type="checkbox" value="Headphones"
+                                v-model="selectedReturnAcc" id="headphonesReturnCheckInput" />
+                            <label class="form-check-label" for="headphonesReturnCheckInput">Headphones</label>
                         </div>
                     </div>
                 </div>
 
                 <div class="mb-3">
-                    <label for="returned_accessories_summary" class="form-label"
-                        >Other / All Accessories (Summary)</label
-                    >
-                    <input
-                        type="text"
-                        id="returned_accessories_summary"
-                        v-model="returnform.returned_accessories"
-                        class="form-control"
-                        placeholder="e.g. Charger, USB-C Cable"
-                    />
+                    <label for="returned_accessories_summary" class="form-label">Other / All Accessories
+                        (Summary)</label>
+                    <input type="text" id="returned_accessories_summary" v-model="returnform.returned_accessories"
+                        class="form-control" placeholder="e.g. Charger, USB-C Cable" />
                 </div>
 
                 <div class="mb-3">
-                    <label for="remarksTextarea" class="form-label"
-                        >Remarks</label
-                    >
-                    <textarea
-                        v-model="returnform.remarks"
-                        id="remarksTextarea"
-                        class="form-control"
-                        rows="3"
-                    ></textarea>
+                    <label for="remarksTextarea" class="form-label">Remarks</label>
+                    <textarea v-model="returnform.remarks" id="remarksTextarea" class="form-control"
+                        rows="3"></textarea>
                 </div>
             </form>
         </template>
         <template #footer>
-            <button
-                type="button"
-                class="btn btn-secondary"
-                data-bs-dismiss="modal"
-            >
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                 Cancel
             </button>
-            <button
-                type="submit"
-                class="btn btn-primary"
-                form="returnForm"
-                :disabled="returnform.processing"
-            >
-                <span
-                    v-if="returnform.processing"
-                    class="spinner-border spinner-border-sm me-1"
-                ></span>
+            <button type="submit" class="btn btn-primary" form="returnForm" :disabled="returnform.processing">
+                <span v-if="returnform.processing" class="spinner-border spinner-border-sm me-1"></span>
                 Return
             </button>
         </template>
     </Modals>
 
     <!-- Update Modal -->
-    <Modals
-        id="UpdatePhoneModal"
-        title="Update Phone Asset"
-        header-class="bg-warning text-white bg-gradient"
-    >
+    <Modals id="UpdatePhoneModal" title="Update Phone Asset" header-class="bg-warning text-white bg-gradient">
         <template #body>
             <form @submit.prevent="updateSubmit" id="updateForm">
                 <div class="row mb-3">
                     <div class="col-md-6">
-                        <label for="update_brand" class="form-label"
-                            >Brand</label
-                        >
-                        <input
-                            type="text"
-                            id="update_brand"
-                            v-model="updateForm.brand"
-                            class="form-control"
-                            required
-                        />
+                        <label for="update_brand" class="form-label">Brand</label>
+                        <input type="text" id="update_brand" v-model="updateForm.brand" class="form-control" required />
                     </div>
                     <div class="col-md-6">
-                        <label for="update_model" class="form-label"
-                            >Model</label
-                        >
-                        <input
-                            type="text"
-                            id="update_model"
-                            v-model="updateForm.model"
-                            class="form-control"
-                            required
-                        />
+                        <label for="update_model" class="form-label">Model</label>
+                        <input type="text" id="update_model" v-model="updateForm.model" class="form-control" required />
                     </div>
                 </div>
 
                 <div class="row mb-3">
                     <div class="col-md-6">
-                        <label for="update_serial_num" class="form-label"
-                            >Serial Number</label
-                        >
-                        <input
-                            type="text"
-                            id="update_serial_num"
-                            v-model="updateForm.serial_num"
-                            class="form-control"
-                            required
-                        />
+                        <label for="update_serial_num" class="form-label">Serial Number</label>
+                        <input type="text" id="update_serial_num" v-model="updateForm.serial_num" class="form-control"
+                            required />
                     </div>
                     <div class="col-md-6">
-                        <label for="update_sim_no" class="form-label"
-                            >SIM Number</label
-                        >
-                        <input
-                            type="text"
-                            id="update_sim_no"
-                            v-model="updateForm.sim_no"
-                            class="form-control"
-                        />
+                        <label for="update_sim_no" class="form-label">SIM Number</label>
+                        <input type="text" id="update_sim_no" v-model="updateForm.sim_no" class="form-control" />
                     </div>
                 </div>
 
                 <div class="row mb-3">
                     <div class="col-md-6">
-                        <label for="update_imei_one" class="form-label"
-                            >IMEI One</label
-                        >
-                        <input
-                            type="text"
-                            id="update_imei_one"
-                            v-model="updateForm.imei_one"
-                            class="form-control"
-                            required
-                        />
+                        <label for="update_imei_one" class="form-label">IMEI One</label>
+                        <input type="text" id="update_imei_one" v-model="updateForm.imei_one" class="form-control"
+                            required />
                     </div>
                     <div class="col-md-6">
-                        <label for="update_imei_two" class="form-label"
-                            >IMEI Two</label
-                        >
-                        <input
-                            type="text"
-                            id="update_imei_two"
-                            v-model="updateForm.imei_two"
-                            class="form-control"
-                        />
+                        <label for="update_imei_two" class="form-label">IMEI Two</label>
+                        <input type="text" id="update_imei_two" v-model="updateForm.imei_two" class="form-control" />
                     </div>
                 </div>
 
                 <div class="row mb-3">
                     <div class="col-md-6">
                         <label for="update_ram" class="form-label">RAM</label>
-                        <input
-                            type="text"
-                            id="update_ram"
-                            v-model="updateForm.ram"
-                            class="form-control"
-                            required
-                        />
+                        <input type="text" id="update_ram" v-model="updateForm.ram" class="form-control" required />
                     </div>
                     <div class="col-md-6">
                         <label for="update_rom" class="form-label">ROM</label>
-                        <input
-                            type="text"
-                            id="update_rom"
-                            v-model="updateForm.rom"
-                            class="form-control"
-                            required
-                        />
+                        <input type="text" id="update_rom" v-model="updateForm.rom" class="form-control" required />
                     </div>
                 </div>
 
                 <div class="row mb-3">
                     <div class="col-md-6">
-                        <label for="update_purchase_date" class="form-label"
-                            >Purchase Date</label
-                        >
-                        <input
-                            type="date"
-                            id="update_purchase_date"
-                            v-model="updateForm.purchase_date"
-                            class="form-control"
-                        />
+                        <label for="update_purchase_date" class="form-label">Purchase Date</label>
+                        <input type="date" id="update_purchase_date" v-model="updateForm.purchase_date"
+                            class="form-control" />
                     </div>
                 </div>
 
                 <div class="mb-3">
-                    <label for="update_remarks" class="form-label"
-                        >Remarks</label
-                    >
-                    <textarea
-                        v-model="updateForm.remarks"
-                        id="update_remarks"
-                        rows="3"
-                        class="form-control"
-                    ></textarea>
+                    <label for="update_remarks" class="form-label">Remarks</label>
+                    <textarea v-model="updateForm.remarks" id="update_remarks" rows="3" class="form-control"></textarea>
                 </div>
             </form>
         </template>
 
         <template #footer>
-            <button
-                type="button"
-                class="btn btn-secondary"
-                data-bs-dismiss="modal"
-            >
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                 Cancel
             </button>
-            <button
-                type="submit"
-                class="btn btn-warning"
-                form="updateForm"
-                :disabled="updateForm.processing"
-            >
-                <span
-                    v-if="updateForm.processing"
-                    class="spinner-border spinner-border-sm me-1"
-                ></span>
+            <button type="submit" class="btn btn-warning" form="updateForm" :disabled="updateForm.processing">
+                <span v-if="updateForm.processing" class="spinner-border spinner-border-sm me-1"></span>
                 Update Asset
             </button>
         </template>

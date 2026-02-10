@@ -2,6 +2,7 @@ import { library } from '@fortawesome/fontawesome-svg-core';
 import { faHouse, faLock, faUser } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { createInertiaApp, router, usePage } from '@inertiajs/vue3';
+import { definePreset } from '@primeuix/themes'; // Add this import
 import Aura from '@primeuix/themes/aura';
 import 'admin-lte/dist/js/adminlte.min.js';
 import AOS from 'aos';
@@ -12,12 +13,21 @@ import { InputText } from 'primevue';
 import Badge from 'primevue/badge';
 import Breadcrumb from 'primevue/breadcrumb';
 import Button from 'primevue/button';
+import Calendar from 'primevue/calendar';
 import Card from 'primevue/card';
+import Checkbox from 'primevue/checkbox';
+import Column from 'primevue/column';
 import PrimeVue from 'primevue/config';
+import DataTable from 'primevue/datatable';
+import Dialog from 'primevue/dialog';
 import InputGroup from 'primevue/inputgroup';
 import InputGroupAddon from 'primevue/inputgroupaddon';
-import Swal from 'sweetalert2';
+import InputNumber from 'primevue/inputnumber';
+import Paginator from 'primevue/paginator';
+import RadioButton from 'primevue/radiobutton';
 import Tag from 'primevue/tag';
+import Textarea from 'primevue/textarea';
+import Swal from 'sweetalert2';
 import { createApp, h, watch } from 'vue';
 import VueApexCharts from 'vue3-apexcharts';
 import { ZiggyVue } from '../../vendor/tightenco/ziggy';
@@ -28,6 +38,24 @@ window.bootstrap = bootstrap;
 const appName = import.meta.env.VITE_APP_NAME || 'CIMS';
 
 library.add(faUser, faHouse, faLock);
+
+const BootstrapBluePreset = definePreset(Aura, {
+    semantic: {
+        primary: {
+            50: '{blue.50}',
+            100: '{blue.100}',
+            200: '{blue.200}',
+            300: '{blue.300}',
+            400: '{blue.400}',
+            500: '{blue.500}', // This is the main "Bootstrap Primary" shade
+            600: '{blue.600}',
+            700: '{blue.700}',
+            800: '{blue.800}',
+            900: '{blue.900}',
+            950: '{blue.950}',
+        },
+    },
+});
 
 AOS.init({
     duration: 1700,
@@ -60,7 +88,12 @@ createInertiaApp({
             .use(VueApexCharts)
             .use(PrimeVue, {
                 theme: {
-                    preset: Aura,
+                    preset: BootstrapBluePreset, // Use our new custom blue preset
+                    options: {
+                        prefix: 'p',
+                        darkModeSelector: 'none', // Keeps it consistent with standard AdminLTE light mode
+                        cssLayer: false,
+                    },
                 },
             })
             .component('font-awesome-icon', FontAwesomeIcon)
@@ -71,7 +104,16 @@ createInertiaApp({
             .component('Card', Card)
             .component('Breadcrumb', Breadcrumb)
             .component('Tag', Tag)
-            .component('Badge', Badge);
+            .component('Badge', Badge)
+            .component('Dialog', Dialog)
+            .component('Checkbox', Checkbox)
+            .component('RadioButton', RadioButton)
+            .component('Paginator', Paginator)
+            .component('Textarea', Textarea)
+            .component('DataTable', DataTable)
+            .component('Calendar', Calendar)
+            .component('Column', Column)
+            .component('InputNumber', InputNumber);
         const page = usePage();
         router.on('invalid', (event) => {
             if (event.detail.response.status === 419) {
