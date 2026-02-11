@@ -302,21 +302,21 @@ const openReturnModal = () => {
 const generateLogsheet = (id) => {
     window.open(
         `
-        /AssetAndInventoryManagement/Phone/${id}/logsheet`,
+         /AssetAndInventoryManagement/Phone/${id}/logsheet `,
         '_blank',
     );
 };
 
 onMounted(() => {
-    window.Echo.channel('inventory').listen('.AssetUpdated', (e) => {
+    window.Echo.channel('phoneInventory').listen('.AssetUpdated', (e) => {
         console.log('Update received:', e.message);
 
-        router.reload({ only: ['phones'] });
+        router.reload({ only: ['phone', 'phone_issuance', 'phone_return'] });
     });
 });
 
 onUnmounted(() => {
-    window.Echo.leave('inventory');
+    window.Echo.leave('phoneInventory');
 });
 </script>
 

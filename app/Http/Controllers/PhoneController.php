@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\AssetUpdated;
 use App\Models\Phone;
 use App\Models\PhoneTransaction;
 use App\Models\PhoneIssuance;
@@ -170,6 +171,8 @@ class PhoneController extends Controller
             'remarks' => $validated['remarks'] ?? $phone->remarks,
         ]);
 
+        event(new AssetUpdated('Phone asset manage and inventory updated! ... '));
+
         return redirect()->back()->with('success', 'The device has been issued successfully to ' . $validated['issued_to']);
     }
 
@@ -206,6 +209,9 @@ class PhoneController extends Controller
                 'status' => 'available',
                 'remarks' => $validated['remarks'] ?? $phone->remarks,
             ]);
+
+            event(new AssetUpdated('Phone asset manage and inventory updated! ... '));
+
 
             return redirect()->back()->with('success', 'The device has been returned successfully.');
         }
@@ -258,6 +264,7 @@ class PhoneController extends Controller
 
         try {
             $phone->update($validated);
+            event(new AssetUpdated('Phone asset manage and inventory updated! ... '));
             return redirect()->back()->with('success', 'Phone asset updated successfully');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Failed to update phone asset.');
@@ -271,6 +278,7 @@ class PhoneController extends Controller
     {
         try {
             $phone->delete();
+            event(new AssetUpdated('Phone asset manage and inventory updated! ... '));
             return redirect()->route('phone.index')->with('success', 'Asset record and all related history have been deleted');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Failed to delete asset.');

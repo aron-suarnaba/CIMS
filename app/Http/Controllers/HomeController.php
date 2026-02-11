@@ -23,7 +23,7 @@ public function getNewsAPI()
             //     'apiKey'   => '6249d6d9b05f4c66b29d67a0ff4f46da',
             // ]);
             $response = Http::withOptions([
-                'verify' => false, // Fixes local SSL issues
+                'verify' => false,
             ])->get("https://saurav.tech/NewsAPI/top-headlines/category/technology/in.json");
 
             if ($response->successful()) {
