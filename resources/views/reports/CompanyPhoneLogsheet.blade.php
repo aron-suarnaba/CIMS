@@ -19,13 +19,26 @@
 
         /* Internal labels and lines */
         .field-row { margin-bottom: 4px; display: table; width: 100%; }
-        .label { display: table-cell; white-space: nowrap; width: 1%; padding-right: 5px; }
-        .line-fill { display: table-cell; border-bottom: 1px solid black; padding-left: 5px; height: 14px; }
+        .label {
+            display: table-cell;
+            white-space: nowrap;
+            width: 1%;
+            padding-right: 5px;
+            min-width: 70px; /* Forces symmetrical starting point for underlines */
+        }
+        .line-fill { display: table-cell; border-bottom: 1px solid black; padding-left: 5px; height: 14px; vertical-align: bottom; }
 
-        /* The Main Log Area with Gap */
+        /* Centering the cashout section */
+        .cashout-container {
+            text-align: center;
+            margin-top: 12px;
+            width: 100%;
+        }
+
+        /* The Main Log Area */
         .log-wrapper { width: 100%; display: table; border-collapse: collapse; table-layout: fixed; }
         .log-column { display: table-cell; width: 49%; vertical-align: top; }
-        .spacer-column { display: table-cell; width: 2%; } /* THE GAP */
+        .spacer-column { display: table-cell; width: 2%; }
 
         table.log-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
         table.log-table th { border: 1px solid black; background: #fff; font-size: 8px; padding: 4px 1px; font-weight: bold; }
@@ -48,28 +61,28 @@
 
         <table class="info-table">
             <tr>
-                <td width="42%">
+                <td width="45%">
                     <div class="field-row"><span class="label">Brand/Model:</span><span class="line-fill">{{ $phone->brand }} {{ $phone->model }}</span></div>
                     <div class="field-row"><span class="label">Serial Number:</span><span class="line-fill">{{ $phone->serial_num }}</span></div>
                     <div class="field-row"><span class="label">RAM/ROM:</span><span class="line-fill">{{ $phone->ram }}/{{ $phone->rom }}</span></div>
                     <div class="field-row"><span class="label">IMEI 1/2:</span><span class="line-fill">{{ $phone->imei_one }} / {{ $phone->imei_two }}</span></div>
                     <div class="field-row"><span class="label">Sim No.:</span><span class="line-fill">{{ $phone->sim_no }}</span></div>
-                    <div class="field-row"><span class="label">Department:</span><span class="line-fill">{{ $transactions[0]->department }}</span></div>
+                    <div class="field-row"><span class="label">Department:</span><span class="line-fill">{{ $transactions[count($transactions) - 1]->department }}</span></div>
 
-                    <div style="margin-top: 8px;">
+                    <div class="cashout-container">
                         <span class="checkbox-custom">☐</span> With Cashout &nbsp;&nbsp;&nbsp;
                         <span class="checkbox-custom">☐</span> Without cashout
                     </div>
                 </td>
 
-                <td width="16%"></td>
+                <td width="10%"></td>
 
-                <td width="42%">
+                <td width="45%">
                     <div class="field-row"><span class="label">Date Received:</span><span class="line-fill">{{ $date }}</span></div>
                     <div class="field-row"><span class="label">Device name:</span><span class="line-fill"></span></div>
                     <div class="field-row">
                         <span class="label">Accessories:</span>
-                        <span style="display: table-cell;">
+                        <span class="line-fill" style="border-bottom: none;">
                             <span class="checkbox-custom">☐</span> Charger &nbsp;&nbsp;
                             <span class="checkbox-custom">☐</span> Earphone
                         </span>
