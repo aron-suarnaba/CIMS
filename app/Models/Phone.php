@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\PhoneTransaction;
+use Illuminate\Support\Facades\URL;
 
 class Phone extends Model
 {
@@ -28,6 +29,7 @@ class Phone extends Model
      */
     protected $fillable = [
         'brand',
+        'image_path',
         'model',
         'serial_num',
         'imei_one',
@@ -38,6 +40,10 @@ class Phone extends Model
         'purchase_date',
         'status',
         'remarks',
+    ];
+
+    protected $appends = [
+        'image_url',
     ];
 
     /**
@@ -51,8 +57,50 @@ class Phone extends Model
         'purchase_date' => 'date',
     ];
 
+    public function getImageUrlAttribute(): ?string
+    {
+        if (!$this->image_path) {
+            return null;
+        }
+
+        if (str_starts_with($this->image_path, 'http://') || str_starts_with($this->image_path, 'https://')) {
+            return $this->image_path;
+        }
+
+        return URL::to('/' . ltrim($this->image_path, '/'));
+    }
+
     // Use default id for routing (no custom getRouteKeyName needed)
 
+    /**
+     * Get all issuances for this phone
+     */
+    public function issuances()
+    {
+        return $this->hasMany(PhoneIssuance::class, 'serial_num', 'serial_num');
+    }
+
+    /**
+     * Get the current active issuance (without return)
+     */
+    public function currentIssuance()
+    {
+        return $this->hasOne(PhoneIssuance::class, 'serial_num', 'serial_num')
+            ->whereDoesntHave('return')
+            ->latest();
+    }
+
+    /**
+     * Get all returns for this phone through issuances
+     */
+    public function returns()
+    {
+        return PhoneReturn::whereIn('phone_issuance_id',
+            $this->issuances()->pluck('id')
+        );
+    }
+
+    // Legacy support for backward compatibility with old phone_transactions table
     public function transactions()
     {
         return $this->hasMany(PhoneTransaction::class, 'serial_num', 'serial_num');

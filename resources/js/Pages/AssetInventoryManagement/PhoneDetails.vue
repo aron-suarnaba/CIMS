@@ -6,7 +6,7 @@ import { useDateFormatter } from '@/composables/useDateFormatter';
 import HomeLayout from '@/Layouts/HomeLayout.vue';
 import { router, useForm } from '@inertiajs/vue3';
 import Swal from 'sweetalert2';
-import { computed, ref, watch } from 'vue';
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 
 defineOptions({ layout: HomeLayout });
 
@@ -17,9 +17,12 @@ const props = defineProps({
         type: Object,
         required: true,
     },
-    phone_transaction: {
+    phone_issuance: {
         type: [Object, null],
-        required: true,
+        default: null,
+    },
+    phone_return: {
+        type: [Object, null],
         default: null,
     },
 });
@@ -34,6 +37,8 @@ const myBreadcrumb = [
 
 // Function for the phone image path
 const getPhoneImagePath = (phone) => {
+    if (phone?.image_url) return phone.image_url;
+
     const defaultPath = '../../img/phone/default.png';
     if (!phone || !phone.brand) return defaultPath;
 
@@ -114,17 +119,24 @@ const currentPage = ref(1);
 const itemsPerPage = 3;
 
 const filteredHistory = computed(() => {
-    if (!props.phone.transactions) return [];
+    if (!props.phone.issuances) return [];
     const searchTerm = historySearch.value.toLowerCase();
 
-    return props.phone.transactions.filter((tx) => {
-        return (
-            (tx.issued_to?.toLowerCase() || '').includes(searchTerm) ||
-            (tx.issued_by?.toLowerCase() || '').includes(searchTerm) ||
-            (tx.returned_by?.toLowerCase() || '').includes(searchTerm) ||
-            (tx.department?.toLowerCase() || '').includes(searchTerm)
-        );
-    });
+    return props.phone.issuances
+        .map((issuance) => ({
+            ...issuance,
+            return: issuance.return,
+        }))
+        .filter((record) => {
+            return (
+                (record.issued_to?.toLowerCase() || '').includes(searchTerm) ||
+                (record.issued_by?.toLowerCase() || '').includes(searchTerm) ||
+                (record.return?.returned_by?.toLowerCase() || '').includes(
+                    searchTerm,
+                ) ||
+                (record.department?.toLowerCase() || '').includes(searchTerm)
+            );
+        });
 });
 
 const paginatedHistory = computed(() => {
@@ -172,6 +184,7 @@ const returnform = useForm({
 
 // Form for update
 const updateForm = useForm({
+    image: null,
     brand: props.phone.brand || '',
     model: props.phone.model || '',
     serial_num: props.phone.serial_num || '',
@@ -183,6 +196,8 @@ const updateForm = useForm({
     purchase_date: props.phone.purchase_date || '',
     remarks: props.phone.remarks || '',
 });
+const updateSamplePic = ref(getPhoneImagePath(props.phone));
+let updatePicObjectUrl = null;
 
 // Listeners
 watch(selectedAcc, (newVal) => {
@@ -226,7 +241,13 @@ const returnSubmit = () => {
 // Submit logic for the update
 const updateSubmit = () => {
     updateForm.put(route('phone.update', props.phone.id), {
+        forceFormData: true,
         onSuccess: () => {
+            updateForm.image = null;
+            if (updatePicObjectUrl) {
+                URL.revokeObjectURL(updatePicObjectUrl);
+                updatePicObjectUrl = null;
+            }
             const closeButton = document.querySelector(
                 '#UpdatePhoneModal [data-bs-dismiss="modal"]',
             );
@@ -242,10 +263,16 @@ const openUpdateModal = (phone) => {
     updateForm.id = phone.id;
     updateForm.brand = phone.brand;
     updateForm.model = phone.model;
+    updateForm.serial_num = phone.serial_num;
     updateForm.imei_one = phone.imei_one;
     updateForm.imei_two = phone.imei_two;
-    updateForm.serial_number = phone.serial_number;
-    updateForm.status = phone.status;
+    updateForm.ram = phone.ram;
+    updateForm.rom = phone.rom;
+    updateForm.sim_no = phone.sim_no;
+    updateForm.purchase_date = phone.purchase_date;
+    updateForm.remarks = phone.remarks;
+    updateForm.image = null;
+    updateSamplePic.value = phone?.image_url || getPhoneImagePath(phone);
 
     updateForm.clearErrors();
 
@@ -257,6 +284,39 @@ const openUpdateModal = (phone) => {
     } else {
         console.error('Modal element #UpdatePhoneModal not found');
     }
+};
+
+const onUpdateFileSelect = (event) => {
+    const file = event.target.files?.[0] || null;
+    updateForm.image = file;
+
+    if (updatePicObjectUrl) {
+        URL.revokeObjectURL(updatePicObjectUrl);
+        updatePicObjectUrl = null;
+    }
+
+    updateSamplePic.value = file
+        ? (() => {
+              updatePicObjectUrl = URL.createObjectURL(file);
+              return updatePicObjectUrl;
+          })()
+        : getPhoneImagePath(props.phone);
+};
+
+const clearUpdateSelectedImage = () => {
+    updateForm.image = null;
+    if (updatePicObjectUrl) {
+        URL.revokeObjectURL(updatePicObjectUrl);
+        updatePicObjectUrl = null;
+    }
+    updateSamplePic.value = getPhoneImagePath(props.phone);
+
+    const input = document.getElementById('updatePhoneImageDetailsInput');
+    if (input) input.value = '';
+};
+
+const handleUpdateModalHidden = () => {
+    clearUpdateSelectedImage();
 };
 
 // Logic to open Issue Modals
@@ -290,8 +350,32 @@ const openReturnModal = () => {
 };
 
 const generateLogsheet = (id) => {
-    window.open(`/AssetAndInventoryManagement/Phone/${id}/logsheet`, '_blank');
+    window.open(
+        `
+         /AssetAndInventoryManagement/Phone/${id}/logsheet `,
+        '_blank',
+    );
 };
+
+onMounted(() => {
+    window.Echo.channel('phoneInventory').listen('.AssetUpdated', (e) => {
+        console.log('Update received:', e.message);
+
+        router.reload({ only: ['phone', 'phone_issuance', 'phone_return'] });
+    });
+
+    document
+        .getElementById('UpdatePhoneModal')
+        ?.addEventListener('hidden.bs.modal', handleUpdateModalHidden);
+});
+
+onUnmounted(() => {
+    window.Echo.leave('phoneInventory');
+
+    document
+        .getElementById('UpdatePhoneModal')
+        ?.removeEventListener('hidden.bs.modal', handleUpdateModalHidden);
+});
 </script>
 
 <template>
@@ -364,7 +448,7 @@ const generateLogsheet = (id) => {
 
             <div class="row g-3">
                 <!-- Asset Details -->
-                <div class="col-sm-12 col-xl-3 col-lg-4">
+                <div class="col-sm-12 col-xl-4 col-lg-5">
                     <div class="card border-0 shadow-sm">
                         <div class="card-header bg-dark py-3 text-white">
                             <h5 class="fw-bold mb-0">Device Specifications</h5>
@@ -378,7 +462,12 @@ const generateLogsheet = (id) => {
                                     :alt="props.phone.model"
                                 />
                                 <h3 class="fw-bold mb-0 mt-3">
-                                    {{ props.phone.brand }}
+                                    {{
+                                        props.phone.brand
+                                            .charAt(0)
+                                            .toUpperCase() +
+                                        props.phone.brand.slice(1)
+                                    }}
                                     {{ props.phone.model }}
                                 </h3>
                                 <span
@@ -421,7 +510,7 @@ const generateLogsheet = (id) => {
                                 >
                                     <span class="text-muted">Sim Number</span>
                                     <span class="fw-bold">{{
-                                        props.phone.sim_no
+                                        props.phone.sim_no || 'N/A'
                                     }}</span>
                                 </li>
                                 <li
@@ -445,9 +534,10 @@ const generateLogsheet = (id) => {
                                 >
                                     <span class="text-muted">RAM / ROM</span>
                                     <span
-                                        >{{ props.phone.ram || 'N/A' }} /
-                                        {{ props.phone.rom || 'N/A' }}</span
-                                    >
+                                        >{{ props.phone.ram + ' GB' || 'N/A' }}
+                                        /
+                                        {{ props.phone.rom + ' GB' || 'N/A' }}
+                                    </span>
                                 </li>
                                 <li
                                     class="list-group-item d-flex justify-content-between"
@@ -471,7 +561,7 @@ const generateLogsheet = (id) => {
                             </ul>
                         </div>
                         <div
-                            class="card-footer d-flex justify-content-around align-items-center border-0 bg-transparent pb-3 text-center"
+                            class="card-footer d-flex justify-content-around align-items-center mb-3 border-0 bg-transparent pb-3 text-center"
                         >
                             <button
                                 class="btn btn-outline-danger"
@@ -489,7 +579,7 @@ const generateLogsheet = (id) => {
                     </div>
                 </div>
 
-                <div class="col-sm-12 col-xl-9 col-lg-8 g-">
+                <div class="col-sm-12 col-xl-8 col-lg-7">
                     <!-- Issuance Card -->
                     <div class="card mb-3 border-0 shadow-sm">
                         <div
@@ -513,8 +603,8 @@ const generateLogsheet = (id) => {
                                     >
                                     <p class="fw-bold fs-5 text-dark mb-1">
                                         {{
-                                            props.phone_transaction
-                                                ?.issued_to || 'Not yet issued'
+                                            props.phone_issuance?.issued_to ||
+                                            'Not yet issued'
                                         }}
                                     </p>
                                     <p class="text-secondary small mb-0">
@@ -523,8 +613,8 @@ const generateLogsheet = (id) => {
                                             >Department:
                                         </span>
                                         {{
-                                            props.phone_transaction
-                                                ?.department || 'Not yet issued'
+                                            props.phone_issuance?.department ||
+                                            'Not yet issued'
                                         }}
                                     </p>
                                 </div>
@@ -535,15 +625,15 @@ const generateLogsheet = (id) => {
                                     >
                                     <p class="fw-bold fs-5 text-dark mb-1">
                                         {{
-                                            props.phone_transaction
-                                                ?.issued_by || 'Not yet issued'
+                                            props.phone_issuance?.issued_by ||
+                                            'Not yet issued'
                                         }}
                                     </p>
                                     <p class="mb-1">
                                         <strong>Date:</strong>
                                         {{
                                             formatDate(
-                                                props.phone_transaction
+                                                props.phone_issuance
                                                     ?.date_issued,
                                             ) || 'Not yet issued'
                                         }}
@@ -560,7 +650,7 @@ const generateLogsheet = (id) => {
                                     >
                                     <div class="d-flex align-items-center">
                                         <span class="text-muted fw-bold ms-2">{{
-                                            props.phone_transaction
+                                            props.phone_issuance
                                                 ?.issued_accessories || 'None'
                                         }}</span>
                                     </div>
@@ -594,8 +684,7 @@ const generateLogsheet = (id) => {
                                     >
                                     <p class="fw-bold fs-5 text-dark mb-1">
                                         {{
-                                            props.phone_transaction
-                                                ?.returned_by ||
+                                            props.phone_return?.returned_by ||
                                             'Not yet returned'
                                         }}
                                     </p>
@@ -605,7 +694,7 @@ const generateLogsheet = (id) => {
                                             >Department:
                                         </span>
                                         {{
-                                            props.phone_transaction
+                                            props.phone_return
                                                 ?.returnee_department ||
                                             'Not yet returned'
                                         }}
@@ -618,8 +707,7 @@ const generateLogsheet = (id) => {
                                     >
                                     <p class="fw-bold fs-5 text-dark mb-1">
                                         {{
-                                            props.phone_transaction
-                                                ?.returned_to ||
+                                            props.phone_return?.returned_to ||
                                             'Not yet returned'
                                         }}
                                     </p>
@@ -627,7 +715,7 @@ const generateLogsheet = (id) => {
                                         <strong>Date:</strong>
                                         {{
                                             formatDate(
-                                                props.phone_transaction
+                                                props.phone_return
                                                     ?.date_returned,
                                             ) || 'Not yet returned'
                                         }}
@@ -645,7 +733,7 @@ const generateLogsheet = (id) => {
 
                                     <p class="d-flex align-items-center">
                                         <span class="text-muted fw-bold ms-2">{{
-                                            props.phone_transaction
+                                            props.phone_return
                                                 ?.returned_accessories || 'None'
                                         }}</span>
                                     </p>
@@ -708,7 +796,7 @@ const generateLogsheet = (id) => {
                                 >
                                     <thead class="table-light">
                                         <tr
-                                            class="fs-7 text-uppercase text-muted border-top-0 text-wrap"
+                                            class="fs-8 text-uppercase text-muted border-top-0 text-wrap text-center"
                                         >
                                             <th class="ps-3" scope="col">
                                                 Date Issued
@@ -726,7 +814,7 @@ const generateLogsheet = (id) => {
                                     </thead>
                                     <tbody>
                                         <tr
-                                            class="fs-7"
+                                            class="fs-8 text-center"
                                             v-for="tx in paginatedHistory"
                                             :key="tx.id"
                                         >
@@ -764,12 +852,15 @@ const generateLogsheet = (id) => {
 
                                             <td class="text-nowrap">
                                                 <span
-                                                    v-if="tx.date_returned"
+                                                    v-if="
+                                                        tx.return?.date_returned
+                                                    "
                                                     class="fw-medium mb-0 text-nowrap ps-2"
                                                 >
                                                     {{
                                                         formatDate(
-                                                            tx.date_returned,
+                                                            tx.return
+                                                                .date_returned,
                                                         )
                                                     }}
                                                 </span>
@@ -782,17 +873,23 @@ const generateLogsheet = (id) => {
 
                                             <td>
                                                 <div class="fw-bold text-dark">
-                                                    {{ tx.returned_by || '—' }}
+                                                    {{
+                                                        tx.return
+                                                            ?.returned_by || '—'
+                                                    }}
                                                 </div>
                                                 <div
                                                     class="text-muted small ps-2"
                                                 >
-                                                    {{ tx.returnee_department }}
+                                                    {{
+                                                        tx.return
+                                                            ?.returnee_department
+                                                    }}
                                                 </div>
                                             </td>
                                             <td>
                                                 <div class="fw-bold text-dark">
-                                                    {{ tx.returned_to }}
+                                                    {{ tx.return?.returned_to }}
                                                 </div>
                                             </td>
 
@@ -801,7 +898,8 @@ const generateLogsheet = (id) => {
                                                 style="max-width: 150px"
                                             >
                                                 {{
-                                                    tx.returned_accessories ||
+                                                    tx.return
+                                                        ?.returned_accessories ||
                                                     '—'
                                                 }}
                                             </td>
@@ -1236,6 +1334,35 @@ const generateLogsheet = (id) => {
     >
         <template #body>
             <form @submit.prevent="updateSubmit" id="updateForm">
+                <div class="row d-flex align-items-center mb-3">
+                    <div class="col-12">
+                        <img
+                            :src="updateSamplePic"
+                            alt="update-asset-image"
+                            class="preview-image-fixed img-thumbnail rounded-circle d-block mx-auto border border-2 shadow-md"
+                        />
+                    </div>
+                </div>
+
+                <div class="row d-flex align-items-center mb-3">
+                    <div class="col-sm-12">
+                        <div class="input-group">
+                            <label
+                                class="input-group-text"
+                                for="updatePhoneImageDetailsInput"
+                                >Upload</label
+                            >
+                            <input
+                                type="file"
+                                class="form-control"
+                                id="updatePhoneImageDetailsInput"
+                                accept="image/*"
+                                @change="onUpdateFileSelect"
+                            />
+                        </div>
+                    </div>
+                </div>
+
                 <div class="row mb-3">
                     <div class="col-md-6">
                         <label for="update_brand" class="form-label"
@@ -1393,5 +1520,11 @@ const generateLogsheet = (id) => {
 <style scoped>
 tr td {
     align-items: center;
+}
+
+.preview-image-fixed {
+    width: 8rem;
+    height: 8rem;
+    object-fit: cover;
 }
 </style>

@@ -396,7 +396,6 @@ const brandsOption = [
                             id="imeiOneInput"
                             v-model="addForm.imei_one"
                             class="form-control"
-                            required
                         />
                     </div>
                 </div>
@@ -415,7 +414,7 @@ const brandsOption = [
                     <div class="col-sm-12 col-md-6">
                         <label for="ramInput" class="form-label">RAM</label>
                         <input
-                            type="text"
+                            type="number"
                             id="ramInput"
                             v-model="addForm.ram"
                             class="form-control"
@@ -427,7 +426,7 @@ const brandsOption = [
                     <div class="col-sm-12 col-md-6">
                         <label for="romInput" class="form-label">ROM</label>
                         <input
-                            type="text"
+                            type="number"
                             id="romInput"
                             v-model="addForm.rom"
                             class="form-control"
