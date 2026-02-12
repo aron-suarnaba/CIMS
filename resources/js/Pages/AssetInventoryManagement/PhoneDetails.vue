@@ -197,6 +197,7 @@ const updateForm = useForm({
     remarks: props.phone.remarks || '',
 });
 const updateSamplePic = ref(getPhoneImagePath(props.phone));
+let updatePicObjectUrl = null;
 
 // Listeners
 watch(selectedAcc, (newVal) => {
@@ -243,6 +244,10 @@ const updateSubmit = () => {
         forceFormData: true,
         onSuccess: () => {
             updateForm.image = null;
+            if (updatePicObjectUrl) {
+                URL.revokeObjectURL(updatePicObjectUrl);
+                updatePicObjectUrl = null;
+            }
             const closeButton = document.querySelector(
                 '#UpdatePhoneModal [data-bs-dismiss="modal"]',
             );
@@ -284,9 +289,34 @@ const openUpdateModal = (phone) => {
 const onUpdateFileSelect = (event) => {
     const file = event.target.files?.[0] || null;
     updateForm.image = file;
+
+    if (updatePicObjectUrl) {
+        URL.revokeObjectURL(updatePicObjectUrl);
+        updatePicObjectUrl = null;
+    }
+
     updateSamplePic.value = file
-        ? URL.createObjectURL(file)
+        ? (() => {
+              updatePicObjectUrl = URL.createObjectURL(file);
+              return updatePicObjectUrl;
+          })()
         : getPhoneImagePath(props.phone);
+};
+
+const clearUpdateSelectedImage = () => {
+    updateForm.image = null;
+    if (updatePicObjectUrl) {
+        URL.revokeObjectURL(updatePicObjectUrl);
+        updatePicObjectUrl = null;
+    }
+    updateSamplePic.value = getPhoneImagePath(props.phone);
+
+    const input = document.getElementById('updatePhoneImageDetailsInput');
+    if (input) input.value = '';
+};
+
+const handleUpdateModalHidden = () => {
+    clearUpdateSelectedImage();
 };
 
 // Logic to open Issue Modals
@@ -333,10 +363,18 @@ onMounted(() => {
 
         router.reload({ only: ['phone', 'phone_issuance', 'phone_return'] });
     });
+
+    document
+        .getElementById('UpdatePhoneModal')
+        ?.addEventListener('hidden.bs.modal', handleUpdateModalHidden);
 });
 
 onUnmounted(() => {
     window.Echo.leave('phoneInventory');
+
+    document
+        .getElementById('UpdatePhoneModal')
+        ?.removeEventListener('hidden.bs.modal', handleUpdateModalHidden);
 });
 </script>
 
@@ -424,7 +462,12 @@ onUnmounted(() => {
                                     :alt="props.phone.model"
                                 />
                                 <h3 class="fw-bold mb-0 mt-3">
-                                    {{ props.phone.brand }}
+                                    {{
+                                        props.phone.brand
+                                            .charAt(0)
+                                            .toUpperCase() +
+                                        props.phone.brand.slice(1)
+                                    }}
                                     {{ props.phone.model }}
                                 </h3>
                                 <span
@@ -518,7 +561,7 @@ onUnmounted(() => {
                             </ul>
                         </div>
                         <div
-                            class="card-footer d-flex justify-content-around align-items-center border-0 bg-transparent pb-3 text-center mb-3"
+                            class="card-footer d-flex justify-content-around align-items-center mb-3 border-0 bg-transparent pb-3 text-center"
                         >
                             <button
                                 class="btn btn-outline-danger"
@@ -1296,8 +1339,7 @@ onUnmounted(() => {
                         <img
                             :src="updateSamplePic"
                             alt="update-asset-image"
-                            class="img-thumbnail rounded-circle d-block mx-auto border border-2 shadow-md"
-                            style="width: 8rem; height: auto"
+                            class="preview-image-fixed img-thumbnail rounded-circle d-block mx-auto border border-2 shadow-md"
                         />
                     </div>
                 </div>
@@ -1478,5 +1520,11 @@ onUnmounted(() => {
 <style scoped>
 tr td {
     align-items: center;
+}
+
+.preview-image-fixed {
+    width: 8rem;
+    height: 8rem;
+    object-fit: cover;
 }
 </style>

@@ -4,6 +4,7 @@ defineProps({
     title: { type: String, default: 'Modal Title' },
     size: { type: String, default: '' },
     headerClass: { type: String, default: '' },
+    headerIcon: { type: String, default: '' },
 });
 </script>
 
@@ -18,6 +19,7 @@ defineProps({
         <div class="modal-dialog modal-dialog-centered" :class="size">
             <div class="modal-content">
                 <div class="modal-header" :class="headerClass">
+                    <i v-if="headerIcon" :class="headerIcon"></i>
                     <h1 class="modal-title fs-5" :id="id + 'Label'">
                         {{ title }}
                     </h1>
