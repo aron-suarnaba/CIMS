@@ -13,6 +13,7 @@ return new class extends Migration {
         Schema::create('phones', function (Blueprint $table) {
             $table->id();
             $table->string('brand');
+            $table->string('image_path')->nullable();
             $table->string('model');
             $table->string('serial_num')->unique();
             $table->string('imei_one')->unique()->nullable();

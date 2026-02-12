@@ -41,16 +41,16 @@ Route::middleware('auth')->group(function () {
             Route::get('/', [PhoneController::class, 'index'])->name('phone.index');
             Route::get('/create', [PhoneController::class, 'create'])->name('phone.create');
             Route::post('/', [PhoneController::class, 'store'])->name('phone.store');
-            Route::get('/{phone}', [PhoneController::class, 'show'])->name('phone.show');
-            Route::put('/{phone}', [PhoneController::class, 'update'])->name('phone.update');
+            Route::get('/{phone}', [PhoneController::class, 'show'])->whereNumber('phone')->name('phone.show');
+            Route::put('/{phone}', [PhoneController::class, 'update'])->whereNumber('phone')->name('phone.update');
 
             // Asset Actions
-            Route::post('/{phone}/issue', [PhoneController::class, 'issue'])->name('phone.issue');
-            Route::post('/{phone}/return', [PhoneController::class, 'return'])->name('phone.return');
-            Route::delete('/{phone}', [PhoneController::class, 'destroy'])->name('phone.destroy');
+            Route::post('/{phone}/issue', [PhoneController::class, 'issue'])->whereNumber('phone')->name('phone.issue');
+            Route::post('/{phone}/return', [PhoneController::class, 'return'])->whereNumber('phone')->name('phone.return');
+            Route::delete('/{phone}', [PhoneController::class, 'destroy'])->whereNumber('phone')->name('phone.destroy');
 
             //Generate Report
-            Route::get('/{phone}/logsheet', [PhoneController::class, 'generateLogsheetReport'])->name('phone.logsheet');
+            Route::get('/{phone}/logsheet', [PhoneController::class, 'generateLogsheetReport'])->whereNumber('phone')->name('phone.logsheet');
         });
 
         // Your existing transaction store (if used for logging)

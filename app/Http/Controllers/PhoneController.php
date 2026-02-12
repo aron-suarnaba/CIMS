@@ -10,6 +10,8 @@ use App\Models\PhoneReturn;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Log;
 use Barryvdh\DomPDF\Facade\Pdf;
 
 class PhoneController extends Controller
@@ -125,6 +127,7 @@ class PhoneController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:9048',
             'brand' => 'required|string|max:255',
             'model' => 'required|string|max:255',
             'serial_num' => 'required|string|max:255|unique:phones,serial_num',
@@ -137,7 +140,24 @@ class PhoneController extends Controller
             'remarks' => 'nullable|string',
         ]);
 
+        if($request->hasFile('image')){
+            $file = $request->file('image');
+            File::ensureDirectoryExists(public_path('img/phone_uploads'));
+
+        // Generate a clean, unique filename
+        $fileName = time() . '_' . preg_replace('/\s+/', '_', $file->getClientOriginalName());
+
+        // Move to public/img/phone_uploads
+        $file->move(public_path('img/phone_uploads'), $fileName);
+
+        // Save the path string to the database column
+        $validated['image_path'] = 'img/phone_uploads/' . $fileName;
+
+        }
+
         $validated['status'] = 'available';
+
+        unset($validated['image']);
 
         Phone::create($validated);
 
@@ -188,35 +208,53 @@ class PhoneController extends Controller
             'remarks' => 'nullable|string|max:255',
         ]);
 
-        // Find the active issuance (one without a return record)
-        $issuance = PhoneIssuance::where('serial_num', $phone->serial_num)
-            ->whereDoesntHave('return')
-            ->latest()
-            ->first();
+        try {
+            $result = DB::transaction(function () use ($phone, $validated) {
+                // Lock active issuance row to prevent duplicate return submissions.
+                $issuance = PhoneIssuance::where('serial_num', $phone->serial_num)
+                    ->whereDoesntHave('return')
+                    ->latest()
+                    ->lockForUpdate()
+                    ->first();
 
-        if ($issuance) {
-            // Create return record linked to the issuance
-            PhoneReturn::create([
-                'phone_issuance_id' => $issuance->id,
-                'returned_to' => $validated['returned_to'],
-                'returned_by' => $validated['returned_by'],
-                'returnee_department' => $validated['returnee_department'],
-                'date_returned' => $validated['date_returned'],
-                'returned_accessories' => $validated['returned_accessories'],
-            ]);
+                if (!$issuance) {
+                    return false;
+                }
 
-            $phone->update([
-                'status' => 'available',
-                'remarks' => $validated['remarks'] ?? $phone->remarks,
-            ]);
+                PhoneReturn::create([
+                    'phone_issuance_id' => $issuance->id,
+                    'returned_to' => $validated['returned_to'],
+                    'returned_by' => $validated['returned_by'],
+                    'returnee_department' => $validated['returnee_department'],
+                    'date_returned' => $validated['date_returned'],
+                    'returned_accessories' => $validated['returned_accessories'],
+                ]);
+
+                $phone->update([
+                    'status' => 'available',
+                    'remarks' => $validated['remarks'] ?? $phone->remarks,
+                ]);
+
+                return true;
+            });
+
+            if (!$result) {
+                return redirect()->back()->withErrors(['error' => 'No active issuance found for this device.']);
+            }
 
             event(new AssetUpdated('Phone asset manage and inventory updated! ... '));
-
-
             return redirect()->back()->with('success', 'The device has been returned successfully.');
-        }
+        } catch (\Throwable $e) {
+            Log::error('Phone return failed.', [
+                'phone_id' => $phone->id,
+                'serial_num' => $phone->serial_num,
+                'error' => $e->getMessage(),
+            ]);
 
-        return redirect()->back()->withErrors(['error' => 'No active issuance found for this device.']);
+            return redirect()->back()->withErrors([
+                'error' => 'Failed to process return. Please retry.',
+            ]);
+        }
     }
 
     /**
@@ -250,6 +288,7 @@ class PhoneController extends Controller
     public function update(Request $request, Phone $phone)
     {
         $validated = $request->validate([
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:9048',
             'brand' => 'required|string|max:255',
             'model' => 'required|string|max:255',
             'serial_num' => 'required|string|max:255|unique:phones,serial_num,' . $phone->id,
@@ -263,6 +302,27 @@ class PhoneController extends Controller
         ]);
 
         try {
+            if ($request->hasFile('image')) {
+                $file = $request->file('image');
+                File::ensureDirectoryExists(public_path('img/phone_uploads'));
+
+                $fileName = time() . '_' . preg_replace('/\s+/', '_', $file->getClientOriginalName());
+                $file->move(public_path('img/phone_uploads'), $fileName);
+                $validated['image_path'] = 'img/phone_uploads/' . $fileName;
+
+                // Delete previous uploaded image to avoid orphan files.
+                if (
+                    $phone->image_path &&
+                    str_starts_with($phone->image_path, 'img/phone_uploads/')
+                ) {
+                    $oldPath = public_path($phone->image_path);
+                    if (File::exists($oldPath)) {
+                        File::delete($oldPath);
+                    }
+                }
+            }
+
+            unset($validated['image']);
             $phone->update($validated);
             event(new AssetUpdated('Phone asset manage and inventory updated! ... '));
             return redirect()->back()->with('success', 'Phone asset updated successfully');

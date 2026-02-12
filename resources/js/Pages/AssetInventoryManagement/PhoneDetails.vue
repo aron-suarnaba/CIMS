@@ -37,6 +37,8 @@ const myBreadcrumb = [
 
 // Function for the phone image path
 const getPhoneImagePath = (phone) => {
+    if (phone?.image_url) return phone.image_url;
+
     const defaultPath = '../../img/phone/default.png';
     if (!phone || !phone.brand) return defaultPath;
 
@@ -182,6 +184,7 @@ const returnform = useForm({
 
 // Form for update
 const updateForm = useForm({
+    image: null,
     brand: props.phone.brand || '',
     model: props.phone.model || '',
     serial_num: props.phone.serial_num || '',
@@ -193,6 +196,7 @@ const updateForm = useForm({
     purchase_date: props.phone.purchase_date || '',
     remarks: props.phone.remarks || '',
 });
+const updateSamplePic = ref(getPhoneImagePath(props.phone));
 
 // Listeners
 watch(selectedAcc, (newVal) => {
@@ -236,7 +240,9 @@ const returnSubmit = () => {
 // Submit logic for the update
 const updateSubmit = () => {
     updateForm.put(route('phone.update', props.phone.id), {
+        forceFormData: true,
         onSuccess: () => {
+            updateForm.image = null;
             const closeButton = document.querySelector(
                 '#UpdatePhoneModal [data-bs-dismiss="modal"]',
             );
@@ -252,10 +258,16 @@ const openUpdateModal = (phone) => {
     updateForm.id = phone.id;
     updateForm.brand = phone.brand;
     updateForm.model = phone.model;
+    updateForm.serial_num = phone.serial_num;
     updateForm.imei_one = phone.imei_one;
     updateForm.imei_two = phone.imei_two;
-    updateForm.serial_number = phone.serial_number;
-    updateForm.status = phone.status;
+    updateForm.ram = phone.ram;
+    updateForm.rom = phone.rom;
+    updateForm.sim_no = phone.sim_no;
+    updateForm.purchase_date = phone.purchase_date;
+    updateForm.remarks = phone.remarks;
+    updateForm.image = null;
+    updateSamplePic.value = phone?.image_url || getPhoneImagePath(phone);
 
     updateForm.clearErrors();
 
@@ -267,6 +279,14 @@ const openUpdateModal = (phone) => {
     } else {
         console.error('Modal element #UpdatePhoneModal not found');
     }
+};
+
+const onUpdateFileSelect = (event) => {
+    const file = event.target.files?.[0] || null;
+    updateForm.image = file;
+    updateSamplePic.value = file
+        ? URL.createObjectURL(file)
+        : getPhoneImagePath(props.phone);
 };
 
 // Logic to open Issue Modals
@@ -498,7 +518,7 @@ onUnmounted(() => {
                             </ul>
                         </div>
                         <div
-                            class="card-footer d-flex justify-content-around align-items-center border-0 bg-transparent pb-3 text-center"
+                            class="card-footer d-flex justify-content-around align-items-center border-0 bg-transparent pb-3 text-center mb-3"
                         >
                             <button
                                 class="btn btn-outline-danger"
@@ -1271,6 +1291,36 @@ onUnmounted(() => {
     >
         <template #body>
             <form @submit.prevent="updateSubmit" id="updateForm">
+                <div class="row d-flex align-items-center mb-3">
+                    <div class="col-12">
+                        <img
+                            :src="updateSamplePic"
+                            alt="update-asset-image"
+                            class="img-thumbnail rounded-circle d-block mx-auto border border-2 shadow-md"
+                            style="width: 8rem; height: auto"
+                        />
+                    </div>
+                </div>
+
+                <div class="row d-flex align-items-center mb-3">
+                    <div class="col-sm-12">
+                        <div class="input-group">
+                            <label
+                                class="input-group-text"
+                                for="updatePhoneImageDetailsInput"
+                                >Upload</label
+                            >
+                            <input
+                                type="file"
+                                class="form-control"
+                                id="updatePhoneImageDetailsInput"
+                                accept="image/*"
+                                @change="onUpdateFileSelect"
+                            />
+                        </div>
+                    </div>
+                </div>
+
                 <div class="row mb-3">
                     <div class="col-md-6">
                         <label for="update_brand" class="form-label"
