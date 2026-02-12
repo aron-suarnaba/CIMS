@@ -25,6 +25,18 @@ const resolveRoute = (name, fallback) => {
 };
 const loginUrl = resolveRoute('login', '/login');
 const refreshSessionUrl = resolveRoute('session.refresh', '/refresh-session');
+let sessionWarningVisible = false;
+const showSessionWarning = (message) => {
+    if (sessionWarningVisible) return;
+    sessionWarningVisible = true;
+    Swal.fire({
+        title: 'Session issue detected',
+        text: message,
+        icon: 'warning',
+    }).finally(() => {
+        sessionWarningVisible = false;
+    });
+};
 
 library.add(faUser, faHouse);
 
@@ -36,7 +48,10 @@ window.axios.interceptors.response.use(
     (response) => response,
     (error) => {
         if (error.response && error.response.status === 419) {
-            window.location.reload();
+            showSessionWarning(
+                'Your form was not refreshed. Please submit again.',
+            );
+            return Promise.reject(error);
         }
         if (error.response && error.response.status === 401) {
             window.location.href = loginUrl;
@@ -62,8 +77,9 @@ createInertiaApp({
         router.on('invalid', (event) => {
             if (event.detail.response.status === 419) {
                 event.preventDefault(); // Prevent Inertia's default modal
-                Swal.fire('Session Expired', 'Refreshing page...', 'info');
-                window.location.reload();
+                showSessionWarning(
+                    'Your inputs are kept. Please submit again.',
+                );
             }
         });
 
