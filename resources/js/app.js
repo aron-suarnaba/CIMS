@@ -16,6 +16,15 @@ import './bootstrap'; // This usually defines window.axios
 window.bootstrap = bootstrap;
 
 const appName = import.meta.env.VITE_APP_NAME || 'CIMS';
+const resolveRoute = (name, fallback) => {
+    try {
+        return typeof route === 'function' ? route(name) : fallback;
+    } catch {
+        return fallback;
+    }
+};
+const loginUrl = resolveRoute('login', '/login');
+const refreshSessionUrl = resolveRoute('session.refresh', '/refresh-session');
 
 library.add(faUser, faHouse);
 
@@ -30,7 +39,7 @@ window.axios.interceptors.response.use(
             window.location.reload();
         }
         if (error.response && error.response.status === 401) {
-            window.location.href = '/login';
+            window.location.href = loginUrl;
         }
         return Promise.reject(error);
     },
@@ -79,15 +88,32 @@ createInertiaApp({
             { deep: true },
         );
 
+        let heartbeatTimer = null;
+        watch(
+            () => page.props?.auth?.user?.id,
+            (userId) => {
+                if (!userId) {
+                    if (heartbeatTimer) {
+                        clearInterval(heartbeatTimer);
+                        heartbeatTimer = null;
+                    }
+                    return;
+                }
+
+                if (heartbeatTimer) return;
+
+                heartbeatTimer = setInterval(() => {
+                    if (document.visibilityState !== 'visible') return;
+
+                    window.axios.get(refreshSessionUrl).catch(() => {
+                        console.log('Session refresh failed.');
+                    });
+                }, 300000);
+            },
+            { immediate: true },
+        );
+
         return app.mount(el);
     },
     progress: { color: '#4B5563' },
 });
-
-// Heartbeat: Keep session alive
-setInterval(() => {
-    // Use window.axios to ensure it's the configured instance
-    window.axios.get('/refresh-session').catch(() => {
-        console.log('Session refresh failed.');
-    });
-}, 300000);

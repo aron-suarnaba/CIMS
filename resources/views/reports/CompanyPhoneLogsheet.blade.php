@@ -64,7 +64,7 @@
                 <td width="45%">
                     <div class="field-row"><span class="label">Brand/Model:</span><span class="line-fill">{{ $phone->brand }} {{ $phone->model }}</span></div>
                     <div class="field-row"><span class="label">Serial Number:</span><span class="line-fill">{{ $phone->serial_num }}</span></div>
-                    <div class="field-row"><span class="label">RAM/ROM:</span><span class="line-fill">{{ $phone->ram }}/{{ $phone->rom }}</span></div>
+                    <div class="field-row"><span class="label">RAM/ROM:</span><span class="line-fill">{{ $phone->ram }}GB / {{ $phone->rom }}GB</span></div>
                     <div class="field-row"><span class="label">IMEI 1/2:</span><span class="line-fill">{{ $phone->imei_one }} / {{ $phone->imei_two }}</span></div>
                     <div class="field-row"><span class="label">Sim No.:</span><span class="line-fill">{{ $phone->sim_no }}</span></div>
                     <div class="field-row"><span class="label">Department:</span><span class="line-fill">{{ $transactions[count($transactions) - 1]->department }}</span></div>

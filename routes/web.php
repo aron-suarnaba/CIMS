@@ -14,7 +14,7 @@ Route::get('/', function () {
 
 Route::get('/refresh-session', function () {
     return response()->json(['status' => 'alive']);
-})->middleware(['auth']);
+})->middleware(['auth'])->name('session.refresh');
 
 Route::get('/login', [UserController::class, 'showLogin'])->name('login');
 
