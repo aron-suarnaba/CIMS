@@ -173,7 +173,7 @@ class PhoneController extends Controller
         // 1. Validate Transaction Data
         $validated = $request->validate([
             'issued_to' => 'required|string|max:255',
-            'issued_by' => 'nullable|string|max:255',
+            'issued_by' => 'required|string|max:255',
             'department' => 'required|string|max:255',
             'date_issued' => 'required|date',
             'issued_accessories' => 'nullable|string',
@@ -292,7 +292,7 @@ class PhoneController extends Controller
             'brand' => 'required|string|max:255',
             'model' => 'required|string|max:255',
             'serial_num' => 'required|string|max:255|unique:phones,serial_num,' . $phone->id,
-            'imei_one' => 'required|string|max:255|unique:phones,imei_one,' . $phone->id,
+            'imei_one' => 'nullable|string|max:255|unique:phones,imei_one,' . $phone->id,
             'imei_two' => 'nullable|string|max:255|unique:phones,imei_two,' . $phone->id,
             'ram' => 'required|string|max:255',
             'rom' => 'required|string|max:255',
@@ -351,7 +351,11 @@ class PhoneController extends Controller
     public function generateLogsheetReport(Phone $phone)
     {
         // Load the history of transactions/issuances
-        $transactions = $phone->issuances()->with('return')->get();
+        $transactions = $phone->issuances()
+            ->with('return')
+            ->orderBy('date_issued', 'asc')
+            ->orderBy('id', 'asc')
+            ->get();
 
         $data = [
             'phone' => $phone,

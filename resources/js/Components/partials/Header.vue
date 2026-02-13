@@ -3,7 +3,7 @@ import { Link } from '@inertiajs/vue3';
 import { ref } from 'vue';
 
 // Use absolute paths for images in Laravel public folder
-const logo = ref('./img/logo.png');
+const logo = ref('/img/logo.png');
 
 // Note: You don't actually need to wrap these in ref()
 // unless you plan on changing the strings dynamically.
@@ -16,7 +16,7 @@ const navItem = [
     },
     {
         name: 'Login',
-        url: 'login',
+        url: route('login'),
     },
     {
         name: 'Features',
@@ -56,7 +56,7 @@ const navItem = [
                 </Link>
 
                 <ul class="nav nav-pills">
-                    <li class="nav-item" v-for="nav in navItem" :key="nav.id">
+                    <li class="nav-item" v-for="nav in navItem" :key="nav.name">
                         <a :href="nav.url" class="nav-link">{{ nav.name }}</a>
                     </li>
                 </ul>
