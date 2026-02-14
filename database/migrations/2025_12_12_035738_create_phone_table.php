@@ -43,7 +43,7 @@ return new class extends Migration {
                 $table->date('date_issued');
                 $table->string('issued_by');
                 $table->text('issued_accessories')->nullable();
-                $table->boolean('aknowledgement')->nullable();
+                $table->boolean('acknowledgement')->nullable();
                 $table->boolean('cashout')->default(false);
                 $table->date('date_returned')->nullable();
                 $table->string('returned_to')->nullable();

@@ -178,6 +178,7 @@ class PhoneController extends Controller
             'date_issued' => 'required|date',
             'issued_accessories' => 'nullable|string',
             'cashout' => 'required|boolean',
+            'acknowledgement' => 'nullable|boolean',
             'remarks' => 'nullable|string|max:255',
         ]);
 

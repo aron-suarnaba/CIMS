@@ -18,10 +18,10 @@ return new class extends Migration {
 
             // Foreign key to phones table
             $table->foreign('serial_num')
-                  ->references('serial_num')
-                  ->on('phones')
-                  ->onDelete('cascade')
-                  ->onUpdate('cascade');
+                ->references('serial_num')
+                ->on('phones')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
 
             // Issuance Info
             $table->string('issued_to');
@@ -29,7 +29,7 @@ return new class extends Migration {
             $table->date('date_issued');
             $table->string('issued_by');
             $table->text('issued_accessories')->nullable();
-            $table->boolean('aknowledgement')->nullable();
+            $table->boolean('acknowledgement')->nullable();
             $table->boolean('cashout')->default(false);
 
             $table->timestamps();
@@ -42,10 +42,10 @@ return new class extends Migration {
 
             // Foreign key to phone_issuances table
             $table->foreign('phone_issuance_id')
-                  ->references('id')
-                  ->on('phone_issuances')
-                  ->onDelete('cascade')
-                  ->onUpdate('cascade');
+                ->references('id')
+                ->on('phone_issuances')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
 
             // Return Info
             $table->date('date_returned');
@@ -71,6 +71,7 @@ return new class extends Migration {
                     'issued_by' => $transaction->issued_by,
                     'issued_accessories' => $transaction->issued_accessories,
                     'cashout' => $transaction->cashout,
+                    'acknowledgement' => $transaction->acknowledgement,
                     'created_at' => $transaction->created_at,
                     'updated_at' => $transaction->updated_at,
                 ]);

@@ -165,7 +165,7 @@ watch(historySearch, () => {
 const form = useForm({
     issued_by: '',
     issued_to: '',
-    aknowledgement: '',
+    acknowledgement: '',
     department: '',
     date_issued: new Date().toISOString().substr(0, 10),
     issued_accessories: '',
@@ -1124,6 +1124,7 @@ onUnmounted(() => {
                                 type="checkbox"
                                 class="form-check-input"
                                 id="acknowledgement"
+                                v-model="form.acknowledgement"
                             />
                             <label for="acknowledgement" class="form-label"
                                 >Information Technology</label

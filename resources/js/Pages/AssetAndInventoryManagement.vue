@@ -61,7 +61,8 @@ const navCard = [
         <div class="container">
             <Breadcrumb :breadcrumbs="myBreadcrumb" />
         </div>
-    </div>``
+    </div>
+    ``
 
     <div class="app-content mt-4">
         <div class="container">
