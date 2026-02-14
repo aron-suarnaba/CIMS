@@ -165,6 +165,7 @@ watch(historySearch, () => {
 const form = useForm({
     issued_by: '',
     issued_to: '',
+    aknowledgement: '',
     department: '',
     date_issued: new Date().toISOString().substr(0, 10),
     issued_accessories: '',
@@ -286,6 +287,7 @@ const openUpdateModal = (phone) => {
     }
 };
 
+//Logic to handle image upload
 const onUpdateFileSelect = (event) => {
     const file = event.target.files?.[0] || null;
     updateForm.image = file;
@@ -1062,7 +1064,7 @@ onUnmounted(() => {
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label text-muted small fw-bold"
+                    <label class="form-label"
                         >Select Accessories<i class="text-danger">*</i></label
                     >
                     <div
@@ -1110,6 +1112,24 @@ onUnmounted(() => {
                         rows="2"
                         placeholder="e.g. Charger, USB-C Cable"
                     ></textarea>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Acknowledgement</label>
+                    <div
+                        class="d-flex justify-content-around align-items-center rounded border pb-2 pt-3"
+                    >
+                        <div class="form-check">
+                            <input
+                                type="checkbox"
+                                class="form-check-input"
+                                id="acknowledgement"
+                            />
+                            <label for="acknowledgement" class="form-label"
+                                >Information Technology</label
+                            >
+                        </div>
+                    </div>
                 </div>
 
                 <div class="mb-3">
