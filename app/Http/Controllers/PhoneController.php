@@ -177,6 +177,8 @@ class PhoneController extends Controller
             'department' => 'required|string|max:255',
             'date_issued' => 'required|date',
             'issued_accessories' => 'nullable|string',
+            'headphones' => 'nullable|boolean',
+            'charger' => 'nullable|boolean',
             'cashout' => 'required|boolean',
             'acknowledgement' => 'nullable|boolean',
             'remarks' => 'nullable|string|max:255',
@@ -192,6 +194,8 @@ class PhoneController extends Controller
             'department' => $validated['department'],
             'date_issued' => $validated['date_issued'],
             'issued_accessories' => $validated['issued_accessories'] ?? null,
+            'headphones' => $validated['headphones'] ?? false,
+            'charger' => $validated['charger'] ?? false,
             'acknowledgement' => $validated['acknowledgement'] ?? null,
             'cashout' => $validated['cashout'],
         ];

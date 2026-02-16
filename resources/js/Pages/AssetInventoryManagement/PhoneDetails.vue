@@ -165,11 +165,13 @@ watch(historySearch, () => {
 const form = useForm({
     issued_by: '',
     issued_to: '',
-    acknowledgement: '',
+    acknowledgement: false,
     department: '',
     date_issued: new Date().toISOString().substr(0, 10),
     issued_accessories: '',
-    cashout: false,
+    headphones: false,
+    charger: false,
+    cashout: '0',
     remarks: '',
 });
 
@@ -203,6 +205,8 @@ let updatePicObjectUrl = null;
 // Listeners
 watch(selectedAcc, (newVal) => {
     form.issued_accessories = newVal.join(', ');
+    form.charger = newVal.includes('Charger');
+    form.headphones = newVal.includes('Headphones');
 });
 watch(selectedReturnAcc, (newVal) => {
     returnform.returned_accessories = newVal.join(', ');
@@ -305,6 +309,7 @@ const onUpdateFileSelect = (event) => {
         : getPhoneImagePath(props.phone);
 };
 
+//Automatically clear the image when close the modals
 const clearUpdateSelectedImage = () => {
     updateForm.image = null;
     if (updatePicObjectUrl) {
@@ -351,6 +356,7 @@ const openReturnModal = () => {
     modal.show();
 };
 
+//Redirect to the logsheet url base in the phone id
 const generateLogsheet = (id) => {
     window.open(
         `
@@ -359,6 +365,7 @@ const generateLogsheet = (id) => {
     );
 };
 
+//This is the logic for attaching websocket in the pages
 onMounted(() => {
     window.Echo.channel('phoneInventory').listen('.AssetUpdated', (e) => {
         console.log('Update received:', e.message);
@@ -371,6 +378,7 @@ onMounted(() => {
         ?.addEventListener('hidden.bs.modal', handleUpdateModalHidden);
 });
 
+//This is the logic for removing websocket in the pages when leaving the pages to avoid background running websocket
 onUnmounted(() => {
     window.Echo.leave('phoneInventory');
 
