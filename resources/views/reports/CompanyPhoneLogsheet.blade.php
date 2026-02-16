@@ -24,18 +24,16 @@
             white-space: nowrap;
             width: 1%;
             padding-right: 5px;
-            min-width: 70px; /* Forces symmetrical starting point for underlines */
+            min-width: 70px;
         }
         .line-fill { display: table-cell; border-bottom: 1px solid black; padding-left: 5px; height: 14px; vertical-align: bottom; }
 
-        /* Centering the cashout section */
         .cashout-container {
             text-align: center;
             margin-top: 12px;
             width: 100%;
         }
 
-        /* The Main Log Area */
         .log-wrapper { width: 100%; display: table; border-collapse: collapse; table-layout: fixed; }
         .log-column { display: table-cell; width: 49%; vertical-align: top; }
         .spacer-column { display: table-cell; width: 2%; }
@@ -53,6 +51,29 @@
     </style>
 </head>
 <body>
+    @php
+        $latestIssuance = $transactions->last();
+        $withCashout = (bool) ($latestIssuance->cashout ?? false);
+        $hasCharger = (bool) ($latestIssuance->charger ?? false);
+        $hasHeadphones = (bool) ($latestIssuance->headphones ?? false);
+        $hasReturnedAccessory = function ($return, $keyword) {
+            if (!$return) {
+                return false;
+            }
+
+            $normalized = strtolower($keyword);
+            if ($normalized === 'charger' && isset($return->charger)) {
+                return (bool) $return->charger;
+            }
+            if (($normalized === 'headphone' || $normalized === 'earphone') && isset($return->headphones)) {
+                return (bool) $return->headphones;
+            }
+
+            return !empty($return->returned_accessories)
+                && str_contains(strtolower((string) $return->returned_accessories), $normalized);
+        };
+    @endphp
+
     <div class="container">
         <div class="header-section">
             <div class="company-name">Printwell, Inc.</div>
@@ -62,16 +83,16 @@
         <table class="info-table">
             <tr>
                 <td width="45%">
-                    <div class="field-row"><span class="label">Brand/Model:</span><span class="line-fill">{{ $phone->brand ?? '' }} {{ $phone->model ?? '' }}</span></div>
+                    <div class="field-row"><span class="label">Brand/Model:</span><span class="line-fill">{{ trim(($phone->brand ?? '') . ' ' . ($phone->model ?? '')) }}</span></div>
                     <div class="field-row"><span class="label">Serial Number:</span><span class="line-fill">{{ $phone->serial_num ?? '' }}</span></div>
-                    <div class="field-row"><span class="label">RAM/ROM:</span><span class="line-fill">{{ $phone->ram . " GB" ?? '' }}{{ " / " . $phone->rom . " GB" ?? '' }}</span></div>
-                    <div class="field-row"><span class="label">IMEI 1/2:</span><span class="line-fill">{{ $phone->imei_one ?? '' }}{{ " / " . $phone->imei_two ?? '' }}</span></div>
+                    <div class="field-row"><span class="label">RAM/ROM:</span><span class="line-fill">{{ ($phone->ram !== null ? $phone->ram . ' GB' : '') . (($phone->ram !== null && $phone->rom !== null) ? ' / ' : '') . ($phone->rom !== null ? $phone->rom . ' GB' : '') }}</span></div>
+                    <div class="field-row"><span class="label">IMEI 1/2:</span><span class="line-fill">{{ ($phone->imei_one ?? '') . (($phone->imei_one && $phone->imei_two) ? ' / ' : '') . ($phone->imei_two ?? '') }}</span></div>
                     <div class="field-row"><span class="label">Sim No.:</span><span class="line-fill">{{ $phone->sim_no ?? '' }}</span></div>
-                    <div class="field-row"><span class="label">Department:</span><span class="line-fill">{{ $transactions->last()->department ?? '' }}</span></div>
+                    <div class="field-row"><span class="label">Department:</span><span class="line-fill">{{ optional($transactions->last())->department ?? '' }}</span></div>
 
                     <div class="cashout-container">
-                        <span class="checkbox-custom">☐</span> With Cashout &nbsp;&nbsp;&nbsp;
-                        <span class="checkbox-custom">☐</span> Without cashout
+                        <span class="checkbox-custom">{!! $withCashout ? '&#x2611;' : '&#x2610;' !!}</span> With Cashout &nbsp;&nbsp;&nbsp;
+                        <span class="checkbox-custom">{!! !$withCashout ? '&#x2611;' : '&#x2610;' !!}</span> Without cashout
                     </div>
                 </td>
 
@@ -83,8 +104,8 @@
                     <div class="field-row">
                         <span class="label">Accessories:</span>
                         <span class="line-fill" style="border-bottom: none;">
-                            <span class="checkbox-custom">☐</span> Charger &nbsp;&nbsp;
-                            <span class="checkbox-custom">☐</span> Earphone
+                            <span class="checkbox-custom">{!! $hasCharger ? '&#x2611;' : '&#x2610;' !!}</span> Charger &nbsp;&nbsp;
+                            <span class="checkbox-custom">{!! $hasHeadphones ? '&#x2611;' : '&#x2610;' !!}</span> Headphones
                         </span>
                     </div>
                 </td>
@@ -109,17 +130,18 @@
                         @foreach($transactions as $trx)
                         <tr>
                             <td>{{ $trx->issued_to }}</td>
-                            <td>{{ $trx->date_issued ? $trx->date_issued->format('m/d/y') : '' }}</td>
+                            <td>{{ $trx->date_issued ? $trx->date_issued->format('F j, Y') : '' }}</td>
                             <td>{{ $trx->issued_by }}</td>
                             <td class="acc-cell">
-                                <span class="checkbox-custom">☐</span> Charger<br><span class="checkbox-custom">☐</span> Earphone
+                                <span class="checkbox-custom">{!! $trx->charger ? '&#x2611;' : '&#x2610;' !!}</span> Charger<br>
+                                <span class="checkbox-custom">{!! $trx->headphones ? '&#x2611;' : '&#x2610;' !!}</span> Headphones
                             </td>
                             <td></td>
                             <td></td>
                         </tr>
                         @endforeach
                         @for ($i = count($transactions); $i < 11; $i++)
-                        <tr><td></td><td></td><td></td><td class="acc-cell"><span class="checkbox-custom">☐</span> Charger<br><span class="checkbox-custom">☐</span> Earphone</td><td></td><td></td></tr>
+                        <tr><td></td><td></td><td></td><td class="acc-cell"><span class="checkbox-custom">&#x2610;</span> Charger<br><span class="checkbox-custom">&#x2610;</span> Headphones</td><td></td><td></td></tr>
                         @endfor
                     </tbody>
                 </table>
@@ -144,17 +166,18 @@
                         @foreach($transactions as $trx)
                         <tr>
                             <td>{{ $trx->return->returned_by ?? '' }}</td>
-                            <td>{{ ($trx->return && $trx->return->date_returned) ? $trx->return->date_returned->format('m/d/y') : '' }}</td>
+                            <td>{{ ($trx->return && $trx->return->date_returned) ? $trx->return->date_returned->format('F j, Y') : '' }}</td>
                             <td>{{ $trx->return->returned_to ?? '' }}</td>
                             <td class="acc-cell">
-                                <span class="checkbox-custom">☐</span> Charger<br><span class="checkbox-custom">☐</span> Earphone
+                                <span class="checkbox-custom">{!! $hasReturnedAccessory($trx->return, 'charger') ? '&#x2611;' : '&#x2610;' !!}</span> Charger<br>
+                                <span class="checkbox-custom">{!! $hasReturnedAccessory($trx->return, 'headphone') || $hasReturnedAccessory($trx->return, 'earphone') ? '&#x2611;' : '&#x2610;' !!}</span> Headphones
                             </td>
                             <td></td>
                             <td></td>
                         </tr>
                         @endforeach
                         @for ($i = count($transactions); $i < 11; $i++)
-                        <tr><td></td><td></td><td></td><td class="acc-cell"><span class="checkbox-custom">☐</span> Charger<br><span class="checkbox-custom">☐</span> Earphone</td><td></td><td></td></tr>
+                        <tr><td></td><td></td><td></td><td class="acc-cell"><span class="checkbox-custom">&#x2610;</span> Charger<br><span class="checkbox-custom">&#x2610;</span> Headphones</td><td></td><td></td></tr>
                         @endfor
                     </tbody>
                 </table>

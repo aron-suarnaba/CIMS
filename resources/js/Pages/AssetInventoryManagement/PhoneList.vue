@@ -9,7 +9,7 @@ import debounce from 'lodash/debounce';
 import Swal from 'sweetalert2';
 import { onMounted, onUnmounted, ref, watch } from 'vue';
 
-const { formatDate } = useDateFormatter();
+const { formatDate, formatDateForInput } = useDateFormatter();
 defineOptions({ layout: HomeLayout });
 
 const props = defineProps({
@@ -130,7 +130,7 @@ const updateForm = useForm({
     ram: props.phones.ram || '',
     rom: props.phones.rom || '',
     sim_no: props.phones.sim_no || '',
-    purchase_date: props.phones.purchase_date || '',
+    purchase_date: formatDateForInput(props.phones.purchase_date) || '',
     remarks: props.phones.remarks || '',
 });
 
@@ -243,7 +243,7 @@ const openUpdateModal = (phone) => {
     updateForm.ram = phone.ram || '';
     updateForm.rom = phone.rom || '';
     updateForm.sim_no = phone.sim_no || '';
-    updateForm.purchase_date = phone.purchase_date || '';
+    updateForm.purchase_date = formatDateForInput(phone.purchase_date) || '';
     updateForm.remarks = phone.remarks || '';
 
     if (updatePicObjectUrl) {
@@ -434,7 +434,7 @@ const brandsOption = [
                             class="col-md-4 d-flex justify-content-md-end gap-2"
                         >
                             <button
-                                class="btn btn-success shadow-sm"
+                                class="btn btn-primary shadow-sm"
                                 data-bs-toggle="modal"
                                 data-bs-target="#AddPhoneModal"
                             >
@@ -918,8 +918,8 @@ const brandsOption = [
     <Modals
         id="AddPhoneModal"
         title="Add New Phone"
-        header-icon="bi bi-phone fs-4 me-1"
-        header-class="bg-primary text-white bg-gradient"
+        header-icon="bi bi-plus-lg me-1 fs-4"
+        header-class="bg-primary text-white"
     >
         <template #body>
             <form @submit.prevent="submitAddForm" id="addPhoneForm">
@@ -1107,7 +1107,7 @@ const brandsOption = [
             <button
                 type="submit"
                 form="addPhoneForm"
-                class="btn btn-primary bg-gradient"
+                class="btn btn-primary"
                 :disabled="addForm.processing"
             >
                 <span

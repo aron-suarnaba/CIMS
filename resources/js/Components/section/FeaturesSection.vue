@@ -37,7 +37,7 @@ const features = [
 <template>
     <section class="container px-4 py-5" :id="id">
         <h2
-            class="border-bottom d-flex align-items-center justify-content-start pb-2"
+            class="border-bottom border-dark d-flex align-items-center justify-content-start pb-2"
             data-aos="fade-right"
             data-aos-duration="1500"
             data-aos-ease="ease-in-out"

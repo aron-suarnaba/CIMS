@@ -43,6 +43,9 @@ return new class extends Migration {
                 $table->date('date_issued');
                 $table->string('issued_by');
                 $table->text('issued_accessories')->nullable();
+                $table->boolean('charger')->default(false);
+                $table->boolean('headphones')->default(false);
+                $table->boolean('acknowledgement')->default(false);
                 $table->boolean('cashout')->default(false);
                 $table->date('date_returned')->nullable();
                 $table->string('returned_to')->nullable();

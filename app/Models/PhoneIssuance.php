@@ -18,12 +18,19 @@ class PhoneIssuance extends Model
         'date_issued',
         'issued_by',
         'issued_accessories',
+        'headphones',
+        'charger',
+        'acknowledgement',
         'cashout',
+        'remarks',
     ];
 
     protected $casts = [
         'date_issued' => 'date',
         'cashout' => 'boolean',
+        'headphones' => 'boolean',
+        'charger' => 'boolean',
+        'acknowledgement' => 'boolean',
     ];
 
     /**

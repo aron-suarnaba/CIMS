@@ -18,6 +18,8 @@ class PhoneReturnFactory extends Factory
             'returned_by' => $this->faker->name(),
             'returnee_department' => $this->faker->jobTitle(),
             'returned_accessories' => 'Charger, Case',
+            'charger' => false,
+            'headphones' => false,
         ];
     }
 }

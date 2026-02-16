@@ -1,10 +1,10 @@
 <script setup>
-import HomeLayout from '@/Layouts/HomeLayout.vue';
-import { router, useForm, usePage } from '@inertiajs/vue3'; // Added useForm and usePage
 import BackButton from '@/Components/BackButton.vue';
 import Breadcrumb from '@/Components/Breadcrumb.vue';
-import avatarPath from '/public/img/avatar.png';
 import Modals from '@/Components/Modals.vue';
+import HomeLayout from '@/Layouts/HomeLayout.vue';
+import { router, useForm, usePage } from '@inertiajs/vue3'; // Added useForm and usePage
+import avatarPath from '/public/img/avatar.png';
 
 defineOptions({ layout: HomeLayout });
 

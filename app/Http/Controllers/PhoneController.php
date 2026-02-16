@@ -173,18 +173,39 @@ class PhoneController extends Controller
         // 1. Validate Transaction Data
         $validated = $request->validate([
             'issued_to' => 'required|string|max:255',
-            'issued_by' => 'nullable|string|max:255',
+            'issued_by' => 'required|string|max:255',
             'department' => 'required|string|max:255',
             'date_issued' => 'required|date',
             'issued_accessories' => 'nullable|string',
+            'headphones' => 'nullable|boolean',
+            'charger' => 'nullable|boolean',
             'cashout' => 'required|boolean',
+            'acknowledgement' => 'nullable|boolean',
             'remarks' => 'nullable|string|max:255',
         ]);
 
         $validated['serial_num'] = $phone->serial_num;
 
-        // Create issuance record
-        PhoneIssuance::create($validated);
+        // Create issuance record - only pass fillable fields
+        $issuanceData = [
+            'serial_num' => $validated['serial_num'],
+            'issued_to' => $validated['issued_to'],
+            'issued_by' => $validated['issued_by'],
+            'department' => $validated['department'],
+            'date_issued' => $validated['date_issued'],
+            'issued_accessories' => $validated['issued_accessories'] ?? null,
+            'headphones' => $validated['headphones'] ?? false,
+            'charger' => $validated['charger'] ?? false,
+            'acknowledgement' => $validated['acknowledgement'] ?? null,
+            'cashout' => $validated['cashout'],
+        ];
+
+        // Add remarks if column exists
+        if (\Illuminate\Support\Facades\Schema::hasColumn('phone_issuances', 'remarks')) {
+            $issuanceData['remarks'] = $validated['remarks'] ?? null;
+        }
+
+        PhoneIssuance::create($issuanceData);
 
         $phone->update([
             'status' => 'issued',
@@ -205,6 +226,8 @@ class PhoneController extends Controller
             'returnee_department' => 'required|string|max:255',
             'date_returned' => 'required|date',
             'returned_accessories' => 'nullable|string',
+            'charger' => 'nullable|boolean',
+            'headphones' => 'nullable|boolean',
             'remarks' => 'nullable|string|max:255',
         ]);
 
@@ -228,6 +251,9 @@ class PhoneController extends Controller
                     'returnee_department' => $validated['returnee_department'],
                     'date_returned' => $validated['date_returned'],
                     'returned_accessories' => $validated['returned_accessories'],
+                    'charger' => $validated['charger'] ?? false,
+                    'headphones' => $validated['headphones'] ?? false,
+                    'remarks' => $validated['remarks'] ?? null,
                 ]);
 
                 $phone->update([
@@ -292,7 +318,7 @@ class PhoneController extends Controller
             'brand' => 'required|string|max:255',
             'model' => 'required|string|max:255',
             'serial_num' => 'required|string|max:255|unique:phones,serial_num,' . $phone->id,
-            'imei_one' => 'required|string|max:255|unique:phones,imei_one,' . $phone->id,
+            'imei_one' => 'nullable|string|max:255|unique:phones,imei_one,' . $phone->id,
             'imei_two' => 'nullable|string|max:255|unique:phones,imei_two,' . $phone->id,
             'ram' => 'required|string|max:255',
             'rom' => 'required|string|max:255',
@@ -351,7 +377,11 @@ class PhoneController extends Controller
     public function generateLogsheetReport(Phone $phone)
     {
         // Load the history of transactions/issuances
-        $transactions = $phone->issuances()->with('return')->get();
+        $transactions = $phone->issuances()
+            ->with('return')
+            ->orderBy('date_issued', 'asc')
+            ->orderBy('id', 'asc')
+            ->get();
 
         $data = [
             'phone' => $phone,
