@@ -18,11 +18,15 @@ class PhoneReturn extends Model
         'returned_by',
         'returnee_department',
         'returned_accessories',
+        'charger',
+        'headphones',
         'remarks',
     ];
 
     protected $casts = [
         'date_returned' => 'date',
+        'charger' => 'boolean',
+        'headphones' => 'boolean',
     ];
 
     /**

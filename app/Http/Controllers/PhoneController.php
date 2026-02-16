@@ -226,6 +226,8 @@ class PhoneController extends Controller
             'returnee_department' => 'required|string|max:255',
             'date_returned' => 'required|date',
             'returned_accessories' => 'nullable|string',
+            'charger' => 'nullable|boolean',
+            'headphones' => 'nullable|boolean',
             'remarks' => 'nullable|string|max:255',
         ]);
 
@@ -249,6 +251,8 @@ class PhoneController extends Controller
                     'returnee_department' => $validated['returnee_department'],
                     'date_returned' => $validated['date_returned'],
                     'returned_accessories' => $validated['returned_accessories'],
+                    'charger' => $validated['charger'] ?? false,
+                    'headphones' => $validated['headphones'] ?? false,
                     'remarks' => $validated['remarks'] ?? null,
                 ]);
 

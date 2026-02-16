@@ -27,6 +27,42 @@ const props = defineProps({
     },
 });
 
+const issuanceAccessoryText = (issuance) => {
+    if (!issuance) return 'None';
+
+    const selected = [];
+    if (issuance.charger) selected.push('Charger');
+    if (issuance.headphones) selected.push('Headphones');
+
+    if (selected.length > 0) {
+        return selected.join(', ');
+    }
+
+    return issuance.issued_accessories || 'None';
+};
+
+const returnAccessoryText = (returnRecord, issuanceRecord = null) => {
+    if (returnRecord) {
+        const selected = [];
+        if (returnRecord.charger) selected.push('Charger');
+        if (returnRecord.headphones) selected.push('Headphones');
+
+        if (selected.length > 0) {
+            return selected.join(', ');
+        }
+
+        if (returnRecord.returned_accessories) {
+            return returnRecord.returned_accessories;
+        }
+    }
+
+    if (issuanceRecord && (issuanceRecord.charger || issuanceRecord.headphones)) {
+        return 'See issuance accessories';
+    }
+
+    return 'None';
+};
+
 // Function for breadcrumb
 const myBreadcrumb = [
     { label: 'Dashboard', url: route('dashboard') },
@@ -182,6 +218,8 @@ const returnform = useForm({
     returnee_department: '',
     date_returned: new Date().toISOString().substr(0, 10),
     returned_accessories: '',
+    charger: false,
+    headphones: false,
     remarks: '',
 });
 
@@ -210,6 +248,8 @@ watch(selectedAcc, (newVal) => {
 });
 watch(selectedReturnAcc, (newVal) => {
     returnform.returned_accessories = newVal.join(', ');
+    returnform.charger = newVal.includes('Charger');
+    returnform.headphones = newVal.includes('Headphones');
 });
 
 // Submit logic for the issue
@@ -660,8 +700,9 @@ onUnmounted(() => {
                                     >
                                     <div class="d-flex align-items-center">
                                         <span class="text-muted fw-bold ms-2">{{
-                                            props.phone_issuance
-                                                ?.issued_accessories || 'None'
+                                            issuanceAccessoryText(
+                                                props.phone_issuance,
+                                            )
                                         }}</span>
                                     </div>
                                 </div>
@@ -743,8 +784,10 @@ onUnmounted(() => {
 
                                     <p class="d-flex align-items-center">
                                         <span class="text-muted fw-bold ms-2">{{
-                                            props.phone_return
-                                                ?.returned_accessories || 'None'
+                                            returnAccessoryText(
+                                                props.phone_return,
+                                                props.phone_issuance,
+                                            )
                                         }}</span>
                                     </p>
                                 </div>
@@ -855,9 +898,7 @@ onUnmounted(() => {
                                                 class="small text-wrap"
                                                 style="max-width: 150px"
                                             >
-                                                {{
-                                                    tx.issued_accessories || '—'
-                                                }}
+                                                {{ issuanceAccessoryText(tx) }}
                                             </td>
 
                                             <td class="text-nowrap">
@@ -908,9 +949,10 @@ onUnmounted(() => {
                                                 style="max-width: 150px"
                                             >
                                                 {{
-                                                    tx.return
-                                                        ?.returned_accessories ||
-                                                    '—'
+                                                    returnAccessoryText(
+                                                        tx.return,
+                                                        tx,
+                                                    )
                                                 }}
                                             </td>
                                         </tr>

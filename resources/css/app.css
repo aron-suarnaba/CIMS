@@ -22,6 +22,8 @@
     touch-action: manipulation;
 }
 
+
+
 /* 1. Global Color Definition */
 :root {
   --bs-primary: #354c7c;
@@ -78,6 +80,37 @@ a:hover {
 .form-control:focus {
   border-color: var(--bs-primary);
   box-shadow: 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.25);
+}
+
+/* 7. AdminLTE Sidebar Overrides */
+/* Active link background */
+.sidebar-dark-primary .nav-sidebar > .nav-item > .nav-link.active,
+.sidebar-light-primary .nav-sidebar > .nav-item > .nav-link.active {
+    background-color: var(--bs-primary) !important;
+    color: #fff !important;
+}
+
+/* Sidebar "Brand" logo area background if using bg-primary */
+.brand-link.bg-primary {
+    background-color: var(--bs-primary) !important;
+}
+
+/* 8. AdminLTE Navbar Overrides */
+/* Navbar background if using .navbar-primary or .bg-primary */
+.main-header.navbar-primary,
+.main-header.bg-primary {
+    background-color: var(--bs-primary) !important;
+}
+
+/* 9. Progress Bars & Small Boxes */
+.bg-primary {
+    background-color: var(--bs-primary) !important;
+}
+
+/* 10. Fix for AdminLTE 'Accent' colors */
+/* This handles things like breadcrumb links and active page numbers */
+[class*="accent-"] .nav-treeview > .nav-item > .nav-link.active {
+    color: var(--bs-primary) !important;
 }
 
 .clickable-card {
