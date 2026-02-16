@@ -460,7 +460,7 @@ onUnmounted(() => {
                 <!-- Asset Details -->
                 <div class="col-sm-12 col-xl-4 col-lg-5">
                     <div class="card border-0 shadow-sm">
-                        <div class="card-header bg-dark py-3 text-white">
+                        <div class="card-header bg-primary py-3 text-white">
                             <h5 class="fw-bold mb-0">Device Specifications</h5>
                         </div>
                         <div class="card-body">

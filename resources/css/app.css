@@ -21,6 +21,65 @@
         sans-serif;
     touch-action: manipulation;
 }
+
+/* 1. Global Color Definition */
+:root {
+  --bs-primary: #354c7c;
+  --bs-primary-rgb: 53, 76, 124;
+}
+
+/* 2. Text Utility Override */
+.text-primary {
+  color: var(--bs-primary) !important;
+}
+
+/* 3. Primary Button (Solid) */
+.btn-primary {
+  --bs-btn-color: #fff;
+  --bs-btn-bg: var(--bs-primary);
+  --bs-btn-border-color: var(--bs-primary);
+  --bs-btn-hover-color: #fff;
+  --bs-btn-hover-bg: #293a5e;
+  --bs-btn-hover-border-color: #293a5e;
+  --bs-btn-active-color: #fff;
+  --bs-btn-active-bg: #253353;
+  --bs-btn-active-border-color: #253353;
+  --bs-btn-focus-shadow-rgb: var(--bs-primary-rgb);
+}
+
+/* 4. Outline Button (New) */
+.btn-outline-primary {
+  --bs-btn-color: var(--bs-primary);
+  --bs-btn-border-color: var(--bs-primary);
+
+  /* When you hover over an outline button, it fills with the color */
+  --bs-btn-hover-color: #fff;
+  --bs-btn-hover-bg: var(--bs-primary);
+  --bs-btn-hover-border-color: var(--bs-primary);
+
+  --bs-btn-active-color: #fff;
+  --bs-btn-active-bg: #253353;
+  --bs-btn-active-border-color: #253353;
+
+  --bs-btn-focus-shadow-rgb: var(--bs-primary-rgb);
+}
+
+/* 5. Link Colors */
+a {
+  color: var(--bs-primary);
+  text-decoration: none;
+}
+
+a:hover {
+  color: #293a5e;
+}
+
+/* 6. Form & Inputs */
+.form-control:focus {
+  border-color: var(--bs-primary);
+  box-shadow: 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.25);
+}
+
 .clickable-card {
     cursor: pointer;
     transition: transform 0.2s;
@@ -36,3 +95,4 @@
 .text-logo {
     font-family: "Montserrat", sans-serif;
 }
+
