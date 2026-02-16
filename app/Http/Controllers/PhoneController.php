@@ -76,6 +76,7 @@ class PhoneController extends Controller
         FROM (
             SELECT
                 p.*,
+                pi.issued_to as trans_issued_to,
                 pi.department as trans_dept,
                 pi.date_issued as trans_date,
                 ROW_NUMBER() OVER (ORDER BY $orderBy) AS row_num
@@ -93,6 +94,7 @@ class PhoneController extends Controller
 
         $formattedData = array_map(function ($phone) {
             $phone->current_transaction = $phone->trans_dept ? [
+                'issued_to' => $phone->trans_issued_to,
                 'department' => $phone->trans_dept,
                 'date_issued' => $phone->trans_date,
             ] : null;

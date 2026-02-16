@@ -161,7 +161,11 @@ const submitAddForm = () => {
 };
 
 // --- NAVIGATION & FILTERING ---
-const applyFilter = () => {
+const applyFilter = (sortValue = null) => {
+    if (sortValue) {
+        currentSort.value = sortValue;
+    }
+
     router.get(
         route('phone.index'),
         {
@@ -460,12 +464,7 @@ const brandsOption = [
                                                 active:
                                                     currentSort === opt.value,
                                             }"
-                                            @click.prevent="
-                                                applyFilter(
-                                                    filterBrand,
-                                                    opt.value,
-                                                )
-                                            "
+                                            @click.prevent="applyFilter(opt.value)"
                                         >
                                             {{ opt.label }}
                                         </a>
@@ -534,6 +533,8 @@ const brandsOption = [
                                                 'text-bg-warning':
                                                     phone.status === 'issued',
                                                 'text-bg-danger':
+                                                    phone.status ===
+                                                        'returned' ||
                                                     phone.status === 'return',
                                             }"
                                         >
@@ -554,13 +555,15 @@ const brandsOption = [
                                     <td>
                                         <span
                                             :class="
-                                                phone.phone?.issued_to
+                                                phone.current_transaction
+                                                    ?.issued_to
                                                     ? 'text-dark'
                                                     : 'text-muted fst-italic'
                                             "
                                         >
                                             {{
-                                                phone.phone?.issued_to ||
+                                                phone.current_transaction
+                                                    ?.issued_to ||
                                                 'Not yet issued'
                                             }}
                                         </span>

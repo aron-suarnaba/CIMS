@@ -10,9 +10,9 @@ import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import Swal from 'sweetalert2';
 import { createApp, h, watch } from 'vue';
 import VueApexCharts from 'vue3-apexcharts';
-import { ZiggyVue } from '../../vendor/tightenco/ziggy';
-import '../css/app.css';
-import './bootstrap'; // This usually defines window.axios
+import { ZiggyVue } from 'ziggy-js';
+import '@css/app.css';
+import '@/bootstrap'; // This usually defines window.axios
 window.bootstrap = bootstrap;
 
 const appName = import.meta.env.VITE_APP_NAME || 'CIMS';
@@ -54,7 +54,7 @@ window.axios.interceptors.response.use(
             // Wait 2 seconds then refresh
             setTimeout(() => {
                 window.location.reload();
-            }, 2000);
+            }, 1000);
             return Promise.reject(error);
         }
         if (error.response && error.response.status === 401) {
