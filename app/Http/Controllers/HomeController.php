@@ -15,21 +15,21 @@ public function getNewsAPI()
         // 'tech_news' is the key, 86400 is 24 hours (use 3600 for 1 hour)
         $articles = Cache::remember('tech_news', 86400, function () {
 
+            // $response = Http::withOptions([
+            //     'verify' => false, // Fixes local SSL issues
+            // ])->get("https://newsapi.org/v2/top-headlines", [
+            //     'country'  => 'us',
+            //     'category' => 'technology',
+            //     'apiKey'   => '6249d6d9b05f4c66b29d67a0ff4f46da',
+            // ]);
             $response = Http::withOptions([
-                'verify' => false, // Fixes local SSL issues
-            ])->get("https://newsapi.org/v2/top-headlines", [
-                'country'  => 'us',
-                'category' => 'technology',
-                'apiKey'   => '6249d6d9b05f4c66b29d67a0ff4f46da',
-            ]);
+                'verify' => false,
+            ])->get("https://saurav.tech/NewsAPI/top-headlines/category/technology/in.json");
 
             if ($response->successful()) {
                 $data = $response->json();
-                // We return ONLY the articles array to the cache
                 return $data['articles'] ?? [];
             }
-
-            // If API fails, return empty array so we don't cache a 'fail' state forever
             return [];
         });
 

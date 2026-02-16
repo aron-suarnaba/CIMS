@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\PhoneTransaction;
+use Illuminate\Support\Facades\URL;
 
 class Phone extends Model
 {
@@ -28,6 +29,7 @@ class Phone extends Model
      */
     protected $fillable = [
         'brand',
+        'image_path',
         'model',
         'serial_num',
         'imei_one',
@@ -40,6 +42,10 @@ class Phone extends Model
         'remarks',
     ];
 
+    protected $appends = [
+        'image_url',
+    ];
+
     /**
      * The attributes that should be cast to native types.
      *
@@ -50,6 +56,19 @@ class Phone extends Model
     protected $casts = [
         'purchase_date' => 'date',
     ];
+
+    public function getImageUrlAttribute(): ?string
+    {
+        if (!$this->image_path) {
+            return null;
+        }
+
+        if (str_starts_with($this->image_path, 'http://') || str_starts_with($this->image_path, 'https://')) {
+            return $this->image_path;
+        }
+
+        return URL::to('/' . ltrim($this->image_path, '/'));
+    }
 
     // Use default id for routing (no custom getRouteKeyName needed)
 

@@ -36,6 +36,27 @@ import './bootstrap'; // This usually defines window.axios
 window.bootstrap = bootstrap;
 
 const appName = import.meta.env.VITE_APP_NAME || 'CIMS';
+const resolveRoute = (name, fallback) => {
+    try {
+        return typeof route === 'function' ? route(name) : fallback;
+    } catch {
+        return fallback;
+    }
+};
+const loginUrl = resolveRoute('login', '/login');
+const refreshSessionUrl = resolveRoute('session.refresh', '/refresh-session');
+let sessionWarningVisible = false;
+const showSessionWarning = (message) => {
+    if (sessionWarningVisible) return;
+    sessionWarningVisible = true;
+    Swal.fire({
+        title: 'Session issue detected',
+        text: message,
+        icon: 'warning',
+    }).finally(() => {
+        sessionWarningVisible = false;
+    });
+};
 
 library.add(faUser, faHouse, faLock);
 
@@ -65,10 +86,17 @@ window.axios.interceptors.response.use(
     (response) => response,
     (error) => {
         if (error.response && error.response.status === 419) {
-            window.location.reload();
+            showSessionWarning(
+                'Session token expired. Refreshing the page...',
+            );
+            // Wait 2 seconds then refresh
+            setTimeout(() => {
+                window.location.reload();
+            }, 2000);
+            return Promise.reject(error);
         }
         if (error.response && error.response.status === 401) {
-            window.location.href = '/login';
+            window.location.href = loginUrl;
         }
         return Promise.reject(error);
     },
@@ -118,8 +146,9 @@ createInertiaApp({
         router.on('invalid', (event) => {
             if (event.detail.response.status === 419) {
                 event.preventDefault(); // Prevent Inertia's default modal
-                Swal.fire('Session Expired', 'Refreshing page...', 'info');
-                window.location.reload();
+                showSessionWarning(
+                    'Your inputs are kept. Please submit again.',
+                );
             }
         });
 
@@ -144,15 +173,32 @@ createInertiaApp({
             { deep: true },
         );
 
+        let heartbeatTimer = null;
+        watch(
+            () => page.props?.auth?.user?.id,
+            (userId) => {
+                if (!userId) {
+                    if (heartbeatTimer) {
+                        clearInterval(heartbeatTimer);
+                        heartbeatTimer = null;
+                    }
+                    return;
+                }
+
+                if (heartbeatTimer) return;
+
+                heartbeatTimer = setInterval(() => {
+                    if (document.visibilityState !== 'visible') return;
+
+                    window.axios.get(refreshSessionUrl).catch(() => {
+                        console.log('Session refresh failed.');
+                    });
+                }, 300000);
+            },
+            { immediate: true },
+        );
+
         return app.mount(el);
     },
     progress: { color: '#4B5563' },
 });
-
-// Heartbeat: Keep session alive
-setInterval(() => {
-    // Use window.axios to ensure it's the configured instance
-    window.axios.get('/refresh-session').catch(() => {
-        console.log('Session refresh failed.');
-    });
-}, 300000);

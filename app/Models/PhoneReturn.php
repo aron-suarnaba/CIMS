@@ -18,6 +18,7 @@ class PhoneReturn extends Model
         'returned_by',
         'returnee_department',
         'returned_accessories',
+        'remarks',
     ];
 
     protected $casts = [

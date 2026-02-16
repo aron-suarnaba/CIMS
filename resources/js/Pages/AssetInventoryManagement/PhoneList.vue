@@ -7,9 +7,9 @@ import HomeLayout from '@/Layouts/HomeLayout.vue';
 import { router, useForm } from '@inertiajs/vue3';
 import debounce from 'lodash/debounce';
 import Swal from 'sweetalert2';
-import { ref, watch } from 'vue';
+import { onMounted, onUnmounted, ref, watch } from 'vue';
 
-const { formatDate } = useDateFormatter();
+const { formatDate, formatDateForInput } = useDateFormatter();
 defineOptions({ layout: HomeLayout });
 
 const props = defineProps({
@@ -26,6 +26,42 @@ const currentSort = ref(
 const searchQuery = ref(
     new URLSearchParams(window.location.search).get('search') || '',
 );
+
+const samplePic = ref('../img/phone/default.png');
+let samplePicObjectUrl = null;
+const updateSamplePic = ref('../img/phone/default.png');
+let updatePicObjectUrl = null;
+
+const closeAllModals = () => {
+    document.querySelectorAll('.modal.show').forEach((element) => {
+        const instance = window.bootstrap?.Modal?.getInstance(element);
+        instance?.hide();
+    });
+};
+
+const getBrandDefaultImage = (brand) => {
+    const defaultPath = '../img/phone/default.png';
+    if (!brand) return defaultPath;
+
+    const normalized = String(brand).toLowerCase();
+    const supported = [
+        'apple',
+        'oppo',
+        'redmi',
+        'samsung',
+        'vivo',
+        'realme',
+        'xiaomi',
+        'honor',
+        'techno',
+    ];
+
+    const matched = supported.find((item) => normalized.includes(item));
+    if (!matched) return defaultPath;
+
+    const fileName = matched === 'apple' ? 'iphone' : matched;
+    return `../img/phone/${fileName}.png`;
+};
 
 //Searching
 const debouncedSearch = debounce(() => {
@@ -44,6 +80,7 @@ const getRowNumber = (index) => {
 };
 // --- FORM LOGIC ---
 const addForm = useForm({
+    image: '',
     brand: '',
     model: '',
     serial_num: '',
@@ -56,9 +93,35 @@ const addForm = useForm({
     remarks: '',
 });
 
+watch(
+    () => addForm.brand,
+    (brand) => {
+        if (samplePicObjectUrl) return;
+        samplePic.value = getBrandDefaultImage(brand);
+    },
+);
+
+const onFileSelect = (event) => {
+    const file = event.target.files?.[0] || null;
+    addForm.image = file;
+
+    if (samplePicObjectUrl) {
+        URL.revokeObjectURL(samplePicObjectUrl);
+        samplePicObjectUrl = null;
+    }
+
+    if (file) {
+        samplePicObjectUrl = URL.createObjectURL(file);
+        samplePic.value = samplePicObjectUrl;
+    } else {
+        samplePic.value = getBrandDefaultImage(addForm.brand);
+    }
+};
+
 // Form for update
 const updateForm = useForm({
     id: null,
+    image: null,
     brand: props.phones.brand || '',
     model: props.phones.model || '',
     serial_num: props.phones.serial_num || '',
@@ -67,17 +130,21 @@ const updateForm = useForm({
     ram: props.phones.ram || '',
     rom: props.phones.rom || '',
     sim_no: props.phones.sim_no || '',
-    purchase_date: props.phones.purchase_date || '',
+    purchase_date: formatDateForInput(props.phones.purchase_date) || '',
     remarks: props.phones.remarks || '',
 });
 
 const submitAddForm = () => {
     addForm.post(route('phone.store'), {
+        forceFormData: true,
         onSuccess: () => {
             addForm.reset();
-            const modal = document.getElementById('AddPhoneModal');
-            const bootstrapModal = bootstrap.Modal.getInstance(modal);
-            if (bootstrapModal) bootstrapModal.hide();
+            if (samplePicObjectUrl) {
+                URL.revokeObjectURL(samplePicObjectUrl);
+                samplePicObjectUrl = null;
+            }
+            samplePic.value = '../img/phone/default.png';
+            closeAllModals();
         },
         onError: (errors) => {
             const errorDetails = Object.values(errors)
@@ -111,8 +178,20 @@ const applyFilter = () => {
 };
 
 const getPhoneImagePath = (phone) => {
+    if (phone?.image_url) {
+        return phone.image_url;
+    }
+
+    if (phone?.image_path) {
+        const baseUrl =
+            typeof route === 'function'
+                ? route('welcome').replace(/\/$/, '')
+                : window.location.origin;
+
+        return `${baseUrl}/${String(phone.image_path).replace(/^\/+/, '')}`;
+    }
+
     const supported = [
-        'iphone',
         'apple',
         'oppo',
         'redmi',
@@ -155,6 +234,7 @@ const sortOption = [
 // });
 const openUpdateModal = (phone) => {
     updateForm.id = phone.id;
+    updateForm.image = null;
     updateForm.brand = phone.brand || '';
     updateForm.model = phone.model || '';
     updateForm.serial_num = phone.serial_num || '';
@@ -163,23 +243,96 @@ const openUpdateModal = (phone) => {
     updateForm.ram = phone.ram || '';
     updateForm.rom = phone.rom || '';
     updateForm.sim_no = phone.sim_no || '';
-    updateForm.purchase_date = phone.purchase_date || '';
+    updateForm.purchase_date = formatDateForInput(phone.purchase_date) || '';
     updateForm.remarks = phone.remarks || '';
+
+    if (updatePicObjectUrl) {
+        URL.revokeObjectURL(updatePicObjectUrl);
+        updatePicObjectUrl = null;
+    }
+
+    updateSamplePic.value = getPhoneImagePath(phone);
 };
 
 const updateSubmit = () => {
     updateForm.put(route('phone.update', updateForm.id), {
         preserveScroll: true,
+        forceFormData: true,
         onSuccess: () => {
-            // Closes modal using the data-bs-dismiss trigger
-            const modalElement = document.getElementById('UpdatePhoneModal');
-            const closeBtn = modalElement.querySelector(
-                '[data-bs-dismiss="modal"]',
-            );
-            closeBtn?.click();
+            updateForm.image = null;
+            if (updatePicObjectUrl) {
+                URL.revokeObjectURL(updatePicObjectUrl);
+                updatePicObjectUrl = null;
+            }
+            closeAllModals();
         },
     });
 };
+
+const onUpdateFileSelect = (event) => {
+    const file = event.target.files?.[0] || null;
+    updateForm.image = file;
+
+    if (updatePicObjectUrl) {
+        URL.revokeObjectURL(updatePicObjectUrl);
+        updatePicObjectUrl = null;
+    }
+
+    if (file) {
+        updatePicObjectUrl = URL.createObjectURL(file);
+        updateSamplePic.value = updatePicObjectUrl;
+    }
+};
+
+const clearAddSelectedImage = () => {
+    addForm.image = '';
+    if (samplePicObjectUrl) {
+        URL.revokeObjectURL(samplePicObjectUrl);
+        samplePicObjectUrl = null;
+    }
+    samplePic.value = getBrandDefaultImage(addForm.brand);
+
+    const input = document.getElementById('inputGroupFile01');
+    if (input) input.value = '';
+};
+
+const clearUpdateSelectedImage = () => {
+    updateForm.image = null;
+    if (updatePicObjectUrl) {
+        URL.revokeObjectURL(updatePicObjectUrl);
+        updatePicObjectUrl = null;
+    }
+    updateSamplePic.value = getBrandDefaultImage(updateForm.brand);
+
+    const input = document.getElementById('updatePhoneImageInput');
+    if (input) input.value = '';
+};
+
+const handleAddModalHidden = () => {
+    clearAddSelectedImage();
+};
+
+const handleUpdateModalHidden = () => {
+    clearUpdateSelectedImage();
+};
+
+onMounted(() => {
+    document
+        .getElementById('AddPhoneModal')
+        ?.addEventListener('hidden.bs.modal', handleAddModalHidden);
+    document
+        .getElementById('UpdatePhoneModal')
+        ?.addEventListener('hidden.bs.modal', handleUpdateModalHidden);
+});
+
+onUnmounted(() => {
+    document
+        .getElementById('AddPhoneModal')
+        ?.removeEventListener('hidden.bs.modal', handleAddModalHidden);
+    document
+        .getElementById('UpdatePhoneModal')
+        ?.removeEventListener('hidden.bs.modal', handleUpdateModalHidden);
+});
 
 const deleteItem = (id) => {
     Swal.fire({
@@ -221,7 +374,6 @@ const deleteItem = (id) => {
 };
 
 const brandsOption = [
-    'iphone',
     'apple',
     'oppo',
     'redmi',
@@ -253,11 +405,11 @@ const brandsOption = [
             </div>
 
             <div class="card mb-5 border-0 shadow-sm">
-                <div class="card-header bg-white py-3">
+                <div class="card-header bg-white py-4">
                     <div class="row align-items-center g-3">
                         <div class="col-md-4">
                             <h5 class="fw-bold text-primary mb-0">
-                                Phone Inventory
+                                List of Phones
                             </h5>
                         </div>
 
@@ -395,8 +547,8 @@ const brandsOption = [
                                     </td>
                                     <td>
                                         <small class="text-muted"
-                                            >{{ phone.ram }} /
-                                            {{ phone.rom }}</small
+                                            >{{ phone.ram }} GB /
+                                            {{ phone.rom }} GB</small
                                         >
                                     </td>
                                     <td>
@@ -567,18 +719,61 @@ const brandsOption = [
     >
         <template #body>
             <form @submit.prevent="updateSubmit" id="updateForm">
+                <div class="row d-flex align-items-center mb-3">
+                    <div class="col-12">
+                        <img
+                            :src="updateSamplePic"
+                            alt="update-asset-image"
+                            class="preview-image-fixed img-thumbnail rounded-circle d-block mx-auto border border-2 shadow-md"
+                        />
+                    </div>
+                </div>
+
+                <div class="row d-flex align-items-center mb-3">
+                    <div class="col-sm-12">
+                        <div class="input-group">
+                            <label
+                                class="input-group-text"
+                                for="updatePhoneImageInput"
+                                >Upload</label
+                            >
+                            <input
+                                type="file"
+                                class="form-control"
+                                id="updatePhoneImageInput"
+                                accept="image/*"
+                                @change="onUpdateFileSelect"
+                            />
+                        </div>
+                    </div>
+                </div>
+
                 <div class="row mb-3">
                     <div class="col-md-6">
                         <label for="update_brand" class="form-label"
                             >Brand</label
                         >
-                        <input
-                            type="text"
+                        <select
+                            class="form-select"
+                            aria-label="Update Brand"
                             id="update_brand"
                             v-model="updateForm.brand"
-                            class="form-control"
                             required
-                        />
+                        >
+                            <option selected disabled value="">
+                                Select Brand
+                            </option>
+                            <option
+                                v-for="brand in brandsOption"
+                                :key="`update-${brand}`"
+                                :value="brand"
+                            >
+                                {{
+                                    brand.charAt(0).toUpperCase() +
+                                    brand.slice(1)
+                                }}
+                            </option>
+                        </select>
                     </div>
                     <div class="col-md-6">
                         <label for="update_model" class="form-label"
@@ -722,14 +917,44 @@ const brandsOption = [
 
     <Modals
         id="AddPhoneModal"
-        title="Add new phone"
-        header-class="bg-success text-white bg-gradient"
+        title="Add New Phone"
+        header-icon="bi bi-phone fs-4 me-1"
+        header-class="bg-primary text-white bg-gradient"
     >
         <template #body>
             <form @submit.prevent="submitAddForm" id="addPhoneForm">
                 <div class="row d-flex align-items-center mb-3">
+                    <div class="col-12">
+                        <img
+                            :src="samplePic"
+                            alt="asset-image"
+                            class="preview-image-fixed img-thumbnail rounded-circle d-block mx-auto border border-2 shadow-md"
+                        />
+                    </div>
+                </div>
+                <div class="row d-flex align-items-center mb-3">
+                    <div class="col-sm-12">
+                        <div class="input-group">
+                            <label
+                                class="input-group-text"
+                                for="inputGroupFile01"
+                                >Upload</label
+                            >
+                            <input
+                                type="file"
+                                class="form-control"
+                                id="inputGroupFile01"
+                                @change="onFileSelect"
+                                accept="image/*"
+                            />
+                        </div>
+                    </div>
+                </div>
+                <div class="row d-flex align-items-center mb-3">
                     <div class="col-sm-12 col-md-6">
-                        <label for="brandInput" class="form-label">Brand</label>
+                        <label for="brandInput" class="form-label"
+                            >Brand<i class="text-danger">*</i></label
+                        >
 
                         <select
                             class="form-select"
@@ -759,11 +984,13 @@ const brandsOption = [
                             type="text"
                             id="modelInput"
                             v-model="addForm.model"
+                            placeholder="(e.g. iPhone 17)"
                             class="form-control"
                             required
                         />
                     </div>
                 </div>
+
                 <div class="row d-flex align-items-center mb-3">
                     <div class="col-sm-12 col-md-6">
                         <label for="serialNumInput" class="form-label"
@@ -773,57 +1000,7 @@ const brandsOption = [
                             type="text"
                             id="serialNumInput"
                             v-model="addForm.serial_num"
-                            class="form-control"
-                            required
-                        />
-                    </div>
-                    <div class="col-sm-12 col-md-6">
-                        <label for="imeiOneInput" class="form-label"
-                            >IMEI One</label
-                        >
-                        <input
-                            type="text"
-                            id="imeiOneInput"
-                            v-model="addForm.imei_one"
-                            class="form-control"
-                            required
-                        />
-                    </div>
-                </div>
-                <div class="row d-flex align-items-center mb-3">
-                    <div class="col-sm-12 col-md-6">
-                        <label for="imeiTwoInput" class="form-label"
-                            >IMEI Two</label
-                        >
-                        <input
-                            type="text"
-                            id="imeiTwoInput"
-                            v-model="addForm.imei_two"
-                            class="form-control"
-                        />
-                    </div>
-                    <div class="col-sm-12 col-md-6">
-                        <label for="ramInput" class="form-label"
-                            >RAM<i class="text-danger">*</i></label
-                        >
-                        <input
-                            type="text"
-                            id="ramInput"
-                            v-model="addForm.ram"
-                            class="form-control"
-                            required
-                        />
-                    </div>
-                </div>
-                <div class="row d-flex align-items-center mb-3">
-                    <div class="col-sm-12 col-md-6">
-                        <label for="romInput" class="form-label"
-                            >ROM<i class="text-danger">*</i></label
-                        >
-                        <input
-                            type="text"
-                            id="romInput"
-                            v-model="addForm.rom"
+                            placeholder="e.g. C39F2V9JCL"
                             class="form-control"
                             required
                         />
@@ -835,8 +1012,63 @@ const brandsOption = [
                         <input
                             type="text"
                             id="simNoInput"
+                            placeholder="(e.g. 09072853112)"
                             v-model="addForm.sim_no"
                             class="form-control"
+                        />
+                    </div>
+                </div>
+                <div class="row d-flex align-items-center mb-3">
+                    <div class="col-sm-12 col-md-6">
+                        <label for="imeiOneInput" class="form-label"
+                            >IMEI One<i class="text-danger">*</i></label
+                        >
+                        <input
+                            type="text"
+                            id="imeiOneInput"
+                            placeholder="e.g. 356938035643809"
+                            v-model="addForm.imei_one"
+                            class="form-control"
+                            required
+                        />
+                    </div>
+                    <div class="col-sm-12 col-md-6">
+                        <label for="imeiTwoInput" class="form-label"
+                            >IMEI Two</label
+                        >
+                        <input
+                            type="text"
+                            id="imeiTwoInput"
+                            v-model="addForm.imei_two"
+                            class="form-control"
+                        />
+                    </div>
+                </div>
+                <div class="row d-flex align-items-center mb-3">
+                    <div class="col-sm-12 col-md-6">
+                        <label for="ramInput" class="form-label"
+                            >RAM<i class="text-danger">*</i> (GB)</label
+                        >
+                        <input
+                            type="text"
+                            id="ramInput"
+                            v-model="addForm.ram"
+                            placeholder="e.g. 8"
+                            class="form-control"
+                            required
+                        />
+                    </div>
+                    <div class="col-sm-12 col-md-6">
+                        <label for="romInput" class="form-label"
+                            >ROM<i class="text-danger">*</i> (GB)</label
+                        >
+                        <input
+                            type="text"
+                            id="romInput"
+                            v-model="addForm.rom"
+                            placeholder="e.g. 256"
+                            class="form-control"
+                            required
                         />
                     </div>
                 </div>
@@ -859,7 +1091,7 @@ const brandsOption = [
                         id="remarksInput"
                         v-model="addForm.remarks"
                         class="form-control"
-                        rows="3"
+                        rows="2"
                     ></textarea>
                 </div>
             </form>
@@ -875,13 +1107,14 @@ const brandsOption = [
             <button
                 type="submit"
                 form="addPhoneForm"
-                class="btn btn-success bg-gradient"
+                class="btn btn-primary bg-gradient"
                 :disabled="addForm.processing"
             >
                 <span
                     v-if="addForm.processing"
                     class="spinner-border spinner-border-sm me-1"
                 ></span>
+                <i class="bi bi-plus-lg me-1"></i>
                 Add Asset
             </button>
         </template>
@@ -898,5 +1131,11 @@ const brandsOption = [
 .badge {
     font-weight: 500;
     padding: 0.5em 0.8em;
+}
+
+.preview-image-fixed {
+    width: 8rem;
+    height: 8rem;
+    object-fit: cover;
 }
 </style>

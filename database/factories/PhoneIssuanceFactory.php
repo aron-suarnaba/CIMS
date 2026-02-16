@@ -18,6 +18,7 @@ class PhoneIssuanceFactory extends Factory
             'date_issued' => $this->faker->date(),
             'issued_by' => 'IT Admin',
             'issued_accessories' => 'Charger, Case',
+            'acknowledgement' => true,
             'cashout' => true,
         ];
     }

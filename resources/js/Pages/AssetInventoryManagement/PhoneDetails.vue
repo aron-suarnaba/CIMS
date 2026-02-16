@@ -4,7 +4,7 @@ import { useDateFormatter } from '@/composables/useDateFormatter';
 import HomeLayout from '@/Layouts/HomeLayout.vue';
 import { Link, router, useForm } from '@inertiajs/vue3';
 import Swal from 'sweetalert2';
-import { computed, ref, watch } from 'vue';
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 
 defineOptions({ layout: HomeLayout });
 
@@ -66,6 +66,8 @@ const formatStatus = (status) => {
 
 // Function for the phone image path
 const getPhoneImagePath = (phone) => {
+    if (phone?.image_url) return phone.image_url;
+
     const defaultPath = '../../img/phone/default.png';
     if (!phone || !phone.brand) return defaultPath;
 
@@ -184,6 +186,7 @@ watch(historySearch, () => {
 const form = useForm({
     issued_by: '',
     issued_to: '',
+    acknowledgement: '',
     department: '',
     date_issued: new Date(),
     issued_accessories: '',
@@ -203,6 +206,7 @@ const returnform = useForm({
 
 // Form for update
 const updateForm = useForm({
+    image: null,
     brand: props.phone.brand || '',
     model: props.phone.model || '',
     serial_num: props.phone.serial_num || '',
@@ -214,11 +218,8 @@ const updateForm = useForm({
     purchase_date: props.phone.purchase_date || '',
     remarks: props.phone.remarks || '',
 });
-
-// Modal visibility state
-const showIssueModal = ref(false);
-const showReturnModal = ref(false);
-const showUpdateModal = ref(false);
+const updateSamplePic = ref(getPhoneImagePath(props.phone));
+let updatePicObjectUrl = null;
 
 // Listeners
 watch(selectedAcc, (newVal) => {
@@ -254,8 +255,19 @@ const returnSubmit = () => {
 // Submit logic for the update
 const updateSubmit = () => {
     updateForm.put(route('phone.update', props.phone.id), {
+        forceFormData: true,
         onSuccess: () => {
-            showUpdateModal.value = false;
+            updateForm.image = null;
+            if (updatePicObjectUrl) {
+                URL.revokeObjectURL(updatePicObjectUrl);
+                updatePicObjectUrl = null;
+            }
+            const closeButton = document.querySelector(
+                '#UpdatePhoneModal [data-bs-dismiss="modal"]',
+            );
+            if (closeButton) {
+                closeButton.click();
+            }
         },
     });
 };
@@ -265,20 +277,74 @@ const openUpdateModal = (phone) => {
     updateForm.id = phone.id;
     updateForm.brand = phone.brand;
     updateForm.model = phone.model;
+    updateForm.serial_num = phone.serial_num;
     updateForm.imei_one = phone.imei_one;
-updateForm.imei_two = phone.imei_two;
-    updateForm.serial_number = phone.serial_number;
-    updateForm.status = phone.status;
+    updateForm.imei_two = phone.imei_two;
+    updateForm.ram = phone.ram;
+    updateForm.rom = phone.rom;
+    updateForm.sim_no = phone.sim_no;
+    updateForm.purchase_date = phone.purchase_date;
+    updateForm.remarks = phone.remarks;
+    updateForm.image = null;
+    updateSamplePic.value = phone?.image_url || getPhoneImagePath(phone);
 
     updateForm.clearErrors();
-    showUpdateModal.value = true;
+
+    const modalElement = document.getElementById('UpdatePhoneModal');
+    if (modalElement) {
+        const modalInstance =
+            window.bootstrap.Modal.getOrCreateInstance(modalElement);
+        modalInstance.show();
+    } else {
+        console.error('Modal element #UpdatePhoneModal not found');
+    }
+};
+
+//Logic to handle image upload
+const onUpdateFileSelect = (event) => {
+    const file = event.target.files?.[0] || null;
+    updateForm.image = file;
+
+    if (updatePicObjectUrl) {
+        URL.revokeObjectURL(updatePicObjectUrl);
+        updatePicObjectUrl = null;
+    }
+
+    updateSamplePic.value = file
+        ? (() => {
+              updatePicObjectUrl = URL.createObjectURL(file);
+              return updatePicObjectUrl;
+          })()
+        : getPhoneImagePath(props.phone);
+};
+
+const clearUpdateSelectedImage = () => {
+    updateForm.image = null;
+    if (updatePicObjectUrl) {
+        URL.revokeObjectURL(updatePicObjectUrl);
+        updatePicObjectUrl = null;
+    }
+    updateSamplePic.value = getPhoneImagePath(props.phone);
+
+    const input = document.getElementById('updatePhoneImageDetailsInput');
+    if (input) input.value = '';
+};
+
+const handleUpdateModalHidden = () => {
+    clearUpdateSelectedImage();
 };
 
 // Logic to open Issue Modals
 const openIssueModal = () => {
-    form.reset();
-    selectedAcc.value = [];
-    showIssueModal.value = true;
+    const modalElement = document.getElementById('IssuePhoneModal');
+    if (!modalElement) return;
+
+    const modal = window.bootstrap.Modal.getOrCreateInstance(modalElement, {
+        backdrop: true,
+        keyboard: true,
+    });
+
+    modal.show();
 };
 
 // Logic to open Return Modals
@@ -291,11 +357,30 @@ const openReturnModal = () => {
 const generateLogsheet = (id) => {
     window.open(
         `
-        /CIMS/public
-        /AssetAndInventoryManagement/Phone/${id}/logsheet`,
+         /AssetAndInventoryManagement/Phone/${id}/logsheet `,
         '_blank',
     );
 };
+
+onMounted(() => {
+    window.Echo.channel('phoneInventory').listen('.AssetUpdated', (e) => {
+        console.log('Update received:', e.message);
+
+        router.reload({ only: ['phone', 'phone_issuance', 'phone_return'] });
+    });
+
+    document
+        .getElementById('UpdatePhoneModal')
+        ?.addEventListener('hidden.bs.modal', handleUpdateModalHidden);
+});
+
+onUnmounted(() => {
+    window.Echo.leave('phoneInventory');
+
+    document
+        .getElementById('UpdatePhoneModal')
+        ?.removeEventListener('hidden.bs.modal', handleUpdateModalHidden);
+});
 </script>
 
 <template>
@@ -386,7 +471,12 @@ const generateLogsheet = (id) => {
                                     :alt="props.phone.model"
                                 />
                                 <h3 class="fw-bold mb-0 mt-3">
-                                    {{ props.phone.brand }}
+                                    {{
+                                        props.phone.brand
+                                            .charAt(0)
+                                            .toUpperCase() +
+                                        props.phone.brand.slice(1)
+                                    }}
                                     {{ props.phone.model }}
                                 </h3>
                                 <span
@@ -480,7 +570,7 @@ const generateLogsheet = (id) => {
                             </ul>
                         </div>
                         <div
-                            class="card-footer d-flex justify-content-around align-items-center border-0 bg-transparent pb-3 text-center"
+                            class="card-footer d-flex justify-content-around align-items-center mb-3 border-0 bg-transparent pb-3 text-center"
                         >
                             <button
                                 class="btn btn-outline-danger"
@@ -952,7 +1042,7 @@ const generateLogsheet = (id) => {
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label text-muted small fw-bold"
+                    <label class="form-label"
                         >Select Accessories<i class="text-danger">*</i></label
                     >
                     <div
@@ -1000,6 +1090,25 @@ const generateLogsheet = (id) => {
                         rows="2"
                         placeholder="e.g. Charger, USB-C Cable"
                     ></textarea>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Acknowledgement</label>
+                    <div
+                        class="d-flex justify-content-around align-items-center rounded border pb-2 pt-3"
+                    >
+                        <div class="form-check">
+                            <input
+                                type="checkbox"
+                                class="form-check-input"
+                                id="acknowledgement"
+                                v-model="form.acknowledgement"
+                            />
+                            <label for="acknowledgement" class="form-label"
+                                >Information Technology</label
+                            >
+                        </div>
+                    </div>
                 </div>
 
                 <div class="mb-3">
@@ -1243,8 +1352,16 @@ const generateLogsheet = (id) => {
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                 Cancel
             </button>
-            <button type="submit" class="btn btn-primary" form="returnForm" :disabled="returnform.processing">
-                <span v-if="returnform.processing" class="spinner-border spinner-border-sm me-1"></span>
+            <button
+                type="submit"
+                class="btn btn-warning"
+                form="returnForm"
+                :disabled="returnform.processing"
+            >
+                <span
+                    v-if="returnform.processing"
+                    class="spinner-border spinner-border-sm me-1"
+                ></span>
                 Return
             </button>
         </template>
@@ -1254,38 +1371,111 @@ const generateLogsheet = (id) => {
     <Modals id="UpdatePhoneModal" title="Update Phone Asset" header-class="bg-warning text-white bg-gradient">
         <template #body>
             <form @submit.prevent="updateSubmit" id="updateForm">
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        <label for="update_brand" class="form-label">Brand</label>
-                        <input type="text" id="update_brand" v-model="updateForm.brand" class="form-control" required />
+                <div class="row d-flex align-items-center mb-3">
+                    <div class="col-12">
+                        <img
+                            :src="updateSamplePic"
+                            alt="update-asset-image"
+                            class="preview-image-fixed img-thumbnail rounded-circle d-block mx-auto border border-2 shadow-md"
+                        />
                     </div>
-                    <div class="col-md-6">
-                        <label for="update_model" class="form-label">Model</label>
-                        <input type="text" id="update_model" v-model="updateForm.model" class="form-control" required />
+                </div>
+
+                <div class="row d-flex align-items-center mb-3">
+                    <div class="col-sm-12">
+                        <div class="input-group">
+                            <label
+                                class="input-group-text"
+                                for="updatePhoneImageDetailsInput"
+                                >Upload</label
+                            >
+                            <input
+                                type="file"
+                                class="form-control"
+                                id="updatePhoneImageDetailsInput"
+                                accept="image/*"
+                                @change="onUpdateFileSelect"
+                            />
+                        </div>
                     </div>
                 </div>
 
                 <div class="row mb-3">
                     <div class="col-md-6">
-                        <label for="update_serial_num" class="form-label">Serial Number</label>
-                        <input type="text" id="update_serial_num" v-model="updateForm.serial_num" class="form-control"
-                            required />
+                        <label for="update_brand" class="form-label"
+                            >Brand</label
+                        >
+                        <input
+                            type="text"
+                            id="update_brand"
+                            v-model="updateForm.brand"
+                            class="form-control"
+                            required
+                        />
                     </div>
                     <div class="col-md-6">
-                        <label for="update_sim_no" class="form-label">SIM Number</label>
-                        <input type="text" id="update_sim_no" v-model="updateForm.sim_no" class="form-control" />
+                        <label for="update_model" class="form-label"
+                            >Model</label
+                        >
+                        <input
+                            type="text"
+                            id="update_model"
+                            v-model="updateForm.model"
+                            class="form-control"
+                            required
+                        />
                     </div>
                 </div>
 
                 <div class="row mb-3">
                     <div class="col-md-6">
-                        <label for="update_imei_one" class="form-label">IMEI One</label>
-                        <input type="text" id="update_imei_one" v-model="updateForm.imei_one" class="form-control"
-                            required />
+                        <label for="update_serial_num" class="form-label"
+                            >Serial Number</label
+                        >
+                        <input
+                            type="text"
+                            id="update_serial_num"
+                            v-model="updateForm.serial_num"
+                            class="form-control"
+                            required
+                        />
                     </div>
                     <div class="col-md-6">
-                        <label for="update_imei_two" class="form-label">IMEI Two</label>
-                        <input type="text" id="update_imei_two" v-model="updateForm.imei_two" class="form-control" />
+                        <label for="update_sim_no" class="form-label"
+                            >SIM Number</label
+                        >
+                        <input
+                            type="text"
+                            id="update_sim_no"
+                            v-model="updateForm.sim_no"
+                            class="form-control"
+                        />
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="update_imei_one" class="form-label"
+                            >IMEI One</label
+                        >
+                        <input
+                            type="text"
+                            id="update_imei_one"
+                            v-model="updateForm.imei_one"
+                            class="form-control"
+                            required
+                        />
+                    </div>
+                    <div class="col-md-6">
+                        <label for="update_imei_two" class="form-label"
+                            >IMEI Two</label
+                        >
+                        <input
+                            type="text"
+                            id="update_imei_two"
+                            v-model="updateForm.imei_two"
+                            class="form-control"
+                        />
                     </div>
                 </div>
 
@@ -1330,5 +1520,11 @@ const generateLogsheet = (id) => {
 <style scoped>
 tr td {
     align-items: center;
+}
+
+.preview-image-fixed {
+    width: 8rem;
+    height: 8rem;
+    object-fit: cover;
 }
 </style>

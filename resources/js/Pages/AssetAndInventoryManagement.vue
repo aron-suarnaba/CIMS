@@ -27,7 +27,7 @@ const navCard = [
     },
     {
         label: 'Workstations',
-        url: '#',
+        url: route('computer.index'),
         icon: 'bi bi-pc-display',
         color: 'success',
         desc: 'Desktops & Laptops',
@@ -62,6 +62,7 @@ const navCard = [
             <Breadcrumb :breadcrumbs="myBreadcrumb" />
         </div>
     </div>
+    ``
 
     <div class="app-content mt-4">
         <div class="container">

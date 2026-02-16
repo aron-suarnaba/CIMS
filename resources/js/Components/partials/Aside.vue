@@ -3,7 +3,7 @@ import { ref } from 'vue';
 import { Link } from '@inertiajs/vue3';
 
 const title = ref('CIMS');
-import logo from '/public/img/logo.png';
+const logo = '/CIMS/public/img/logo.png';
 </script>
 
 <template>

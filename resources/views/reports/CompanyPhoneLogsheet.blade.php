@@ -19,13 +19,24 @@
 
         /* Internal labels and lines */
         .field-row { margin-bottom: 4px; display: table; width: 100%; }
-        .label { display: table-cell; white-space: nowrap; width: 1%; padding-right: 5px; }
-        .line-fill { display: table-cell; border-bottom: 1px solid black; padding-left: 5px; height: 14px; }
+        .label {
+            display: table-cell;
+            white-space: nowrap;
+            width: 1%;
+            padding-right: 5px;
+            min-width: 70px;
+        }
+        .line-fill { display: table-cell; border-bottom: 1px solid black; padding-left: 5px; height: 14px; vertical-align: bottom; }
 
-        /* The Main Log Area with Gap */
+        .cashout-container {
+            text-align: center;
+            margin-top: 12px;
+            width: 100%;
+        }
+
         .log-wrapper { width: 100%; display: table; border-collapse: collapse; table-layout: fixed; }
         .log-column { display: table-cell; width: 49%; vertical-align: top; }
-        .spacer-column { display: table-cell; width: 2%; } /* THE GAP */
+        .spacer-column { display: table-cell; width: 2%; }
 
         table.log-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
         table.log-table th { border: 1px solid black; background: #fff; font-size: 8px; padding: 4px 1px; font-weight: bold; }
@@ -48,30 +59,30 @@
 
         <table class="info-table">
             <tr>
-                <td width="42%">
-                    <div class="field-row"><span class="label">Brand/Model:</span><span class="line-fill">{{ $phone->brand }} {{ $phone->model }}</span></div>
-                    <div class="field-row"><span class="label">Serial Number:</span><span class="line-fill">{{ $phone->serial_num }}</span></div>
-                    <div class="field-row"><span class="label">RAM/ROM:</span><span class="line-fill">{{ $phone->ram }}/{{ $phone->rom }}</span></div>
-                    <div class="field-row"><span class="label">IMEI 1/2:</span><span class="line-fill">{{ $phone->imei_one }} / {{ $phone->imei_two }}</span></div>
-                    <div class="field-row"><span class="label">Sim No.:</span><span class="line-fill">{{ $phone->sim_no }}</span></div>
-                    <div class="field-row"><span class="label">Department:</span><span class="line-fill">{{ $transactions[0]->department }}</span></div>
+                <td width="45%">
+                    <div class="field-row"><span class="label">Brand/Model:</span><span class="line-fill">{{ trim(($phone->brand ?? '') . ' ' . ($phone->model ?? '')) }}</span></div>
+                    <div class="field-row"><span class="label">Serial Number:</span><span class="line-fill">{{ $phone->serial_num ?? '' }}</span></div>
+                    <div class="field-row"><span class="label">RAM/ROM:</span><span class="line-fill">{{ ($phone->ram !== null ? $phone->ram . ' GB' : '') . (($phone->ram !== null && $phone->rom !== null) ? ' / ' : '') . ($phone->rom !== null ? $phone->rom . ' GB' : '') }}</span></div>
+                    <div class="field-row"><span class="label">IMEI 1/2:</span><span class="line-fill">{{ ($phone->imei_one ?? '') . (($phone->imei_one && $phone->imei_two) ? ' / ' : '') . ($phone->imei_two ?? '') }}</span></div>
+                    <div class="field-row"><span class="label">Sim No.:</span><span class="line-fill">{{ $phone->sim_no ?? '' }}</span></div>
+                    <div class="field-row"><span class="label">Department:</span><span class="line-fill">{{ optional($transactions->last())->department ?? '' }}</span></div>
 
-                    <div style="margin-top: 8px;">
-                        <span class="checkbox-custom">☐</span> With Cashout &nbsp;&nbsp;&nbsp;
-                        <span class="checkbox-custom">☐</span> Without cashout
+                    <div class="cashout-container">
+                        <span class="checkbox-custom">&#x2610;</span> With Cashout &nbsp;&nbsp;&nbsp;
+                        <span class="checkbox-custom">&#x2610;</span> Without cashout
                     </div>
                 </td>
 
-                <td width="16%"></td>
+                <td width="10%"></td>
 
-                <td width="42%">
-                    <div class="field-row"><span class="label">Date Received:</span><span class="line-fill">{{ $date }}</span></div>
+                <td width="45%">
+                    <div class="field-row"><span class="label">Date Received:</span><span class="line-fill">{{ $date ?? '' }}</span></div>
                     <div class="field-row"><span class="label">Device name:</span><span class="line-fill"></span></div>
                     <div class="field-row">
                         <span class="label">Accessories:</span>
-                        <span style="display: table-cell;">
-                            <span class="checkbox-custom">☐</span> Charger &nbsp;&nbsp;
-                            <span class="checkbox-custom">☐</span> Earphone
+                        <span class="line-fill" style="border-bottom: none;">
+                            <span class="checkbox-custom">&#x2610;</span> Charger &nbsp;&nbsp;
+                            <span class="checkbox-custom">&#x2610;</span> Earphone
                         </span>
                     </div>
                 </td>
@@ -99,14 +110,14 @@
                             <td>{{ $trx->date_issued ? $trx->date_issued->format('m/d/y') : '' }}</td>
                             <td>{{ $trx->issued_by }}</td>
                             <td class="acc-cell">
-                                <span class="checkbox-custom">☐</span> Charger<br><span class="checkbox-custom">☐</span> Earphone
+                                <span class="checkbox-custom">&#x2610;</span> Charger<br><span class="checkbox-custom">&#x2610;</span> Earphone
                             </td>
                             <td></td>
                             <td></td>
                         </tr>
                         @endforeach
                         @for ($i = count($transactions); $i < 11; $i++)
-                        <tr><td></td><td></td><td></td><td class="acc-cell"><span class="checkbox-custom">☐</span> Charger<br><span class="checkbox-custom">☐</span> Earphone</td><td></td><td></td></tr>
+                        <tr><td></td><td></td><td></td><td class="acc-cell"><span class="checkbox-custom">&#x2610;</span> Charger<br><span class="checkbox-custom">&#x2610;</span> Earphone</td><td></td><td></td></tr>
                         @endfor
                     </tbody>
                 </table>
@@ -117,7 +128,7 @@
             <div class="log-column">
                 <table class="log-table">
                     <thead>
-                        <tr><th colspan="3">RETURN</th><th colspan="3">ACKNOWLEDGEMENT</th></tr>
+                        <tr><th colspan="4">RETURN</th><th colspan="2">ACKNOWLEDGEMENT</th></tr>
                         <tr>
                             <th width="26%">RETURNED BY</th>
                             <th width="14%">DATE</th>
@@ -134,14 +145,14 @@
                             <td>{{ ($trx->return && $trx->return->date_returned) ? $trx->return->date_returned->format('m/d/y') : '' }}</td>
                             <td>{{ $trx->return->returned_to ?? '' }}</td>
                             <td class="acc-cell">
-                                <span class="checkbox-custom">☐</span> Charger<br><span class="checkbox-custom">☐</span> Earphone
+                                <span class="checkbox-custom">&#x2610;</span> Charger<br><span class="checkbox-custom">&#x2610;</span> Earphone
                             </td>
                             <td></td>
                             <td></td>
                         </tr>
                         @endforeach
                         @for ($i = count($transactions); $i < 11; $i++)
-                        <tr><td></td><td></td><td></td><td class="acc-cell"><span class="checkbox-custom">☐</span> Charger<br><span class="checkbox-custom">☐</span> Earphone</td><td></td><td></td></tr>
+                        <tr><td></td><td></td><td></td><td class="acc-cell"><span class="checkbox-custom">&#x2610;</span> Charger<br><span class="checkbox-custom">&#x2610;</span> Earphone</td><td></td><td></td></tr>
                         @endfor
                     </tbody>
                 </table>
