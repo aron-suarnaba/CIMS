@@ -24,7 +24,7 @@ const myBreadcrumb = [
 // Fetching Data
 const fetchDevices = async () => {
     try {
-        const response = await axios.get('/CIMS/public/api/fortigate/devices');
+        const response = await axios.get('/api/fortigate/devices');
 
         // Handle different possible response structures from FortiGate API
         if (response.data && response.data.results) {

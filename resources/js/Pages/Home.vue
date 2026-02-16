@@ -78,7 +78,7 @@ const isNewsLoading = ref(true);
 
 const fetchNewsFromBackend = async () => {
     try {
-        const response = await axios.get('/CIMS/public/api/news/tech');
+        const response = await axios.get('/api/news/tech');
         articles.value = response.data.slice(0, 3);
     } catch (error) {
         console.error('Could not load news:', error);

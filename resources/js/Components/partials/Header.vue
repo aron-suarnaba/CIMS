@@ -3,7 +3,7 @@ import { Link } from '@inertiajs/vue3';
 import { ref } from 'vue';
 
 // Use correct path for images in Laravel public folder
-const logo = ref('/CIMS/public/img/logo.png');
+const logo = ref('/img/logo.png');
 
 // Note: You don't actually need to wrap these in ref()
 // unless you plan on changing the strings dynamically.
