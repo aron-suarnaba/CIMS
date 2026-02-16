@@ -9,7 +9,7 @@ import debounce from 'lodash/debounce';
 import Swal from 'sweetalert2';
 import { onMounted, onUnmounted, ref, watch } from 'vue';
 
-const { formatDate } = useDateFormatter();
+const { formatDate, formatDateForInput } = useDateFormatter();
 defineOptions({ layout: HomeLayout });
 
 const props = defineProps({
@@ -130,7 +130,7 @@ const updateForm = useForm({
     ram: props.phones.ram || '',
     rom: props.phones.rom || '',
     sim_no: props.phones.sim_no || '',
-    purchase_date: props.phones.purchase_date || '',
+    purchase_date: formatDateForInput(props.phones.purchase_date) || '',
     remarks: props.phones.remarks || '',
 });
 
@@ -243,7 +243,7 @@ const openUpdateModal = (phone) => {
     updateForm.ram = phone.ram || '';
     updateForm.rom = phone.rom || '';
     updateForm.sim_no = phone.sim_no || '';
-    updateForm.purchase_date = phone.purchase_date || '';
+    updateForm.purchase_date = formatDateForInput(phone.purchase_date) || '';
     updateForm.remarks = phone.remarks || '';
 
     if (updatePicObjectUrl) {

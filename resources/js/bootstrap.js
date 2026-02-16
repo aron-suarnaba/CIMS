@@ -5,15 +5,33 @@ import Pusher from 'pusher-js';
 window.axios = axios;
 window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 
+// Function to get current CSRF token
+const getCSRFToken = () => {
+    const token = document.head.querySelector('meta[name="csrf-token"]');
+    return token ? token.content : null;
+};
+
 // Set CSRF token header from meta tag when available
 try {
-    const token = document.head.querySelector('meta[name="csrf-token"]');
+    const token = getCSRFToken();
     if (token) {
-        window.axios.defaults.headers.common['X-CSRF-TOKEN'] = token.content;
+        window.axios.defaults.headers.common['X-CSRF-TOKEN'] = token;
     }
 } catch (e) {
     // document may be undefined during SSR/build step; ignore silently
 }
+
+// Request interceptor to ensure CSRF token is always current
+window.axios.interceptors.request.use(
+    (config) => {
+        const token = getCSRFToken();
+        if (token) {
+            config.headers['X-CSRF-TOKEN'] = token;
+        }
+        return config;
+    },
+    (error) => Promise.reject(error)
+);
 
 // Ensure cookies (session) are sent with requests on same-origin setups
 window.axios.defaults.withCredentials = true;

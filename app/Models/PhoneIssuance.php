@@ -20,6 +20,7 @@ class PhoneIssuance extends Model
         'issued_accessories',
         'acknowledgement',
         'cashout',
+        'remarks',
     ];
 
     protected $casts = [

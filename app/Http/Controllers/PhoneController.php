@@ -184,8 +184,24 @@ class PhoneController extends Controller
 
         $validated['serial_num'] = $phone->serial_num;
 
-        // Create issuance record
-        PhoneIssuance::create($validated);
+        // Create issuance record - only pass fillable fields
+        $issuanceData = [
+            'serial_num' => $validated['serial_num'],
+            'issued_to' => $validated['issued_to'],
+            'issued_by' => $validated['issued_by'],
+            'department' => $validated['department'],
+            'date_issued' => $validated['date_issued'],
+            'issued_accessories' => $validated['issued_accessories'] ?? null,
+            'acknowledgement' => $validated['acknowledgement'] ?? null,
+            'cashout' => $validated['cashout'],
+        ];
+
+        // Add remarks if column exists
+        if (\Illuminate\Support\Facades\Schema::hasColumn('phone_issuances', 'remarks')) {
+            $issuanceData['remarks'] = $validated['remarks'] ?? null;
+        }
+
+        PhoneIssuance::create($issuanceData);
 
         $phone->update([
             'status' => 'issued',
@@ -229,6 +245,7 @@ class PhoneController extends Controller
                     'returnee_department' => $validated['returnee_department'],
                     'date_returned' => $validated['date_returned'],
                     'returned_accessories' => $validated['returned_accessories'],
+                    'remarks' => $validated['remarks'] ?? null,
                 ]);
 
                 $phone->update([

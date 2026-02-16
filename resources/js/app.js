@@ -49,8 +49,12 @@ window.axios.interceptors.response.use(
     (error) => {
         if (error.response && error.response.status === 419) {
             showSessionWarning(
-                'Your form was not refreshed. Please submit again.',
+                'Session token expired. Refreshing the page...',
             );
+            // Wait 2 seconds then refresh
+            setTimeout(() => {
+                window.location.reload();
+            }, 2000);
             return Promise.reject(error);
         }
         if (error.response && error.response.status === 401) {
