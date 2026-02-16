@@ -3,11 +3,11 @@ defineProps({
     id: { type: String, default: '' },
 });
 const navigateToDashboard = () => {
-    // Use router.push('/dashboard') if using vue-router
-    window.location.href = '#';
+    window.location.href =
+        typeof route === 'function' ? route('dashboard') : '/dashboard';
 };
 
-const videoSource = '/CIMS/public/video/WelcomeBackground.mp4';
+const videoSource = './video/WelcomeBackground.mp4';
 </script>
 
 <template>

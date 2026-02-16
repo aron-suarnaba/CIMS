@@ -1,7 +1,7 @@
 <script setup>
 import HomeLayout from '@/Layouts/HomeLayout.vue';
 import axios from 'axios';
-import { markRaw, onMounted, onUnmounted, ref } from 'vue';
+import { computed, markRaw, onMounted, onUnmounted, ref } from 'vue';
 
 defineOptions({ layout: HomeLayout });
 
@@ -12,9 +12,9 @@ const chartOption = markRaw({
     colors: ['#0d6efd'],
     title: { text: 'Monthly Procurement', align: 'center' },
 });
-const chartSeries = ref([
-    { name: 'New Assets', data: [45, 52, 38, 24, 60, 15] },
-]);
+const chartSeries = ref(
+    markRaw([{ name: 'New Assets', data: [45, 52, 38, 24, 60, 15] }]),
+);
 
 const donutChartOption = markRaw({
     chart: { id: 'cims-distribution', type: 'donut' },
@@ -23,7 +23,7 @@ const donutChartOption = markRaw({
     title: { text: 'Asset Composition', align: 'center' },
     legend: { position: 'bottom', horizontalAlign: 'center' },
 });
-const donutChartSeries = ref([120, 85, 15, 45, 150, 30]);
+const donutChartSeries = ref(markRaw([120, 85, 15, 45, 150, 30]));
 
 const rangeAreaChartOption = markRaw({
     chart: { id: 'cims-costs', type: 'rangeArea', toolbar: { show: false } },
@@ -31,17 +31,19 @@ const rangeAreaChartOption = markRaw({
     title: { text: 'Maintenance Variance', align: 'center' },
     xaxis: { categories: ['Sep', 'Oct', 'Nov', 'Dec'] },
 });
-const rangeAreaChartSeries = ref([
-    {
-        name: 'Cost Range',
-        data: [
-            { x: 'Sep', y: [500, 1200] },
-            { x: 'Oct', y: [800, 1500] },
-            { x: 'Nov', y: [1200, 3000] },
-            { x: 'Dec', y: [400, 900] },
-        ],
-    },
-]);
+const rangeAreaChartSeries = ref(
+    markRaw([
+        {
+            name: 'Cost Range',
+            data: [
+                { x: 'Sep', y: [500, 1200] },
+                { x: 'Oct', y: [800, 1500] },
+                { x: 'Nov', y: [1200, 3000] },
+                { x: 'Dec', y: [400, 900] },
+            ],
+        },
+    ]),
+);
 
 const radialChartOption = markRaw({
     chart: { id: 'cims-compliance', type: 'radialBar' },
@@ -57,7 +59,18 @@ const radialChartOption = markRaw({
     labels: ['Compliance'],
     colors: ['#20c997'],
 });
-const radialChartSeries = ref([88]);
+const radialChartSeries = ref(markRaw([88]));
+
+const dashboardCharts = computed(() => [
+    { type: 'bar', opt: chartOption, ser: chartSeries.value },
+    { type: 'donut', opt: donutChartOption, ser: donutChartSeries.value },
+    {
+        type: 'rangeArea',
+        opt: rangeAreaChartOption,
+        ser: rangeAreaChartSeries.value,
+    },
+    { type: 'radialBar', opt: radialChartOption, ser: radialChartSeries.value },
+]);
 
 // --- NEWS API LOGIC ---
 const articles = ref([]);
@@ -108,7 +121,7 @@ onUnmounted(() => {
 
 <template>
     <div class="app-content mt-4 px-3">
-        <div class="container-fluid">
+        <div class="container">
             <!-- ROW 1 -->
             <div class="row mb-4">
                 <!-- CLOCK DISPLAY -->
@@ -152,24 +165,7 @@ onUnmounted(() => {
             <div class="row row-cols-1 row-cols-md-2 row-cols-xl-4 g-4 mb-5">
                 <div
                     class="col"
-                    v-for="(chart, idx) in [
-                        { type: 'bar', opt: chartOption, ser: chartSeries },
-                        {
-                            type: 'donut',
-                            opt: donutChartOption,
-                            ser: donutChartSeries,
-                        },
-                        {
-                            type: 'rangeArea',
-                            opt: rangeAreaChartOption,
-                            ser: rangeAreaChartSeries,
-                        },
-                        {
-                            type: 'radialBar',
-                            opt: radialChartOption,
-                            ser: radialChartSeries,
-                        },
-                    ]"
+                    v-for="(chart, idx) in dashboardCharts"
                     :key="idx"
                 >
                     <div class="card h-100 rounded-3 border-0 shadow-sm">
@@ -274,10 +270,12 @@ onUnmounted(() => {
 .news-card {
     transition: all 0.3s ease;
 }
+
 .news-card:hover {
     transform: translateY(-3px);
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important;
 }
+
 .text-truncate-2 {
     display: -webkit-box;
     -webkit-line-clamp: 2;
@@ -287,15 +285,18 @@ onUnmounted(() => {
     font-size: 0.85rem;
     line-height: 1.3;
 }
+
 .time-display {
     font-family: 'Share Tech Mono', monospace;
     letter-spacing: -2px;
 }
+
 .date-display {
     font-family: 'Share Tech Mono', monospace;
     font-weight: bold;
     font-size: 1.1rem;
 }
+
 @media (min-width: 768px) {
     .border-end-md {
         border-right: 1px solid #dee2e6 !important;

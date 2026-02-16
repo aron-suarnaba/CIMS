@@ -33,7 +33,7 @@ const gotoPage = (url) => {
 const myBreadcrumb = [
     { label: 'Dashboard', url: route('dashboard') },
     {
-        label: 'Asset Inventory and Management',
+        label: 'Asset & Inventory',
         url: route('AssetAndInventoryManagement'),
     },
     { label: 'Phone Asset' },
@@ -61,10 +61,6 @@ const addForm = useForm({
 
 const submitAddForm = () => {
     addForm.post(route('phone.store'), {
-        headers: {
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')
-                ?.content,
-        },
         onSuccess: () => {
             addForm.reset();
             // Close modal
@@ -162,6 +158,19 @@ const getPhoneImagePath = (phone) => {
 
     return defaultPath;
 };
+
+const brandsOption = [
+    'iphone',
+    'apple',
+    'oppo',
+    'redmi',
+    'samsung',
+    'vivo',
+    'realme',
+    'xiaomi',
+    'honor',
+    'techno',
+];
 </script>
 
 <template>
@@ -333,6 +342,22 @@ const getPhoneImagePath = (phone) => {
                             class="form-control"
                             required
                         />
+                        <select
+                            class="form-select"
+                            aria-label="Brand"
+                            id="brandInput"
+                            v-model="addForm.brand"
+                            required
+                        >
+                            <option selected>Select Brand</option>
+                            <option
+                                :value="brand"
+                                :key="brand"
+                                v-for="brand in brandsOption"
+                            >
+                                {{ brand.charAt(1) + brand.slice(1) }}
+                            </option>
+                        </select>
                     </div>
                     <div class="col-sm-12 col-md-6">
                         <label for="modelInput" class="form-label">Model</label>
@@ -367,7 +392,6 @@ const getPhoneImagePath = (phone) => {
                             id="imeiOneInput"
                             v-model="addForm.imei_one"
                             class="form-control"
-                            required
                         />
                     </div>
                 </div>
@@ -386,7 +410,7 @@ const getPhoneImagePath = (phone) => {
                     <div class="col-sm-12 col-md-6">
                         <label for="ramInput" class="form-label">RAM</label>
                         <input
-                            type="text"
+                            type="number"
                             id="ramInput"
                             v-model="addForm.ram"
                             class="form-control"
@@ -398,7 +422,7 @@ const getPhoneImagePath = (phone) => {
                     <div class="col-sm-12 col-md-6">
                         <label for="romInput" class="form-label">ROM</label>
                         <input
-                            type="text"
+                            type="number"
                             id="romInput"
                             v-model="addForm.rom"
                             class="form-control"

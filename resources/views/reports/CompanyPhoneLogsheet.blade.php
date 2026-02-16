@@ -1,235 +1,197 @@
 <!DOCTYPE html>
 <html>
-
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>CIMS Company Logsheet</title>
+    <title>Company Phone Logsheet</title>
     <style>
-        @page {
-            margin: 20px;
-        }
+        @page { margin: 20px; }
+        body { font-family: "Times New Roman", Times, serif; font-size: 10px; margin: 0; padding: 0; color: #000; }
+        .container { width: 100%; }
 
-        body {
-            font-family: Arial, sans-serif;
-            color: #333;
-            font-size: 12px;
-        }
+        /* Centered Header */
+        .header-section { text-align: center; margin-bottom: 10px; }
+        .company-name { font-style: italic; font-weight: bold; font-size: 14px; margin-bottom: 2px; }
+        .report-title { font-weight: bold; font-size: 16px; text-transform: uppercase; }
 
-        .container {
-            width: 100%;
-        }
+        /* Fixed Info Header Table */
+        .info-table { width: 100%; border-collapse: collapse; margin-bottom: 10px; }
+        .info-table td { vertical-align: top; padding: 0; border: none; }
 
-        h1 {
-            text-align: center;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            margin-bottom: 20px;
-        }
-
-        /* Use Tables instead of Flex for the Header Section */
-        .header-table {
-            width: 100%;
-            margin-bottom: 10px;
-        }
-
-        .header-table td {
-            border: none;
-            vertical-align: bottom;
-            padding: 4px 0;
-        }
-
+        /* Internal labels and lines */
+        .field-row { margin-bottom: 4px; display: table; width: 100%; }
         .label {
+            display: table-cell;
             white-space: nowrap;
+            width: 1%;
             padding-right: 5px;
-            text-align: right;
+            min-width: 70px;
         }
+        .line-fill { display: table-cell; border-bottom: 1px solid black; padding-left: 5px; height: 14px; vertical-align: bottom; }
 
-        .line {
-            border-bottom: 1px solid #000;
-            width: 100%;
-            display: inline-block;
-            min-height: 14px;
-            text-indent: 15px;
-        }
-
-        /* Checkbox styling for PDF */
-        .checkbox-custom {
-            font-family: DejaVu Sans, sans-serif;
-            /* Required for checkbox symbols */
-            font-size: 14px;
-        }
-
-        /* Table Styling */
-        table.log-table {
-            width: 100%;
-            border-collapse: collapse;
-            table-layout: fixed;
-            margin-top: 10px;
-        }
-
-        table.log-table th {
-            background-color: #305496;
-            color: white;
-            font-size: 8px;
-            padding: 5px 2px;
-            border: 1px solid #000;
-            text-transform: uppercase;
-        }
-
-        table.log-table td {
-            border: 1px solid #000;
-            height: 45px;
-            padding: 0px 3px;
-            font-size: 9px;
+        .cashout-container {
             text-align: center;
-            vertical-align: middle;
-        }
-
-        .acc-cell {
-            text-align: left !important;
-            font-size: 8px !important;
-            padding: 0px auto;
-            gap: 0px;
-        }
-
-        .footer-section {
-            margin-top: 20px;
+            margin-top: 12px;
             width: 100%;
         }
+
+        .log-wrapper { width: 100%; display: table; border-collapse: collapse; table-layout: fixed; }
+        .log-column { display: table-cell; width: 49%; vertical-align: top; }
+        .spacer-column { display: table-cell; width: 2%; }
+
+        table.log-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+        table.log-table th { border: 1px solid black; background: #fff; font-size: 8px; padding: 4px 1px; font-weight: bold; }
+        table.log-table td { border: 1px solid black; height: 32px; text-align: center; font-size: 9px; padding: 1px; }
+
+        .acc-cell { text-align: left !important; font-size: 8px !important; padding-left: 4px !important; line-height: 1.1; }
+        .checkbox-custom { font-family: DejaVu Sans, sans-serif; font-size: 10px; }
+
+        .remarks-section { margin-top: 10px; }
+        .remarks-line { border-bottom: 1px solid black; width: 100%; height: 18px; margin-top: 2px; }
+        .footer-code { position: fixed; bottom: 10px; left: 0; font-weight: bold; font-style: italic; font-size: 10px; }
     </style>
 </head>
-
 <body>
+    @php
+        $latestIssuance = $transactions->last();
+        $withCashout = (bool) ($latestIssuance->cashout ?? false);
+        $hasCharger = (bool) ($latestIssuance->charger ?? false);
+        $hasHeadphones = (bool) ($latestIssuance->headphones ?? false);
+        $hasReturnedAccessory = function ($return, $keyword) {
+            if (!$return) {
+                return false;
+            }
+
+            $normalized = strtolower($keyword);
+            if ($normalized === 'charger' && isset($return->charger)) {
+                return (bool) $return->charger;
+            }
+            if (($normalized === 'headphone' || $normalized === 'earphone') && isset($return->headphones)) {
+                return (bool) $return->headphones;
+            }
+
+            return !empty($return->returned_accessories)
+                && str_contains(strtolower((string) $return->returned_accessories), $normalized);
+        };
+    @endphp
+
     <div class="container">
-        <h1>Company Phone Log Sheet</h1>
-
-        <table class="header-table">
-            <tr>
-                <td width="50%">
-                    <table width="100%">
-                        <tr>
-                            <td class="label" width="80px">Brand/Model:</td>
-                            <td><span class="line">{{ $phone->brand ?? '' }} {{ $phone->model ?? '' }}</span></td>
-                        </tr>
-                        <tr>
-                            <td class="label">Serial Number:</td>
-                            <td><span class="line">{{ $phone->serial_num ?? '' }}</span></td>
-                        </tr>
-                        <tr>
-                            <td class="label">RAM/ROM:</td>
-                            <td><span class="line">{{ $phone->ram ?? ''}} / {{ $phone->rom ?? '' }}</span></td>
-                        </tr>
-                        <tr>
-                            <td class="label">IMEI 1/2:</td>
-                            <td><span class="line">{{ $phone->imei_one ?? ''}}
-                                    {{ $phone->imei_two ? '/ ' . $phone->imei_two : '' }}</span></td>
-                        </tr>
-                        <tr>
-                            <td class="label">Sim No:</td>
-                            <td><span class="line">{{ $phone->sim_no ?? ''}}</span></td>
-                        </tr>
-                        <tr>
-                            <td class="label">Department:</td>
-                            <td><span class="line">{{ $current->department ?? ''}}</span></td>
-                        </tr>
-                    </table>
-                </td>
-                <td width="5%"></td>
-                <td width="45%">
-                    <table width="100%">
-                        <tr>
-                            <td class="label">Date Received:</td>
-                            <td><span class="line">{{ $date }}</span></td>
-                        </tr>
-                        <tr>
-                            <td class="label">Device Name:</td>
-                            <td><span class="line">{{ $phone->brand }}-{{ $phone->serial_num }}</span></td>
-                        </tr>
-                        <tr>
-                            <td colspan="2" style="text-align: right; padding-top: 15px;">
-                                <strong>Accessories:</strong>
-                                <span class="checkbox-custom">☐</span> Charger &nbsp;
-                                <span class="checkbox-custom">☐</span> Earphone
-                            </td>
-                        </tr>
-                    </table>
-                </td>
-            </tr>
-        </table>
-
-        <div style="margin: 10px 0;">
-            <span class="checkbox-custom">☐</span> <strong>WITH CASHOUT</strong> &nbsp;&nbsp;
-            <span class="checkbox-custom">☐</span> <strong>WITHOUT CASHOUT</strong>
+        <div class="header-section">
+            <div class="company-name">Printwell, Inc.</div>
+            <div class="report-title">COMPANY PHONE LOGSHEET</div>
         </div>
 
-        <table class="log-table">
-            <thead>
-                <tr>
-                    <th>Issued To</th>
-                    <th>Date Issued</th>
-                    <th>Issued By</th>
-                    <th>Accessories</th>
-                    <th>Ack. By IT</th>
-                    <th>Ack. By Purch.</th>
-                    <th>Returned By</th>
-                    <th>Date Returned</th>
-                    <th>Returned To</th>
-                    <th>Accessories</th>
-                    <th>Ack. By IT</th>
-                    <th>Ack. By Purch.</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>{{ $current->issued_to ?? '' }}</td>
-                    <td>{{ $current->date_issued ?? '' }}</td>
-                    <td>{{ $current->issued_by ?? '' }}</td>
-                    <td class="acc-cell">
-                        <span class="checkbox-custom">☐</span> Charger<br>
-                        <span class="checkbox-custom">☐</span> Earphone
-                    </td>
-                    <td></td>
-                    <td></td>
-                    <td>{{ $current->returned_by ?? '' }}</td>
-                    <td>{{ $current->date_returned ?? '' }}</td>
-                    <td></td>
-                    <td class="acc-cell">
-                        <span class="checkbox-custom">☐</span> Charger<br>
-                        <span class="checkbox-custom">☐</span> Earphone
-                    </td>
-                    <td></td>
-                    <td></td>
-                </tr>
-                @for ($i = 0; $i < 7; $i++)
-                    <tr>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td class="acc-cell"><span class="checkbox-custom">☐</span> Charger <br> <span
-                                class="checkbox-custom">☐</span> Earphone</td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td class="acc-cell">
-                            <span class="checkbox-custom">☐</span> Charger <br> <span class="checkbox-custom">☐</span>
-                            Earphone
-                        </td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                @endfor
-            </tbody>
-        </table>
-
-        <table class="footer-section">
+        <table class="info-table">
             <tr>
-                <td class="label" width="60px">Remarks:</td>
-                <td>{{ $phone->remarks ?? '' }}</td>
+                <td width="45%">
+                    <div class="field-row"><span class="label">Brand/Model:</span><span class="line-fill">{{ trim(($phone->brand ?? '') . ' ' . ($phone->model ?? '')) }}</span></div>
+                    <div class="field-row"><span class="label">Serial Number:</span><span class="line-fill">{{ $phone->serial_num ?? '' }}</span></div>
+                    <div class="field-row"><span class="label">RAM/ROM:</span><span class="line-fill">{{ ($phone->ram !== null ? $phone->ram . ' GB' : '') . (($phone->ram !== null && $phone->rom !== null) ? ' / ' : '') . ($phone->rom !== null ? $phone->rom . ' GB' : '') }}</span></div>
+                    <div class="field-row"><span class="label">IMEI 1/2:</span><span class="line-fill">{{ ($phone->imei_one ?? '') . (($phone->imei_one && $phone->imei_two) ? ' / ' : '') . ($phone->imei_two ?? '') }}</span></div>
+                    <div class="field-row"><span class="label">Sim No.:</span><span class="line-fill">{{ $phone->sim_no ?? '' }}</span></div>
+                    <div class="field-row"><span class="label">Department:</span><span class="line-fill">{{ optional($transactions->last())->department ?? '' }}</span></div>
+
+                    <div class="cashout-container">
+                        <span class="checkbox-custom">{!! $withCashout ? '&#x2611;' : '&#x2610;' !!}</span> With Cashout &nbsp;&nbsp;&nbsp;
+                        <span class="checkbox-custom">{!! !$withCashout ? '&#x2611;' : '&#x2610;' !!}</span> Without cashout
+                    </div>
+                </td>
+
+                <td width="10%"></td>
+
+                <td width="45%">
+                    <div class="field-row"><span class="label">Date Received:</span><span class="line-fill">{{ $date ?? '' }}</span></div>
+                    <div class="field-row"><span class="label">Device name:</span><span class="line-fill"></span></div>
+                    <div class="field-row">
+                        <span class="label">Accessories:</span>
+                        <span class="line-fill" style="border-bottom: none;">
+                            <span class="checkbox-custom">{!! $hasCharger ? '&#x2611;' : '&#x2610;' !!}</span> Charger &nbsp;&nbsp;
+                            <span class="checkbox-custom">{!! $hasHeadphones ? '&#x2611;' : '&#x2610;' !!}</span> Headphones
+                        </span>
+                    </div>
+                </td>
             </tr>
         </table>
+
+        <div class="log-wrapper">
+            <div class="log-column">
+                <table class="log-table">
+                    <thead>
+                        <tr><th colspan="4">ISSUANCE</th><th colspan="2">ACKNOWLEDGEMENT</th></tr>
+                        <tr>
+                            <th width="26%">ISSUED TO</th>
+                            <th width="14%">DATE</th>
+                            <th width="20%">ISSUED BY</th>
+                            <th width="16%">ACCESSORIES</th>
+                            <th width="12%">IT</th>
+                            <th width="12%">PROCUREMENT</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($transactions as $trx)
+                        <tr>
+                            <td>{{ $trx->issued_to }}</td>
+                            <td>{{ $trx->date_issued ? $trx->date_issued->format('F j, Y') : '' }}</td>
+                            <td>{{ $trx->issued_by }}</td>
+                            <td class="acc-cell">
+                                <span class="checkbox-custom">{!! $trx->charger ? '&#x2611;' : '&#x2610;' !!}</span> Charger<br>
+                                <span class="checkbox-custom">{!! $trx->headphones ? '&#x2611;' : '&#x2610;' !!}</span> Headphones
+                            </td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        @endforeach
+                        @for ($i = count($transactions); $i < 11; $i++)
+                        <tr><td></td><td></td><td></td><td class="acc-cell"><span class="checkbox-custom">&#x2610;</span> Charger<br><span class="checkbox-custom">&#x2610;</span> Headphones</td><td></td><td></td></tr>
+                        @endfor
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="spacer-column"></div>
+
+            <div class="log-column">
+                <table class="log-table">
+                    <thead>
+                        <tr><th colspan="4">RETURN</th><th colspan="2">ACKNOWLEDGEMENT</th></tr>
+                        <tr>
+                            <th width="26%">RETURNED BY</th>
+                            <th width="14%">DATE</th>
+                            <th width="20%">RETURNED TO</th>
+                            <th width="16%">ACCESSORIES</th>
+                            <th width="12%">IT</th>
+                            <th width="12%">PROCUREMENT</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($transactions as $trx)
+                        <tr>
+                            <td>{{ $trx->return->returned_by ?? '' }}</td>
+                            <td>{{ ($trx->return && $trx->return->date_returned) ? $trx->return->date_returned->format('F j, Y') : '' }}</td>
+                            <td>{{ $trx->return->returned_to ?? '' }}</td>
+                            <td class="acc-cell">
+                                <span class="checkbox-custom">{!! $hasReturnedAccessory($trx->return, 'charger') ? '&#x2611;' : '&#x2610;' !!}</span> Charger<br>
+                                <span class="checkbox-custom">{!! $hasReturnedAccessory($trx->return, 'headphone') || $hasReturnedAccessory($trx->return, 'earphone') ? '&#x2611;' : '&#x2610;' !!}</span> Headphones
+                            </td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        @endforeach
+                        @for ($i = count($transactions); $i < 11; $i++)
+                        <tr><td></td><td></td><td></td><td class="acc-cell"><span class="checkbox-custom">&#x2610;</span> Charger<br><span class="checkbox-custom">&#x2610;</span> Headphones</td><td></td><td></td></tr>
+                        @endfor
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="remarks-section">
+            <strong>Remarks:</strong>
+            <div class="remarks-line"></div>
+            <div class="remarks-line"></div>
+            <div class="remarks-line"></div>
+        </div>
+
+        <div class="footer-code">IT-F-16/23-00</div>
     </div>
 </body>
-
 </html>

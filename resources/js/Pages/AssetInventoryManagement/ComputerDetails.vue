@@ -1,12 +1,11 @@
 <script setup>
-import HomeLayout from '@/Layouts/HomeLayout.vue';
-import { router } from '@inertiajs/vue3';
 import BackButton from '@/Components/BackButton.vue';
-import Modals from '@/Components/Modals.vue';
-import { useForm } from '@inertiajs/vue3';
 import Breadcrumb from '@/Components/Breadcrumb.vue';
+import Modals from '@/Components/Modals.vue';
+import HomeLayout from '@/Layouts/HomeLayout.vue';
+import { router, useForm } from '@inertiajs/vue3';
 import Swal from 'sweetalert2';
-import { ref, watch, computed } from 'vue';
+import { computed, ref, watch } from 'vue';
 
 defineOptions({ layout: HomeLayout });
 
@@ -187,7 +186,7 @@ const returnSubmit = () => {
 </script>
 
 <template>
-    <div class="app-content-header border-bottom bg-white py-3">
+    <div class="app-content-header py-3">
         <!-- Breadcrumb -->
         <div class="container">
             <Breadcrumb :breadcrumbs="myBreadcrumb" />
@@ -195,44 +194,62 @@ const returnSubmit = () => {
     </div>
 
     <div class="app-content mt-4">
-        <div class="container-fluid">
+        <div class="container">
             <div class="row g-4">
                 <!-- Navigation Menu -->
                 <div class="col-12">
-                    <div class="card bg-light mb-4 border-0 shadow-sm">
-                        <div
-                            class="card-body d-flex justify-content-between align-items-center"
-                        >
-                            <BackButton
-                                @click.prevent="
-                                    router.get(route('computer.index'))
-                                "
-                            />
-                            <div class="btn-group shadow-sm">
-                                <button
-                                    v-if="
-                                        props.computer.status ===
-                                            'In Storage' ||
-                                        props.computer.status === 'In Repair'
-                                    "
-                                    class="btn btn-primary"
-                                    data-bs-toggle="modal"
-                                    data-bs-target="#IssueComputerModal"
+                    <div class="card mb-4 border-0 bg-transparent shadow-none">
+                        <div class="card-body">
+                            <div
+                                class="row d-flex justify-content-between align-items-center"
+                            >
+                                <div class="col-sm-12 col-md-6 mb-3">
+                                    <BackButton
+                                        @click.prevent="
+                                            router.get(route('computer.index'))
+                                        "
+                                    />
+                                </div>
+                                <div
+                                    class="col-sm-12 col-md-6 d-flex justify-content-end align-items-center mb-3"
                                 >
-                                    <i class="bi bi-person-plus me-1"></i>
-                                    Deploy Workstation
-                                </button>
-                                <button
-                                    v-else-if="
-                                        props.computer.status === 'In Use'
-                                    "
-                                    class="btn btn-warning"
-                                    data-bs-toggle="modal"
-                                    data-bs-target="#ReturnComputerModal"
-                                >
-                                    <i class="bi bi-arrow-return-left me-1"></i>
-                                    Pullout Workstation
-                                </button>
+                                    <button
+                                        v-if="
+                                            props.computer.status ===
+                                                'In Storage' ||
+                                            props.computer.status ===
+                                                'In Repair'
+                                        "
+                                        class="btn btn-primary"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#IssueComputerModal"
+                                    >
+                                        <i class="bi bi-person-plus me-1"></i>
+                                        Deploy Workstation
+                                    </button>
+                                    <button
+                                        v-else-if="
+                                            props.computer.status === 'In Use'
+                                        "
+                                        class="btn btn-warning"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#ReturnComputerModal"
+                                    >
+                                        <i
+                                            class="bi bi-arrow-return-left me-1"
+                                        ></i>
+                                        Pullout Workstation
+                                    </button>
+                                    <!-- <button
+                                            @click="
+                                                generateLogsheet(props.phone.id)
+                                            "
+                                            class="btn btn-secondary"
+                                        >
+                                            <i class="bi bi-receipt me-1"></i>
+                                            Generate Logsheet
+                                        </button> -->
+                                </div>
                             </div>
                         </div>
                     </div>

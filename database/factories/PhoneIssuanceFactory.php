@@ -2,11 +2,13 @@
 
 namespace Database\Factories;
 
-use App\Models\PhoneTransaction;
+use App\Models\PhoneIssuance;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-class PhoneTransactionFactory extends Factory
+class PhoneIssuanceFactory extends Factory
 {
+    protected $model = PhoneIssuance::class;
+
     public function definition(): array
     {
         return [
@@ -16,13 +18,10 @@ class PhoneTransactionFactory extends Factory
             'date_issued' => $this->faker->date(),
             'issued_by' => 'IT Admin',
             'issued_accessories' => 'Charger, Case',
-            'date_returned' => $this->faker->date(),
-            'acknowledgement' => true,
-            'returned_by' => $this->faker->name(),
-            'returnee_department' => $this->faker->jobTitle(),
-            'cashout' => true,
-            'created_at' => now(),
-            'updated_at' => now(),
+            'headphones' => false,
+            'charger' => false,
+            'acknowledgement' => false,
+            'cashout' => false,
         ];
     }
 }
