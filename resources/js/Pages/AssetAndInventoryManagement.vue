@@ -34,7 +34,7 @@ const navCard = [
     },
     {
         label: 'Mini PC',
-        url: '#',
+        url: route('minipc.index'),
         icon: 'bi bi-pc-horizontal',
         color: 'dark',
         desc: 'Mini PC Units',

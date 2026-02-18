@@ -51,6 +51,16 @@ Route::middleware('auth')->group(function () {
 
             //Generate Report
             Route::get('/{phone}/logsheet', [PhoneController::class, 'generateLogsheetReport'])->whereNumber('phone')->name('phone.logsheet');
+
+            // mini PC routes
+            Route::get('/minipc', [App\Http\Controllers\MiniPcController::class, 'index'])->name('minipc.index');
+            Route::get('/minipc/create', [App\Http\Controllers\MiniPcController::class, 'create'])->name('minipc.create');
+            Route::post('/minipc', [App\Http\Controllers\MiniPcController::class, 'store'])->name('minipc.store');
+            Route::get('/minipc/{minipc}', [App\Http\Controllers\MiniPcController::class, 'show'])->whereNumber('minipc')->name('minipc.show');
+            Route::put('/minipc/{minipc}', [App\Http\Controllers\MiniPcController::class, 'update'])->whereNumber('minipc')->name('minipc.update');
+            Route::delete('/minipc/{minipc}', [App\Http\Controllers\MiniPcController::class, 'destroy'])->whereNumber('minipc')->name('minipc.destroy');
+            Route::post('/minipc/{minipc}/issue', [App\Http\Controllers\MiniPcController::class, 'issue'])->whereNumber('minipc')->name('minipc.issue');
+            Route::post('/minipc/{minipc}/pullout', [App\Http\Controllers\MiniPcController::class, 'pullout'])->whereNumber('minipc')->name('minipc.pullout');
         });
 
         // Your existing transaction store (if used for logging)
