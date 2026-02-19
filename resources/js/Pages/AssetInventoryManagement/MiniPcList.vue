@@ -176,9 +176,9 @@ watch(
                 <div class="card-header bg-white py-4">
                     <div class="row align-items-center g-3">
                         <div class="col-md-4">
-                            <div class="fw-bold text-primary mb-0">
+                            <h5 class="fw-bold text-primary mb-0">
                                 List of Mini PC
-                            </div>
+                            </h5>
                         </div>
 
                         <div class="col-md-4">
@@ -269,69 +269,107 @@ watch(
                                     <td class="text-muted ps-4">
                                         {{ getRowNumber(index) }}
                                     </td>
-                                    <td>{{ pc.manufacturer_model }}</td>
                                     <td>
                                         <span
-                                            class="badge"
+                                            class="fw-semibold text-capitalize"
+                                            >{{ pc.manufacturer_model }}</span
+                                        >
+                                    </td>
+                                    <td>
+                                        <span
+                                            class="badge px-3 py-2"
                                             :class="{
-                                                'text-bg-success':
+                                                'bg-success':
                                                     pc.status === 'available',
-                                                'text-bg-warning':
+                                                'bg-warning text-dark':
                                                     pc.status === 'issued',
-                                                'text-bg-danger':
+                                                'bg-danger':
                                                     pc.status === 'pullout',
                                             }"
                                         >
-                                            {{ pc.status }}
+                                            {{
+                                                pc.status
+                                                    .charAt(0)
+                                                    .toUpperCase() +
+                                                pc.status.slice(1)
+                                            }}
                                         </span>
                                     </td>
                                     <td>
-                                        {{ pc.cpu }} / {{ pc.ram }} /
-                                        {{ pc.rom }}
+                                        <small class="text-muted">
+                                            <span v-if="pc.cpu">{{
+                                                pc.cpu
+                                            }}</span>
+                                            <span v-if="pc.cpu && pc.ram">
+                                                /
+                                            </span>
+                                            <span v-if="pc.ram"
+                                                >{{ pc.ram }} GB</span
+                                            >
+                                            <span
+                                                v-if="
+                                                    (pc.cpu || pc.ram) && pc.rom
+                                                "
+                                            >
+                                                /
+                                            </span>
+                                            <span v-if="pc.rom"
+                                                >{{ pc.rom }} GB</span
+                                            >
+                                        </small>
                                     </td>
                                     <td>
-                                        <div
+                                        <small
                                             v-if="
                                                 pc.issuances && pc.issuances[0]
                                             "
+                                            class="text-dark fw-semibold"
                                         >
                                             {{ pc.issuances[0].department }}
-                                        </div>
-                                        <div v-else>—</div>
+                                        </small>
+                                        <small v-else class="text-muted"
+                                            >—</small
+                                        >
                                     </td>
                                     <td>
-                                        <div
+                                        <small
                                             v-if="
                                                 pc.issuances && pc.issuances[0]
                                             "
+                                            class="text-dark fw-semibold"
                                         >
                                             {{
                                                 formatDate(
                                                     pc.issuances[0].date_issued,
                                                 )
                                             }}
-                                        </div>
-                                        <div v-else>—</div>
+                                        </small>
+                                        <small v-else class="text-muted"
+                                            >—</small
+                                        >
                                     </td>
                                     <td class="text-center">
                                         <a
-                                            class="btn btn-sm btn-info me-1"
+                                            class="btn btn-sm btn-outline-info me-2"
                                             :href="route('minipc.show', pc.id)"
                                             @click.stop
-                                            >Details</a
+                                            title="View details"
                                         >
+                                            <i class="bi bi-eye"></i>
+                                        </a>
                                         <button
-                                            class="btn btn-sm btn-warning me-1"
+                                            class="btn btn-sm btn-outline-warning me-2"
                                             @click.stop.prevent="
                                                 openUpdateModal(pc)
                                             "
                                             data-bs-toggle="modal"
                                             data-bs-target="#UpdateMiniPcModal"
+                                            title="Edit"
                                         >
-                                            Edit
+                                            <i class="bi bi-pencil"></i>
                                         </button>
                                         <button
-                                            class="btn btn-sm btn-danger"
+                                            class="btn btn-sm btn-outline-danger"
                                             @click.stop.prevent="
                                                 router.delete(
                                                     route(
@@ -340,8 +378,9 @@ watch(
                                                     ),
                                                 )
                                             "
+                                            title="Delete"
                                         >
-                                            Delete
+                                            <i class="bi bi-trash"></i>
                                         </button>
                                     </td>
                                 </tr>
@@ -352,7 +391,7 @@ watch(
 
                 <div class="card-footer border-top-0 bg-white py-3">
                     <div
-                        class="d-flex align-items-center justify-content-between"
+                        class="d-flex align-items-center justify-content-between flex-wrap gap-3"
                     >
                         <div class="text-secondary small">
                             Showing
