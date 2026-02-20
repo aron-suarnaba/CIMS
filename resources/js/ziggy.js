@@ -1,5 +1,114 @@
-const Ziggy = {"url":"http:\/\/localhost\/CIMS\/public","port":null,"defaults":{},"routes":{"sanctum.csrf-cookie":{"uri":"sanctum\/csrf-cookie","methods":["GET","HEAD"]},"welcome":{"uri":"\/","methods":["GET","HEAD"]},"login":{"uri":"login","methods":["GET","HEAD"]},"login.store":{"uri":"login","methods":["POST"]},"logout":{"uri":"logout","methods":["POST"]},"user.index":{"uri":"user\/{userid}","methods":["GET","HEAD"],"parameters":["userid"]},"user.update":{"uri":"user\/update","methods":["PATCH"]},"dashboard":{"uri":"Home","methods":["GET","HEAD"]},"AssetAndInventoryManagement":{"uri":"AssetAndInventoryManagement","methods":["GET","HEAD"]},"phone.index":{"uri":"AssetAndInventoryManagement\/Phone","methods":["GET","HEAD"]},"phone.create":{"uri":"AssetAndInventoryManagement\/Phone\/create","methods":["GET","HEAD"]},"phone.store":{"uri":"AssetAndInventoryManagement\/Phone","methods":["POST"]},"phone.show":{"uri":"AssetAndInventoryManagement\/Phone\/{phone}","methods":["GET","HEAD"],"parameters":["phone"],"bindings":{"phone":"id"}},"phone.update":{"uri":"AssetAndInventoryManagement\/Phone\/{phone}","methods":["PUT"],"parameters":["phone"],"bindings":{"phone":"id"}},"phone.issue":{"uri":"AssetAndInventoryManagement\/Phone\/{phone}\/issue","methods":["POST"],"parameters":["phone"],"bindings":{"phone":"id"}},"phone.return":{"uri":"AssetAndInventoryManagement\/Phone\/{phone}\/return","methods":["POST"],"parameters":["phone"],"bindings":{"phone":"id"}},"phone.destroy":{"uri":"AssetAndInventoryManagement\/Phone\/{phone}","methods":["DELETE"],"parameters":["phone"],"bindings":{"phone":"id"}},"computer.index":{"uri":"AssetAndInventoryManagement\/Computer","methods":["GET","HEAD"]},"computer.store":{"uri":"AssetAndInventoryManagement\/Computer","methods":["POST"]},"computer.show":{"uri":"AssetAndInventoryManagement\/Computer\/{computer}","methods":["GET","HEAD"],"parameters":["computer"],"bindings":{"computer":"host_name"}},"computer.issue":{"uri":"AssetAndInventoryManagement\/Computer\/{computer}\/issue","methods":["POST"],"parameters":["computer"],"bindings":{"computer":"host_name"}},"computer.return":{"uri":"AssetAndInventoryManagement\/Computer\/{computer}\/return","methods":["POST"],"parameters":["computer"],"bindings":{"computer":"host_name"}},"computer.destroy":{"uri":"AssetAndInventoryManagement\/Computer\/{computer}","methods":["DELETE"],"parameters":["computer"],"bindings":{"computer":"host_name"}},"network.index":{"uri":"NetworkMonitoringAndManagement","methods":["GET","HEAD"]},"storage.local":{"uri":"storage\/{path}","methods":["GET","HEAD"],"wheres":{"path":".*"},"parameters":["path"]}}};
+const Ziggy = {
+    url: 'http:\/\/localhost\/CIMS\/public',
+    port: null,
+    defaults: {},
+    routes: {
+        'sanctum.csrf-cookie': {
+            uri: 'sanctum\/csrf-cookie',
+            methods: ['GET', 'HEAD'],
+        },
+        welcome: { uri: '\/', methods: ['GET', 'HEAD'] },
+        login: { uri: 'login', methods: ['GET', 'HEAD'] },
+        'login.store': { uri: 'login', methods: ['POST'] },
+        logout: { uri: 'logout', methods: ['POST'] },
+        'user.index': {
+            uri: 'user\/{userid}',
+            methods: ['GET', 'HEAD'],
+            parameters: ['userid'],
+        },
+        'user.update': { uri: 'user\/update', methods: ['PATCH'] },
+        dashboard: { uri: 'Home', methods: ['GET', 'HEAD'] },
+        AssetAndInventoryManagement: {
+            uri: 'AssetAndInventoryManagement',
+            methods: ['GET', 'HEAD'],
+        },
+        'phone.index': {
+            uri: 'AssetAndInventoryManagement\/Phone',
+            methods: ['GET', 'HEAD'],
+        },
+        'phone.create': {
+            uri: 'AssetAndInventoryManagement\/Phone\/create',
+            methods: ['GET', 'HEAD'],
+        },
+        'phone.store': {
+            uri: 'AssetAndInventoryManagement\/Phone',
+            methods: ['POST'],
+        },
+        'phone.show': {
+            uri: 'AssetAndInventoryManagement\/Phone\/{phone}',
+            methods: ['GET', 'HEAD'],
+            parameters: ['phone'],
+            bindings: { phone: 'id' },
+        },
+        'phone.update': {
+            uri: 'AssetAndInventoryManagement\/Phone\/{phone}',
+            methods: ['PUT'],
+            parameters: ['phone'],
+            bindings: { phone: 'id' },
+        },
+        'phone.issue': {
+            uri: 'AssetAndInventoryManagement\/Phone\/{phone}\/issue',
+            methods: ['POST'],
+            parameters: ['phone'],
+            bindings: { phone: 'id' },
+        },
+        'phone.return': {
+            uri: 'AssetAndInventoryManagement\/Phone\/{phone}\/return',
+            methods: ['POST'],
+            parameters: ['phone'],
+            bindings: { phone: 'id' },
+        },
+        'phone.destroy': {
+            uri: 'AssetAndInventoryManagement\/Phone\/{phone}',
+            methods: ['DELETE'],
+            parameters: ['phone'],
+            bindings: { phone: 'id' },
+        },
+        'computer.index': {
+            uri: 'AssetAndInventoryManagement\/Computer',
+            methods: ['GET', 'HEAD'],
+        },
+        'computer.store': {
+            uri: 'AssetAndInventoryManagement\/Computer',
+            methods: ['POST'],
+        },
+        'computer.show': {
+            uri: 'AssetAndInventoryManagement\/Computer\/{computer}',
+            methods: ['GET', 'HEAD'],
+            parameters: ['computer'],
+            bindings: { computer: 'host_name' },
+        },
+        'computer.issue': {
+            uri: 'AssetAndInventoryManagement\/Computer\/{computer}\/issue',
+            methods: ['POST'],
+            parameters: ['computer'],
+            bindings: { computer: 'host_name' },
+        },
+        'computer.return': {
+            uri: 'AssetAndInventoryManagement\/Computer\/{computer}\/return',
+            methods: ['POST'],
+            parameters: ['computer'],
+            bindings: { computer: 'host_name' },
+        },
+        'computer.destroy': {
+            uri: 'AssetAndInventoryManagement\/Computer\/{computer}',
+            methods: ['DELETE'],
+            parameters: ['computer'],
+            bindings: { computer: 'host_name' },
+        },
+        'network.index': {
+            uri: 'NetworkMonitoringAndManagement',
+            methods: ['GET', 'HEAD'],
+        },
+        'storage.local': {
+            uri: 'storage\/{path}',
+            methods: ['GET', 'HEAD'],
+            wheres: { path: '.*' },
+            parameters: ['path'],
+        },
+    },
+};
 if (typeof window !== 'undefined' && typeof window.Ziggy !== 'undefined') {
-  Object.assign(Ziggy.routes, window.Ziggy.routes);
+    Object.assign(Ziggy.routes, window.Ziggy.routes);
 }
 export { Ziggy };

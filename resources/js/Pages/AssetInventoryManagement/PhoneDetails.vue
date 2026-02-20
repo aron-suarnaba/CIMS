@@ -56,7 +56,10 @@ const returnAccessoryText = (returnRecord, issuanceRecord = null) => {
         }
     }
 
-    if (issuanceRecord && (issuanceRecord.charger || issuanceRecord.headphones)) {
+    if (
+        issuanceRecord &&
+        (issuanceRecord.charger || issuanceRecord.headphones)
+    ) {
         return 'See issuance accessories';
     }
 
@@ -1176,7 +1179,7 @@ onUnmounted(() => {
                                 id="acknowledgement"
                                 v-model="form.acknowledgement"
                             />
-                            <label for="acknowledgement" class="form-label"
+                            <label for="acknowledgement" class="form-label text-primary fw-bold"
                                 >Information Technology</label
                             >
                         </div>

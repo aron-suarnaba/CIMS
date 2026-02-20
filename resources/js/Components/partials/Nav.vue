@@ -1,7 +1,7 @@
 <script setup>
+import { useDateFormatter } from '@/composables/useDateFormatter';
 import { Link, router } from '@inertiajs/vue3';
 import avatarPath from '/public/img/avatar.png';
-import { useDateFormatter } from '@/composables/useDateFormatter';
 
 const { formatDate } = useDateFormatter();
 
@@ -15,7 +15,6 @@ const toggleSidebar = () => {
         body.classList.remove('sidebar-open');
     }
 };
-
 
 const handleLogout = () => {
     router.post(route('logout'));

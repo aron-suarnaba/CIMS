@@ -30,7 +30,7 @@ window.axios.interceptors.request.use(
         }
         return config;
     },
-    (error) => Promise.reject(error)
+    (error) => Promise.reject(error),
 );
 
 // Ensure cookies (session) are sent with requests on same-origin setups

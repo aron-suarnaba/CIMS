@@ -1,8 +1,8 @@
 <script setup>
-import HomeLayout from '@/Layouts/HomeLayout.vue';
-import { router, useForm } from '@inertiajs/vue3';
 import BackButton from '@/Components/BackButton.vue';
 import Breadcrumb from '@/Components/Breadcrumb.vue';
+import HomeLayout from '@/Layouts/HomeLayout.vue';
+import { router, useForm } from '@inertiajs/vue3';
 
 const myBreadcrumb = [
     { label: 'Home', url: route('dashboard') },

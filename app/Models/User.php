@@ -21,6 +21,7 @@ class User extends Authenticatable
         'employee_id', // <-- ADDED THIS FIELD
         'first_name',
         'last_name',
+        'name',
         'department',
         'position',
         'email',
@@ -48,5 +49,17 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function getNameAttribute(): string
+    {
+        return trim(($this->first_name ?? '').' '.($this->last_name ?? ''));
+    }
+
+    public function setNameAttribute(string $value): void
+    {
+        $nameParts = preg_split('/\s+/', trim($value), 2) ?: [];
+        $this->attributes['first_name'] = $nameParts[0] ?? 'User';
+        $this->attributes['last_name'] = $nameParts[1] ?? 'User';
     }
 }

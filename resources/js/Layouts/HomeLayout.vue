@@ -1,7 +1,7 @@
 <script setup>
 import Sidebar from '@/Components/partials/Aside.vue';
-import Nav from '@/Components/partials/Nav.vue';
 import Footer from '@/Components/partials/Footer.vue';
+import Nav from '@/Components/partials/Nav.vue';
 </script>
 
 <template>
@@ -18,7 +18,7 @@ import Footer from '@/Components/partials/Footer.vue';
     </div>
 </template>
 <style scoped>
-#main{
+#main {
     padding-bottom: 13rem;
     min-height: 90vh;
 }

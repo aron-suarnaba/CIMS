@@ -36,8 +36,16 @@ class RegisteredUserController extends Controller
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
+        $nameParts = preg_split('/\s+/', trim((string) $request->name), 2) ?: [];
+        $firstName = $nameParts[0] ?? 'User';
+        $lastName = $nameParts[1] ?? 'User';
+
         $user = User::create([
-            'name' => $request->name,
+            'employee_id' => 'EMP-'.strtoupper(substr(sha1((string) $request->email), 0, 8)),
+            'first_name' => $firstName,
+            'last_name' => $lastName,
+            'department' => 'Unassigned',
+            'position' => 'User',
             'email' => $request->email,
             'password' => Hash::make($request->password),
         ]);

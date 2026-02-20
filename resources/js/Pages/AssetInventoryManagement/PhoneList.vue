@@ -464,7 +464,9 @@ const brandsOption = [
                                                 active:
                                                     currentSort === opt.value,
                                             }"
-                                            @click.prevent="applyFilter(opt.value)"
+                                            @click.prevent="
+                                                applyFilter(opt.value)
+                                            "
                                         >
                                             {{ opt.label }}
                                         </a>

@@ -45,7 +45,7 @@ const navItem = [
     <div class="app-header">
         <div class="container-fluid">
             <header
-                class="d-flex justify-content-center mb-4 flex-wrap px-5 pt-4 border border-0"
+                class="d-flex justify-content-center mb-4 flex-wrap border border-0 px-5 pt-4"
             >
                 <Link
                     :href="HomePath"

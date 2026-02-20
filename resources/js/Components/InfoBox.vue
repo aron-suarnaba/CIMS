@@ -1,5 +1,4 @@
-<script setup>
-</script>
+<script setup></script>
 <template>
     <span class="info-box bg-gradient clickable-card">
         <span class="info-box-icon">

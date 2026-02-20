@@ -1,3 +1,5 @@
+import '@/bootstrap'; // This usually defines window.axios
+import '@css/app.css';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faHouse, faUser } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
@@ -11,8 +13,6 @@ import Swal from 'sweetalert2';
 import { createApp, h, watch } from 'vue';
 import VueApexCharts from 'vue3-apexcharts';
 import { ZiggyVue } from 'ziggy-js';
-import '@css/app.css';
-import '@/bootstrap'; // This usually defines window.axios
 window.bootstrap = bootstrap;
 
 const appName = import.meta.env.VITE_APP_NAME || 'CIMS';
@@ -48,9 +48,7 @@ window.axios.interceptors.response.use(
     (response) => response,
     (error) => {
         if (error.response && error.response.status === 419) {
-            showSessionWarning(
-                'Session token expired. Refreshing the page...',
-            );
+            showSessionWarning('Session token expired. Refreshing the page...');
             // Wait 2 seconds then refresh
             setTimeout(() => {
                 window.location.reload();
