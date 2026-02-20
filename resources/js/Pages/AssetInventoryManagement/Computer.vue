@@ -293,20 +293,78 @@ const submit = () => {
                     class="pagination d-flex justify-content-end align-items-center mb-0 gap-2"
                 >
                     <li
-                        v-for="(link, index) in props.computers.links"
-                        :key="index"
                         class="page-item"
                         :class="{
-                            active: link.active,
-                            disabled: !link.url,
+                            disabled: props.computers.current_page === 1,
                         }"
                     >
                         <button
                             class="page-link"
-                            @click.prevent="gotoPage(link.url)"
-                            v-html="link.label"
-                            :disabled="!link.url"
-                        ></button>
+                            @click.prevent="
+                                gotoPage(props.computers.first_page_url)
+                            "
+                            :disabled="props.computers.current_page === 1"
+                        >
+                            &lt;&lt;
+                        </button>
+                    </li>
+                    <li
+                        class="page-item"
+                        :class="{
+                            disabled: !props.computers.prev_page_url,
+                        }"
+                    >
+                        <button
+                            class="page-link"
+                            @click.prevent="
+                                gotoPage(props.computers.prev_page_url)
+                            "
+                            :disabled="!props.computers.prev_page_url"
+                        >
+                            previous
+                        </button>
+                    </li>
+                    <li class="page-item disabled">
+                        <span class="page-link">
+                            {{ props.computers.current_page }}
+                        </span>
+                    </li>
+                    <li
+                        class="page-item"
+                        :class="{
+                            disabled: !props.computers.next_page_url,
+                        }"
+                    >
+                        <button
+                            class="page-link"
+                            @click.prevent="
+                                gotoPage(props.computers.next_page_url)
+                            "
+                            :disabled="!props.computers.next_page_url"
+                        >
+                            next
+                        </button>
+                    </li>
+                    <li
+                        class="page-item"
+                        :class="{
+                            disabled:
+                                props.computers.current_page ===
+                                props.computers.last_page,
+                        }"
+                    >
+                        <button
+                            class="page-link"
+                            @click.prevent="
+                                gotoPage(props.computers.last_page_url)
+                            "
+                            :disabled="
+                                props.computers.current_page ===
+                                props.computers.last_page
+                            "
+                        >
+                            &gt;&gt;
+                        </button>
                     </li>
                 </ul>
             </nav>

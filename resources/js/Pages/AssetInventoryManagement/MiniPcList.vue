@@ -409,7 +409,26 @@ watch(
                             entries
                         </div>
                         <nav>
-                            <ul class="pagination">
+                            <ul class="pagination mb-0 gap-1">
+                                <li
+                                    class="page-item"
+                                    :class="{
+                                        disabled: props.pcs.current_page === 1,
+                                    }"
+                                >
+                                    <a
+                                        class="page-link"
+                                        href="#"
+                                        @click.prevent="
+                                            router.get(route('minipc.index'), {
+                                                search: searchQuery,
+                                                sort: currentSort,
+                                                page: 1,
+                                            })
+                                        "
+                                        >&lt;&lt;</a
+                                    >
+                                </li>
                                 <li
                                     class="page-item"
                                     :class="{
@@ -422,8 +441,13 @@ watch(
                                         @click.prevent="
                                             router.get(props.pcs.prev_page_url)
                                         "
-                                        >Previous</a
+                                        >previous</a
                                     >
+                                </li>
+                                <li class="page-item disabled">
+                                    <span class="page-link">
+                                        {{ props.pcs.current_page }}
+                                    </span>
                                 </li>
                                 <li
                                     class="page-item"
@@ -437,7 +461,28 @@ watch(
                                         @click.prevent="
                                             router.get(props.pcs.next_page_url)
                                         "
-                                        >Next</a
+                                        >next</a
+                                    >
+                                </li>
+                                <li
+                                    class="page-item"
+                                    :class="{
+                                        disabled:
+                                            props.pcs.current_page ===
+                                            props.pcs.last_page,
+                                    }"
+                                >
+                                    <a
+                                        class="page-link"
+                                        href="#"
+                                        @click.prevent="
+                                            router.get(route('minipc.index'), {
+                                                search: searchQuery,
+                                                sort: currentSort,
+                                                page: props.pcs.last_page,
+                                            })
+                                        "
+                                        >&gt;&gt;</a
                                     >
                                 </li>
                             </ul>

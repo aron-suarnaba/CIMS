@@ -1008,28 +1008,29 @@ onUnmounted(() => {
                                         >
                                             <button
                                                 class="page-link"
-                                                @click="prevPage"
+                                                @click="currentPage = 1"
                                             >
-                                                Previous
+                                                &lt;&lt;
                                             </button>
                                         </li>
-
                                         <li
-                                            v-for="page in totalPages"
-                                            :key="page"
                                             class="page-item"
                                             :class="{
-                                                active: currentPage === page,
+                                                disabled: currentPage === 1,
                                             }"
                                         >
                                             <button
                                                 class="page-link"
-                                                @click="currentPage = page"
+                                                @click="prevPage"
                                             >
-                                                {{ page }}
+                                                previous
                                             </button>
                                         </li>
-
+                                        <li class="page-item disabled">
+                                            <span class="page-link">
+                                                {{ currentPage }}
+                                            </span>
+                                        </li>
                                         <li
                                             class="page-item"
                                             :class="{
@@ -1041,7 +1042,23 @@ onUnmounted(() => {
                                                 class="page-link"
                                                 @click="nextPage"
                                             >
-                                                Next
+                                                next
+                                            </button>
+                                        </li>
+                                        <li
+                                            class="page-item"
+                                            :class="{
+                                                disabled:
+                                                    currentPage === totalPages,
+                                            }"
+                                        >
+                                            <button
+                                                class="page-link"
+                                                @click="
+                                                    currentPage = totalPages
+                                                "
+                                            >
+                                                &gt;&gt;
                                             </button>
                                         </li>
                                     </ul>
@@ -1179,7 +1196,9 @@ onUnmounted(() => {
                                 id="acknowledgement"
                                 v-model="form.acknowledgement"
                             />
-                            <label for="acknowledgement" class="form-label text-primary fw-bold"
+                            <label
+                                for="acknowledgement"
+                                class="form-label text-primary fw-bold"
                                 >Information Technology</label
                             >
                         </div>

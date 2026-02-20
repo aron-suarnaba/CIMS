@@ -648,6 +648,32 @@ const brandsOption = [
                                                 route('phone.index'),
                                                 {
                                                     ...$page.props.filters,
+                                                    page: 1,
+                                                },
+                                                { preserveScroll: true },
+                                            )
+                                        "
+                                        :disabled="
+                                            props.phones.current_page === 1
+                                        "
+                                    >
+                                        &lt;&lt;
+                                    </button>
+                                </li>
+                                <li
+                                    class="page-item"
+                                    :class="{
+                                        disabled:
+                                            props.phones.current_page === 1,
+                                    }"
+                                >
+                                    <button
+                                        class="page-link text-dark border-0 px-3"
+                                        @click="
+                                            router.get(
+                                                route('phone.index'),
+                                                {
+                                                    ...$page.props.filters,
                                                     page:
                                                         props.phones
                                                             .current_page - 1,
@@ -659,10 +685,7 @@ const brandsOption = [
                                             props.phones.current_page === 1
                                         "
                                     >
-                                        <span aria-hidden="true">&larr;</span>
-                                        <span class="d-none d-sm-inline ms-1"
-                                            >Previous</span
-                                        >
+                                        previous
                                     </button>
                                 </li>
 
@@ -670,8 +693,7 @@ const brandsOption = [
                                     <span
                                         class="page-link text-dark fw-medium border-0 bg-transparent px-3"
                                     >
-                                        Page {{ props.phones.current_page }} of
-                                        {{ props.phones.last_page }}
+                                        {{ props.phones.current_page }}
                                     </span>
                                 </li>
 
@@ -702,10 +724,36 @@ const brandsOption = [
                                             props.phones.last_page
                                         "
                                     >
-                                        <span class="d-none d-sm-inline me-1"
-                                            >Next</span
-                                        >
-                                        <span aria-hidden="true">&rarr;</span>
+                                        next
+                                    </button>
+                                </li>
+                                <li
+                                    class="page-item"
+                                    :class="{
+                                        disabled:
+                                            props.phones.current_page ===
+                                            props.phones.last_page,
+                                    }"
+                                >
+                                    <button
+                                        class="page-link text-dark border-0 px-3"
+                                        @click="
+                                            router.get(
+                                                route('phone.index'),
+                                                {
+                                                    ...$page.props.filters,
+                                                    page: props.phones
+                                                        .last_page,
+                                                },
+                                                { preserveScroll: true },
+                                            )
+                                        "
+                                        :disabled="
+                                            props.phones.current_page ===
+                                            props.phones.last_page
+                                        "
+                                    >
+                                        &gt;&gt;
                                     </button>
                                 </li>
                             </ul>

@@ -355,7 +355,30 @@ const deleteItem = (id) => {
                             entries
                         </div>
                         <nav>
-                            <ul class="pagination mb-0">
+                            <ul class="pagination mb-0 gap-1">
+                                <li
+                                    class="page-item"
+                                    :class="{
+                                        disabled:
+                                            props.licenses.current_page === 1,
+                                    }"
+                                >
+                                    <a
+                                        class="page-link"
+                                        href="#"
+                                        @click.prevent="
+                                            router.get(
+                                                route('software-license.index'),
+                                                {
+                                                    search: searchQuery,
+                                                    sort: currentSort,
+                                                    page: 1,
+                                                },
+                                            )
+                                        "
+                                        >&lt;&lt;</a
+                                    >
+                                </li>
                                 <li
                                     class="page-item"
                                     :class="{
@@ -371,8 +394,13 @@ const deleteItem = (id) => {
                                                 props.licenses.prev_page_url,
                                             )
                                         "
-                                        >Previous</a
+                                        >previous</a
                                     >
+                                </li>
+                                <li class="page-item disabled">
+                                    <span class="page-link">
+                                        {{ props.licenses.current_page }}
+                                    </span>
                                 </li>
                                 <li
                                     class="page-item"
@@ -389,7 +417,32 @@ const deleteItem = (id) => {
                                                 props.licenses.next_page_url,
                                             )
                                         "
-                                        >Next</a
+                                        >next</a
+                                    >
+                                </li>
+                                <li
+                                    class="page-item"
+                                    :class="{
+                                        disabled:
+                                            props.licenses.current_page ===
+                                            props.licenses.last_page,
+                                    }"
+                                >
+                                    <a
+                                        class="page-link"
+                                        href="#"
+                                        @click.prevent="
+                                            router.get(
+                                                route('software-license.index'),
+                                                {
+                                                    search: searchQuery,
+                                                    sort: currentSort,
+                                                    page: props.licenses
+                                                        .last_page,
+                                                },
+                                            )
+                                        "
+                                        >&gt;&gt;</a
                                     >
                                 </li>
                             </ul>

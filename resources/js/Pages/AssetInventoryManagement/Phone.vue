@@ -304,20 +304,78 @@ const brandsOption = [
                             class="pagination d-flex justify-content-center align-items-center mb-0 gap-2"
                         >
                             <li
-                                v-for="(link, index) in props.phones.links"
-                                :key="index"
                                 class="page-item"
                                 :class="{
-                                    active: link.active,
-                                    disabled: !link.url,
+                                    disabled: props.phones.current_page === 1,
                                 }"
                             >
                                 <button
                                     class="page-link"
-                                    @click.prevent="gotoPage(link.url)"
-                                    v-html="link.label"
-                                    :disabled="!link.url"
-                                ></button>
+                                    @click.prevent="
+                                        gotoPage(props.phones.first_page_url)
+                                    "
+                                    :disabled="props.phones.current_page === 1"
+                                >
+                                    &lt;&lt;
+                                </button>
+                            </li>
+                            <li
+                                class="page-item"
+                                :class="{
+                                    disabled: !props.phones.prev_page_url,
+                                }"
+                            >
+                                <button
+                                    class="page-link"
+                                    @click.prevent="
+                                        gotoPage(props.phones.prev_page_url)
+                                    "
+                                    :disabled="!props.phones.prev_page_url"
+                                >
+                                    previous
+                                </button>
+                            </li>
+                            <li class="page-item disabled">
+                                <span class="page-link">
+                                    {{ props.phones.current_page }}
+                                </span>
+                            </li>
+                            <li
+                                class="page-item"
+                                :class="{
+                                    disabled: !props.phones.next_page_url,
+                                }"
+                            >
+                                <button
+                                    class="page-link"
+                                    @click.prevent="
+                                        gotoPage(props.phones.next_page_url)
+                                    "
+                                    :disabled="!props.phones.next_page_url"
+                                >
+                                    next
+                                </button>
+                            </li>
+                            <li
+                                class="page-item"
+                                :class="{
+                                    disabled:
+                                        props.phones.current_page ===
+                                        props.phones.last_page,
+                                }"
+                            >
+                                <button
+                                    class="page-link"
+                                    @click.prevent="
+                                        gotoPage(props.phones.last_page_url)
+                                    "
+                                    :disabled="
+                                        props.phones.current_page ===
+                                        props.phones.last_page
+                                    "
+                                >
+                                    &gt;&gt;
+                                </button>
                             </li>
                         </ul>
                     </nav>

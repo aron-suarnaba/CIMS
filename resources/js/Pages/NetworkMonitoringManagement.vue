@@ -208,22 +208,23 @@ onMounted(fetchDevices);
                                 <a
                                     class="page-link"
                                     href="#"
-                                    @click.prevent="setPage(currentPage - 1)"
-                                    >Previous</a
+                                    @click.prevent="setPage(1)"
+                                    >&lt;&lt;</a
                                 >
                             </li>
                             <li
-                                v-for="page in totalPages"
-                                :key="page"
                                 class="page-item"
-                                :class="{ active: currentPage === page }"
+                                :class="{ disabled: currentPage === 1 }"
                             >
                                 <a
                                     class="page-link"
                                     href="#"
-                                    @click.prevent="setPage(page)"
-                                    >{{ page }}</a
+                                    @click.prevent="setPage(currentPage - 1)"
+                                    >previous</a
                                 >
+                            </li>
+                            <li class="page-item disabled">
+                                <span class="page-link">{{ currentPage }}</span>
                             </li>
                             <li
                                 class="page-item"
@@ -235,7 +236,20 @@ onMounted(fetchDevices);
                                     class="page-link"
                                     href="#"
                                     @click.prevent="setPage(currentPage + 1)"
-                                    >Next</a
+                                    >next</a
+                                >
+                            </li>
+                            <li
+                                class="page-item"
+                                :class="{
+                                    disabled: currentPage === totalPages,
+                                }"
+                            >
+                                <a
+                                    class="page-link"
+                                    href="#"
+                                    @click.prevent="setPage(totalPages)"
+                                    >&gt;&gt;</a
                                 >
                             </li>
                         </ul>

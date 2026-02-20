@@ -788,26 +788,29 @@ const returnSubmit = () => {
                                         >
                                             <button
                                                 class="page-link"
-                                                @click="currentPage--"
+                                                @click="currentPage = 1"
                                             >
-                                                Previous
+                                                &lt;&lt;
                                             </button>
                                         </li>
-
                                         <li
-                                            v-for="page in totalPages"
-                                            :key="page"
                                             class="page-item"
                                             :class="{
-                                                active: currentPage === page,
+                                                disabled: currentPage === 1,
                                             }"
                                         >
                                             <button
                                                 class="page-link"
-                                                @click="currentPage = page"
+                                                @click="currentPage--"
                                             >
-                                                {{ page }}
+                                                previous
                                             </button>
+                                        </li>
+
+                                        <li class="page-item disabled">
+                                            <span class="page-link">
+                                                {{ currentPage }}
+                                            </span>
                                         </li>
 
                                         <li
@@ -821,7 +824,23 @@ const returnSubmit = () => {
                                                 class="page-link"
                                                 @click="currentPage++"
                                             >
-                                                Next
+                                                next
+                                            </button>
+                                        </li>
+                                        <li
+                                            class="page-item"
+                                            :class="{
+                                                disabled:
+                                                    currentPage === totalPages,
+                                            }"
+                                        >
+                                            <button
+                                                class="page-link"
+                                                @click="
+                                                    currentPage = totalPages
+                                                "
+                                            >
+                                                &gt;&gt;
                                             </button>
                                         </li>
                                     </ul>
