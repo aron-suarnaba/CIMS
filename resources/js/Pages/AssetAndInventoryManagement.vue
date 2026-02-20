@@ -40,6 +40,13 @@ const navCard = [
         desc: 'Mini PC Units',
     },
     {
+        label: 'Software Licenses',
+        url: route('software-license.index'),
+        icon: 'bi bi-key-fill',
+        color: 'secondary',
+        desc: 'License Inventory',
+    },
+    {
         label: 'Networking',
         url: '#', // Placeholder for future routes
         icon: 'bi bi-router',

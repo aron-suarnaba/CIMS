@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ComputersController;
 use App\Http\Controllers\PhoneController;
+use App\Http\Controllers\SoftwareLicenseController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\FortigateController;
 use App\Http\Controllers\NetworkMonitoringController;
@@ -56,6 +57,14 @@ Route::middleware('auth')->group(function () {
             Route::delete('/minipc/{minipc}', [App\Http\Controllers\MiniPcController::class, 'destroy'])->whereNumber('minipc')->name('minipc.destroy');
             Route::post('/minipc/{minipc}/issue', [App\Http\Controllers\MiniPcController::class, 'issue'])->whereNumber('minipc')->name('minipc.issue');
             Route::post('/minipc/{minipc}/pullout', [App\Http\Controllers\MiniPcController::class, 'pullout'])->whereNumber('minipc')->name('minipc.pullout');
+        });
+
+        Route::prefix('SoftwareLicense')->group(function () {
+            Route::get('/', [SoftwareLicenseController::class, 'index'])->name('software-license.index');
+            Route::post('/', [SoftwareLicenseController::class, 'store'])->name('software-license.store');
+            Route::get('/{softwareLicense}', [SoftwareLicenseController::class, 'show'])->whereNumber('softwareLicense')->name('software-license.show');
+            Route::put('/{softwareLicense}', [SoftwareLicenseController::class, 'update'])->whereNumber('softwareLicense')->name('software-license.update');
+            Route::delete('/{softwareLicense}', [SoftwareLicenseController::class, 'destroy'])->whereNumber('softwareLicense')->name('software-license.destroy');
         });
 
         // Your existing transaction store (if used for logging)
