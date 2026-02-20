@@ -34,7 +34,7 @@ const navCard = [
     },
     {
         label: 'Mini PC',
-        url: '#',
+        url: route('minipc.index'),
         icon: 'bi bi-pc-horizontal',
         color: 'dark',
         desc: 'Mini PC Units',
@@ -57,12 +57,11 @@ const navCard = [
 </script>
 
 <template>
-    <div class="app-content-header bg-light border-bottom py-3">
+    <div class="app-content-header bg-light py-3">
         <div class="container">
             <Breadcrumb :breadcrumbs="myBreadcrumb" />
         </div>
     </div>
-    ``
 
     <div class="app-content mt-4">
         <div class="container">

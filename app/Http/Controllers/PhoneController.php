@@ -76,6 +76,7 @@ class PhoneController extends Controller
         FROM (
             SELECT
                 p.*,
+                pi.issued_to as trans_issued_to,
                 pi.department as trans_dept,
                 pi.date_issued as trans_date,
                 ROW_NUMBER() OVER (ORDER BY $orderBy) AS row_num
@@ -93,6 +94,7 @@ class PhoneController extends Controller
 
         $formattedData = array_map(function ($phone) {
             $phone->current_transaction = $phone->trans_dept ? [
+                'issued_to' => $phone->trans_issued_to,
                 'department' => $phone->trans_dept,
                 'date_issued' => $phone->trans_date,
             ] : null;
@@ -177,6 +179,8 @@ class PhoneController extends Controller
             'department' => 'required|string|max:255',
             'date_issued' => 'required|date',
             'issued_accessories' => 'nullable|string',
+            'headphones' => 'nullable|boolean',
+            'charger' => 'nullable|boolean',
             'cashout' => 'required|boolean',
             'acknowledgement' => 'nullable|boolean',
             'remarks' => 'nullable|string|max:255',
@@ -192,6 +196,8 @@ class PhoneController extends Controller
             'department' => $validated['department'],
             'date_issued' => $validated['date_issued'],
             'issued_accessories' => $validated['issued_accessories'] ?? null,
+            'headphones' => $validated['headphones'] ?? false,
+            'charger' => $validated['charger'] ?? false,
             'acknowledgement' => $validated['acknowledgement'] ?? null,
             'cashout' => $validated['cashout'],
         ];
@@ -222,6 +228,8 @@ class PhoneController extends Controller
             'returnee_department' => 'required|string|max:255',
             'date_returned' => 'required|date',
             'returned_accessories' => 'nullable|string',
+            'charger' => 'nullable|boolean',
+            'headphones' => 'nullable|boolean',
             'remarks' => 'nullable|string|max:255',
         ]);
 
@@ -245,6 +253,8 @@ class PhoneController extends Controller
                     'returnee_department' => $validated['returnee_department'],
                     'date_returned' => $validated['date_returned'],
                     'returned_accessories' => $validated['returned_accessories'],
+                    'charger' => $validated['charger'] ?? false,
+                    'headphones' => $validated['headphones'] ?? false,
                     'remarks' => $validated['remarks'] ?? null,
                 ]);
 

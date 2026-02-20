@@ -45,7 +45,7 @@ const navItem = [
     <div class="app-header">
         <div class="container-fluid">
             <header
-                class="d-flex justify-content-center mb-4 flex-wrap px-5 pt-4"
+                class="d-flex justify-content-center mb-4 flex-wrap px-5 pt-4 border border-0"
             >
                 <Link
                     :href="HomePath"
@@ -57,7 +57,9 @@ const navItem = [
 
                 <ul class="nav nav-pills">
                     <li class="nav-item" v-for="nav in navItem" :key="nav.name">
-                        <a :href="nav.url" class="nav-link">{{ nav.name }}</a>
+                        <a :href="nav.url" class="nav-link text-primary">{{
+                            nav.name
+                        }}</a>
                     </li>
                 </ul>
             </header>

@@ -51,6 +51,29 @@
     </style>
 </head>
 <body>
+    @php
+        $latestIssuance = $transactions->last();
+        $withCashout = (bool) ($latestIssuance->cashout ?? false);
+        $hasCharger = (bool) ($latestIssuance->charger ?? false);
+        $hasHeadphones = (bool) ($latestIssuance->headphones ?? false);
+        $hasReturnedAccessory = function ($return, $keyword) {
+            if (!$return) {
+                return false;
+            }
+
+            $normalized = strtolower($keyword);
+            if ($normalized === 'charger' && isset($return->charger)) {
+                return (bool) $return->charger;
+            }
+            if (($normalized === 'headphone' || $normalized === 'earphone') && isset($return->headphones)) {
+                return (bool) $return->headphones;
+            }
+
+            return !empty($return->returned_accessories)
+                && str_contains(strtolower((string) $return->returned_accessories), $normalized);
+        };
+    @endphp
+
     <div class="container">
         <div class="header-section">
             <div class="company-name">Printwell, Inc.</div>
@@ -68,8 +91,8 @@
                     <div class="field-row"><span class="label">Department:</span><span class="line-fill">{{ optional($transactions->last())->department ?? '' }}</span></div>
 
                     <div class="cashout-container">
-                        <span class="checkbox-custom">&#x2610;</span> With Cashout &nbsp;&nbsp;&nbsp;
-                        <span class="checkbox-custom">&#x2610;</span> Without cashout
+                        <span class="checkbox-custom">{!! $withCashout ? '&#x2611;' : '&#x2610;' !!}</span> With Cashout &nbsp;&nbsp;&nbsp;
+                        <span class="checkbox-custom">{!! !$withCashout ? '&#x2611;' : '&#x2610;' !!}</span> Without cashout
                     </div>
                 </td>
 
@@ -81,8 +104,8 @@
                     <div class="field-row">
                         <span class="label">Accessories:</span>
                         <span class="line-fill" style="border-bottom: none;">
-                            <span class="checkbox-custom">&#x2610;</span> Charger &nbsp;&nbsp;
-                            <span class="checkbox-custom">&#x2610;</span> Earphone
+                            <span class="checkbox-custom">{!! $hasCharger ? '&#x2611;' : '&#x2610;' !!}</span> Charger &nbsp;&nbsp;
+                            <span class="checkbox-custom">{!! $hasHeadphones ? '&#x2611;' : '&#x2610;' !!}</span> Headphones
                         </span>
                     </div>
                 </td>
@@ -107,17 +130,18 @@
                         @foreach($transactions as $trx)
                         <tr>
                             <td>{{ $trx->issued_to }}</td>
-                            <td>{{ $trx->date_issued ? $trx->date_issued->format('m/d/y') : '' }}</td>
+                            <td>{{ $trx->date_issued ? $trx->date_issued->format('F j, Y') : '' }}</td>
                             <td>{{ $trx->issued_by }}</td>
                             <td class="acc-cell">
-                                <span class="checkbox-custom">&#x2610;</span> Charger<br><span class="checkbox-custom">&#x2610;</span> Earphone
+                                <span class="checkbox-custom">{!! $trx->charger ? '&#x2611;' : '&#x2610;' !!}</span> Charger<br>
+                                <span class="checkbox-custom">{!! $trx->headphones ? '&#x2611;' : '&#x2610;' !!}</span> Headphones
                             </td>
                             <td></td>
                             <td></td>
                         </tr>
                         @endforeach
                         @for ($i = count($transactions); $i < 11; $i++)
-                        <tr><td></td><td></td><td></td><td class="acc-cell"><span class="checkbox-custom">&#x2610;</span> Charger<br><span class="checkbox-custom">&#x2610;</span> Earphone</td><td></td><td></td></tr>
+                        <tr><td></td><td></td><td></td><td class="acc-cell"><span class="checkbox-custom">&#x2610;</span> Charger<br><span class="checkbox-custom">&#x2610;</span> Headphones</td><td></td><td></td></tr>
                         @endfor
                     </tbody>
                 </table>
@@ -142,17 +166,18 @@
                         @foreach($transactions as $trx)
                         <tr>
                             <td>{{ $trx->return->returned_by ?? '' }}</td>
-                            <td>{{ ($trx->return && $trx->return->date_returned) ? $trx->return->date_returned->format('m/d/y') : '' }}</td>
+                            <td>{{ ($trx->return && $trx->return->date_returned) ? $trx->return->date_returned->format('F j, Y') : '' }}</td>
                             <td>{{ $trx->return->returned_to ?? '' }}</td>
                             <td class="acc-cell">
-                                <span class="checkbox-custom">&#x2610;</span> Charger<br><span class="checkbox-custom">&#x2610;</span> Earphone
+                                <span class="checkbox-custom">{!! $hasReturnedAccessory($trx->return, 'charger') ? '&#x2611;' : '&#x2610;' !!}</span> Charger<br>
+                                <span class="checkbox-custom">{!! $hasReturnedAccessory($trx->return, 'headphone') || $hasReturnedAccessory($trx->return, 'earphone') ? '&#x2611;' : '&#x2610;' !!}</span> Headphones
                             </td>
                             <td></td>
                             <td></td>
                         </tr>
                         @endforeach
                         @for ($i = count($transactions); $i < 11; $i++)
-                        <tr><td></td><td></td><td></td><td class="acc-cell"><span class="checkbox-custom">&#x2610;</span> Charger<br><span class="checkbox-custom">&#x2610;</span> Earphone</td><td></td><td></td></tr>
+                        <tr><td></td><td></td><td></td><td class="acc-cell"><span class="checkbox-custom">&#x2610;</span> Charger<br><span class="checkbox-custom">&#x2610;</span> Headphones</td><td></td><td></td></tr>
                         @endfor
                     </tbody>
                 </table>

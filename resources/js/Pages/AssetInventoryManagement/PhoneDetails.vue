@@ -25,6 +25,42 @@ const props = defineProps({
     },
 });
 
+const issuanceAccessoryText = (issuance) => {
+    if (!issuance) return 'None';
+
+    const selected = [];
+    if (issuance.charger) selected.push('Charger');
+    if (issuance.headphones) selected.push('Headphones');
+
+    if (selected.length > 0) {
+        return selected.join(', ');
+    }
+
+    return issuance.issued_accessories || 'None';
+};
+
+const returnAccessoryText = (returnRecord, issuanceRecord = null) => {
+    if (returnRecord) {
+        const selected = [];
+        if (returnRecord.charger) selected.push('Charger');
+        if (returnRecord.headphones) selected.push('Headphones');
+
+        if (selected.length > 0) {
+            return selected.join(', ');
+        }
+
+        if (returnRecord.returned_accessories) {
+            return returnRecord.returned_accessories;
+        }
+    }
+
+    if (issuanceRecord && (issuanceRecord.charger || issuanceRecord.headphones)) {
+        return 'See issuance accessories';
+    }
+
+    return 'None';
+};
+
 // Function for breadcrumb
 // const myBreadcrumb = [
 //     { label: 'Dashboard', url: route('dashboard') },
@@ -186,11 +222,13 @@ watch(historySearch, () => {
 const form = useForm({
     issued_by: '',
     issued_to: '',
-    acknowledgement: '',
+    acknowledgement: false,
     department: '',
     date_issued: new Date(),
     issued_accessories: '',
-    cashout: false,
+    headphones: false,
+    charger: false,
+    cashout: '0',
     remarks: '',
 });
 
@@ -201,6 +239,8 @@ const returnform = useForm({
     returnee_department: '',
     date_returned: new Date().toISOString().substr(0, 10),
     returned_accessories: '',
+    charger: false,
+    headphones: false,
     remarks: '',
 });
 
@@ -224,9 +264,13 @@ let updatePicObjectUrl = null;
 // Listeners
 watch(selectedAcc, (newVal) => {
     form.issued_accessories = newVal.join(', ');
+    form.charger = newVal.includes('Charger');
+    form.headphones = newVal.includes('Headphones');
 });
 watch(selectedReturnAcc, (newVal) => {
     returnform.returned_accessories = newVal.join(', ');
+    returnform.charger = newVal.includes('Charger');
+    returnform.headphones = newVal.includes('Headphones');
 });
 
 // const visible = ref(false);
@@ -318,6 +362,7 @@ const onUpdateFileSelect = (event) => {
         : getPhoneImagePath(props.phone);
 };
 
+//Automatically clear the image when close the modals
 const clearUpdateSelectedImage = () => {
     updateForm.image = null;
     if (updatePicObjectUrl) {
@@ -354,6 +399,7 @@ const openReturnModal = () => {
     showReturnModal.value = true;
 };
 
+//Redirect to the logsheet url base in the phone id
 const generateLogsheet = (id) => {
     window.open(
         `
@@ -362,6 +408,7 @@ const generateLogsheet = (id) => {
     );
 };
 
+//This is the logic for attaching websocket in the pages
 onMounted(() => {
     window.Echo.channel('phoneInventory').listen('.AssetUpdated', (e) => {
         console.log('Update received:', e.message);
@@ -374,6 +421,7 @@ onMounted(() => {
         ?.addEventListener('hidden.bs.modal', handleUpdateModalHidden);
 });
 
+//This is the logic for removing websocket in the pages when leaving the pages to avoid background running websocket
 onUnmounted(() => {
     window.Echo.leave('phoneInventory');
 
@@ -458,8 +506,8 @@ onUnmounted(() => {
             <div class="row g-3">
                 <!-- Asset Details -->
                 <div class="col-sm-12 col-xl-4 col-lg-5">
-                    <!-- <div class="card border-0 shadow-sm">
-                        <div class="card-header bg-dark py-3 text-white">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header bg-primary py-3 text-white">
                             <h5 class="fw-bold mb-0">Device Specifications</h5>
                         </div>
                         <div class="card-body">
@@ -721,8 +769,9 @@ onUnmounted(() => {
                                         <i class="bi bi-headphones text-primary me-2"></i>Accessories:</label>
                                     <div class="d-flex align-items-center">
                                         <span class="text-muted fw-bold ms-2">{{
-                                            props.phone_issuance
-                                                ?.issued_accessories || 'None'
+                                            issuanceAccessoryText(
+                                                props.phone_issuance,
+                                            )
                                         }}</span>
                                     </div>
                                 </div>
@@ -784,8 +833,10 @@ onUnmounted(() => {
 
                                     <p class="d-flex align-items-center">
                                         <span class="text-muted fw-bold ms-2">{{
-                                            props.phone_return
-                                                ?.returned_accessories || 'None'
+                                            returnAccessoryText(
+                                                props.phone_return,
+                                                props.phone_issuance,
+                                            )
                                         }}</span>
                                     </p>
                                 </div>
@@ -865,10 +916,11 @@ onUnmounted(() => {
                                                 </div>
                                             </td>
 
-                                            <td class="small text-wrap" style="max-width: 150px">
-                                                {{
-                                                    tx.issued_accessories || '—'
-                                                }}
+                                            <td
+                                                class="small text-wrap"
+                                                style="max-width: 150px"
+                                            >
+                                                {{ issuanceAccessoryText(tx) }}
                                             </td>
 
                                             <td class="text-nowrap">
@@ -906,11 +958,15 @@ onUnmounted(() => {
                                                 </div>
                                             </td>
 
-                                            <td class="small text-muted text-wrap pe-3" style="max-width: 150px">
+                                            <td
+                                                class="small text-muted text-wrap pe-3"
+                                                style="max-width: 150px"
+                                            >
                                                 {{
-                                                    tx.return
-                                                        ?.returned_accessories ||
-                                                    '—'
+                                                    returnAccessoryText(
+                                                        tx.return,
+                                                        tx,
+                                                    )
                                                 }}
                                             </td>
                                         </tr>

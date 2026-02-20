@@ -21,6 +21,7 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             PhoneSeeder::class,
             ComputersSeeder::class,
+            MiniPcSeeder::class,
         ]);
     }
 }
