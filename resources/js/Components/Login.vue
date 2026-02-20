@@ -8,7 +8,7 @@ const form = useForm({
 });
 
 const submit = () => {
-    form.post(route('login.store'), {
+    form.post(route('login'), {
         onFinish: () => {
             // Only resets the password field so the user doesn't have to re-type their email on failure
             form.reset('password');
