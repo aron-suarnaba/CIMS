@@ -46,6 +46,13 @@ const sessionRefreshPath = '/refresh-session';
 const activityEvents = ['input', 'keydown', 'click', 'scroll', 'touchstart'];
 const modalDraftsStorageKey = 'cims_modal_drafts_v1';
 const activeModalStorageKey = 'cims_active_modal_v1';
+let globalReloadTimer = null;
+const schedulePageReload = () => {
+    if (globalReloadTimer) return;
+    globalReloadTimer = setTimeout(() => {
+        window.location.reload();
+    }, 1000);
+};
 
 library.add(faUser, faHouse);
 
@@ -66,9 +73,7 @@ window.axios.interceptors.response.use(
                 return Promise.reject(error);
             }
             // Session is stale: do a quick reload without popup noise.
-            setTimeout(() => {
-                window.location.reload();
-            }, 1000);
+            schedulePageReload();
             return Promise.reject(error);
         }
         if (error.response && error.response.status === 401) {
@@ -95,9 +100,7 @@ createInertiaApp({
         router.on('invalid', (event) => {
             if (event.detail.response.status === 419) {
                 event.preventDefault(); // Replace modal/pop-up with quick silent reload
-                setTimeout(() => {
-                    window.location.reload();
-                }, 1000);
+                schedulePageReload();
             }
         });
 
@@ -228,9 +231,7 @@ createInertiaApp({
                         forceHardReload();
                         return;
                     }
-                    setTimeout(() => {
-                        window.location.reload();
-                    }, 1000);
+                    schedulePageReload();
                     return;
                 }
                 if (status === 419) {
@@ -238,9 +239,7 @@ createInertiaApp({
                         forceHardReload();
                         return;
                     }
-                    setTimeout(() => {
-                        window.location.reload();
-                    }, 1000);
+                    schedulePageReload();
                     return;
                 }
             } finally {
@@ -324,8 +323,20 @@ createInertiaApp({
             window.sessionStorage.setItem(activeModalStorageKey, modalEl.id);
             restoreModalDraft(modalEl);
         });
+        document.addEventListener('hide.bs.modal', (event) => {
+            const modalEl = event.target;
+            if (!modalEl) return;
+
+            const activeEl = document.activeElement;
+            if (activeEl && modalEl.contains(activeEl)) {
+                activeEl.blur();
+            }
+        });
         document.addEventListener('hidden.bs.modal', () => {
             window.sessionStorage.removeItem(activeModalStorageKey);
+            if (!document.querySelector('.modal.show')) {
+                document.body.focus?.();
+            }
         });
         // Clear drafts only when the user explicitly clicks Close (x or "Close" button).
         document.addEventListener('click', (event) => {

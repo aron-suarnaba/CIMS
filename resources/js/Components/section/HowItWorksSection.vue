@@ -46,7 +46,7 @@ const stepCard = [
                     :key="step.stepNumber"
                     data-aos="fade-up"
                     data-aos-ease="ease-in-sine"
-                    :data-aos-duration="aosDuration"
+                    :data-aos-duration="step.aosDuration"
                 >
                     <div class="step-item text-center">
                         <div class="step-icon mb-3">

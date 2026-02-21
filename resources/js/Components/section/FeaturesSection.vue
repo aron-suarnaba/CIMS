@@ -73,7 +73,7 @@ const features = [
                         :key="feature.title"
                         class="col d-flex flex-column gap-2"
                         data-aos="fade-right"
-                        :data-aos-duration="aosDuration"
+                        :data-aos-duration="feature.aosDuration"
                         data-aos-ease="ease-in-out"
                     >
                         <div

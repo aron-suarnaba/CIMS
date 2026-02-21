@@ -43,6 +43,7 @@ const submit = () => {
                                             v-model="form.email"
                                             type="email"
                                             id="email"
+                                            autocomplete="username"
                                             class="form-control"
                                             :class="{
                                                 'is-invalid': form.errors.email,
@@ -69,6 +70,7 @@ const submit = () => {
                                             v-model="form.password"
                                             type="password"
                                             id="password"
+                                            autocomplete="current-password"
                                             class="form-control"
                                             :class="{
                                                 'is-invalid':

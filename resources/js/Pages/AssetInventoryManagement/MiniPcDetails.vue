@@ -19,10 +19,15 @@ const props = defineProps({
 });
 
 const form = useForm({
+    issued_to: '',
+    issued_by: '',
     department: '',
     location: '',
     date_issued: new Date().toISOString().substr(0, 10),
+    issued_accessories: '',
+    acknowledgement: false,
 });
+const selectedAcc = ref([]);
 
 const pulloutForm = useForm({
     pullout_date: new Date().toISOString().substr(0, 10),
