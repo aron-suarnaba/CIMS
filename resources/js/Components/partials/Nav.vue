@@ -1,24 +1,52 @@
 <script setup>
 import { useDateFormatter } from '@/composables/useDateFormatter';
 import { Link, router } from '@inertiajs/vue3';
+import { onBeforeUnmount, onMounted } from 'vue';
 import avatarPath from '/public/img/avatar.png';
 
 const { formatDate } = useDateFormatter();
 
+const desktopBreakpoint = 992;
+
+const isMobileViewport = () => window.innerWidth < desktopBreakpoint;
+
+const syncSidebarStateForViewport = () => {
+    const body = document.body;
+
+    if (isMobileViewport()) {
+        // Mobile uses overlay mode; collapsed class causes inconsistent behavior.
+        body.classList.remove('sidebar-collapse');
+        return;
+    }
+
+    // Desktop should never keep mobile overlay class.
+    body.classList.remove('sidebar-open');
+};
+
 const toggleSidebar = () => {
     const body = document.body;
-    if (body.classList.contains('sidebar-collapse')) {
-        body.classList.remove('sidebar-collapse');
-        body.classList.add('sidebar-open');
-    } else {
-        body.classList.add('sidebar-collapse');
-        body.classList.remove('sidebar-open');
+
+    if (isMobileViewport()) {
+        body.classList.toggle('sidebar-open');
+        return;
     }
+
+    body.classList.toggle('sidebar-collapse');
+    body.classList.remove('sidebar-open');
 };
 
 const handleLogout = () => {
     router.post(route('logout'));
 };
+
+onMounted(() => {
+    syncSidebarStateForViewport();
+    window.addEventListener('resize', syncSidebarStateForViewport);
+});
+
+onBeforeUnmount(() => {
+    window.removeEventListener('resize', syncSidebarStateForViewport);
+});
 </script>
 <template>
     <nav

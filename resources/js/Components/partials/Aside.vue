@@ -4,6 +4,24 @@ import { ref } from 'vue';
 
 const title = ref('CIMS');
 const logo = '/CIMS/public/img/logo.png';
+
+const mobileBreakpoint = 992;
+const tabletBreakpoint = 1200;
+
+const handleCategoryClick = () => {
+    const body = document.body;
+    const width = window.innerWidth;
+
+    if (width < mobileBreakpoint) {
+        body.classList.remove('sidebar-open');
+        return;
+    }
+
+    if (width < tabletBreakpoint) {
+        body.classList.add('sidebar-collapse');
+        body.classList.remove('sidebar-open');
+    }
+};
 </script>
 
 <template>
@@ -46,7 +64,11 @@ const logo = '/CIMS/public/img/logo.png';
                         id="navigation"
                     >
                         <li class="nav-item">
-                            <Link :href="route('dashboard')" class="nav-link">
+                            <Link
+                                :href="route('dashboard')"
+                                class="nav-link"
+                                @click="handleCategoryClick"
+                            >
                                 <i class="nav-icon bi bi-speedometer"></i>
                                 <p>Dashboard</p>
                             </Link>
@@ -55,6 +77,7 @@ const logo = '/CIMS/public/img/logo.png';
                             <Link
                                 :href="route('AssetAndInventoryManagement')"
                                 class="nav-link"
+                                @click="handleCategoryClick"
                             >
                                 <i class="bi bi-pc-display"></i>
                                 <p>Assets & Inventory Management</p>
@@ -64,6 +87,7 @@ const logo = '/CIMS/public/img/logo.png';
                             <Link
                                 :href="route('network.index')"
                                 class="nav-link"
+                                @click="handleCategoryClick"
                             >
                                 <i class="bi bi-router-fill"></i>
                                 <p>Network Monitoring & Management</p>
@@ -73,6 +97,7 @@ const logo = '/CIMS/public/img/logo.png';
                             <Link
                                 :href="route('automation.index')"
                                 class="nav-link"
+                                @click="handleCategoryClick"
                             >
                                 <i class="bi bi-gear-wide-connected"></i>
                                 <p>Automation</p>

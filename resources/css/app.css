@@ -129,3 +129,21 @@ a:hover {
     font-family: "Montserrat", sans-serif;
 }
 
+/* Mobile sidebar layering fix:
+   keep header toggle clickable and disable sidebar hitbox while closed. */
+@media (max-width: 991.98px) {
+    .app-header {
+        position: relative;
+        z-index: 1040;
+    }
+
+    .app-sidebar {
+        z-index: 1035;
+        pointer-events: none;
+    }
+
+    body.sidebar-open .app-sidebar {
+        pointer-events: auto;
+        z-index: 1045;
+    }
+}
