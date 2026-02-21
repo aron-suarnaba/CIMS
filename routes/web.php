@@ -3,6 +3,7 @@
 use App\Http\Controllers\ComputersController;
 use App\Http\Controllers\PhoneController;
 use App\Http\Controllers\SoftwareLicenseController;
+use App\Http\Controllers\AutomationController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\FortigateController;
 use App\Http\Controllers\NetworkMonitoringController;
@@ -65,6 +66,11 @@ Route::middleware('auth')->group(function () {
             Route::get('/{softwareLicense}', [SoftwareLicenseController::class, 'show'])->whereNumber('softwareLicense')->name('software-license.show');
             Route::put('/{softwareLicense}', [SoftwareLicenseController::class, 'update'])->whereNumber('softwareLicense')->name('software-license.update');
             Route::delete('/{softwareLicense}', [SoftwareLicenseController::class, 'destroy'])->whereNumber('softwareLicense')->name('software-license.destroy');
+        });
+
+        Route::prefix('Automation')->group(function () {
+            Route::get('/', [AutomationController::class, 'index'])->name('automation.index');
+            Route::post('/run', [AutomationController::class, 'run'])->name('automation.run');
         });
 
         // Your existing transaction store (if used for logging)

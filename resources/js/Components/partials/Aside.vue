@@ -69,6 +69,15 @@ const logo = '/CIMS/public/img/logo.png';
                                 <p>Network Monitoring & Management</p>
                             </Link>
                         </li>
+                        <li class="nav-item">
+                            <Link
+                                :href="route('automation.index')"
+                                class="nav-link"
+                            >
+                                <i class="bi bi-gear-wide-connected"></i>
+                                <p>Automation</p>
+                            </Link>
+                        </li>
                         <!--
                         <li class="nav-item">
                             <a href="#" class="nav-link">
