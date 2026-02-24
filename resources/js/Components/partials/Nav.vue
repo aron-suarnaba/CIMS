@@ -67,19 +67,19 @@ onBeforeUnmount(() => {
                         <i class="bi bi-list"></i>
                     </a>
                 </li>
-                <li class="nav-item d-none d-md-block">
+                <!-- <li class="nav-item d-none d-md-block">
                     <a href="#" class="nav-link">Home</a>
-                </li>
-                <li class="nav-item d-none d-md-block">
+                </li> -->
+                <!-- <li class="nav-item d-none d-md-block">
                     <a href="#" class="nav-link">Contact</a>
-                </li>
+                </li> -->
             </ul>
             <ul
                 class="navbar-nav ms-auto"
                 role="navigation"
                 aria-label="Navigation 2"
             >
-                <li class="nav-item">
+                <!-- <li class="nav-item">
                     <a
                         class="nav-link"
                         data-widget="navbar-search"
@@ -88,7 +88,7 @@ onBeforeUnmount(() => {
                     >
                         <i class="bi bi-search"></i>
                     </a>
-                </li>
+                </li> -->
                 <li class="nav-item dropdown">
                     <a class="nav-link" data-bs-toggle="dropdown" href="#">
                         <i class="bi bi-chat-text"></i>

@@ -270,6 +270,7 @@ watch(
                                         {{ getRowNumber(index) }}
                                     </td>
                                     <td>
+                                        <i class="bi bi-pc-horizontal pe-2"></i>
                                         <span
                                             class="fw-semibold text-capitalize"
                                             >{{ pc.manufacturer_model }}</span
@@ -494,7 +495,7 @@ watch(
     </div>
 
     <!-- Add Mini PC Modal -->
-    <Modals id="AddMiniPcModal" title="Add Mini PC" size="modal-lg">
+    <Modals id="AddMiniPcModal" title="Add Mini PC" size="modal-lg" header-class="bg-primary text-white">
         <template #body>
             <form @submit.prevent="submitAddForm">
                 <div class="row g-3">

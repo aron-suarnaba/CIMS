@@ -179,7 +179,7 @@ const submit = () => {
                 >
                     <button
                         type="button"
-                        class="btn btn-success bg-gradient"
+                        class="btn btn-primary"
                         data-bs-toggle="modal"
                         data-bs-target="#AddComputerModals"
                     >
@@ -374,7 +374,7 @@ const submit = () => {
     <Modals
         id="AddComputerModals"
         title="Add new workstation"
-        header-class="bg-success text-white bg-gradient"
+        header-class="bg-primary text-white"
     >
         <template #body>
             <form id="addComputerForm" @submit.prevent="submit">
@@ -560,7 +560,7 @@ const submit = () => {
             </button>
             <button
                 type="submit"
-                class="btn btn-success bg-gradient"
+                class="btn btn-primary"
                 form="addComputerForm"
                 :disabled="addForm.processing"
                 @click="submit"
