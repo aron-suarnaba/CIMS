@@ -73,15 +73,10 @@ onMounted(fetchDevices);
         <div class="container">
             <div class="row mb-4">
                 <div class="col-sm-12 col-md-6">
-                    <BackButton
-                        @click.prevent="router.get(route('dashboard'))"
-                    />
+                    <BackButton @click.prevent="router.get(route('dashboard'))" />
                 </div>
                 <div class="col-sm-12 col-md-6 text-end">
-                    <button
-                        @click.prevent="router.get(route('firewall.index'))"
-                        class="btn btn-outline-primary"
-                    >
+                    <button @click.prevent="router.get(route('firewall.index'))" class="btn btn-outline-primary">
                         <i class="bi bi-shield-lock me-1"></i> Firewall Settings
                     </button>
                 </div>
@@ -101,160 +96,127 @@ onMounted(fetchDevices);
 
             <div class="card mt-4 shadow-sm">
                 <div class="card-header bg-white">
-                    <div
-                        class="row d-flex justify-content-between align-items-center"
-                    >
+                    <div class="row d-flex justify-content-between align-items-center">
                         <div class="col-sm-12 col-md-4">
                             <h5 class="text-primary mb-0">Active Device</h5>
                         </div>
                         <div class="col-sm-12 col-md-4">
-                            <input type="text" class="form-control" />
-                            <i class="bi-bi-search form-label"></i>
+                            <div class="input-group">
+                                <i class="bi bi-search input-group-text"></i>
+                                <input type="text" class="form-control" />
+                            </div>
                         </div>
                         <div class="col-sm-12 col-md-4 float-end text-end">
-                            <span class="badge bg-primary fs-5"
-                                >{{ deviceList.length }} Total</span
-                            >
+                            <span class="badge bg-primary fs-5">{{ deviceList.length }} Total</span>
                         </div>
                     </div>
                 </div>
                 <div class="card-body p-0">
                     <div class="table-responsive">
-                        <table class="table-hover mb-0 table">
+                        <table class="table-hover table align-middle mb-0">
                             <thead class="table-light">
                                 <tr>
-                                    <th>Device / Hostname</th>
+                                    <th class="ps-4">Device / Hostname</th>
                                     <th>IP Address</th>
                                     <th>MAC Address</th>
                                     <th>Manufacturer</th>
-                                    <th>Type/OS</th>
+                                    <th>Type / OS</th>
+                                    <th class="text-end pe-4">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr
-                                    v-for="device in paginatedDevices"
-                                    :key="device.mac"
-                                >
-                                    <td
-                                        :class="
-                                            device.ipv4_address
-                                                ? 'text-success'
-                                                : 'text-danger'
-                                        "
-                                    >
-                                        <i class="bi bi-laptop me-2"></i>
-                                        <strong>{{
-                                            device.hostname ||
-                                            device.alias ||
-                                            'Unnamed'
-                                        }}</strong>
-                                        <small class="text-secondary fw-bold">{{
-                                            device.mac_firewall_address
-                                                ? '(' +
-                                                  device.mac_firewall_address +
-                                                  ')'
-                                                : ''
-                                        }}</small>
+                                <tr v-for="device in paginatedDevices" :key="device.mac" class="transition-all">
+                                    <td class="ps-4">
+                                        <div class="d-flex align-items-center">
+                                            <div class="avatar-sm bg-light rounded-circle d-flex align-items-center justify-content-center me-3"
+                                                style="width: 35px; height: 35px;">
+                                                <i class="bi bi-laptop text-primary"></i>
+                                            </div>
+                                            <div>
+                                                <div class="fw-bold text-dark">
+                                                    {{ device.hostname || device.alias || 'Unnamed Device' }}
+                                                </div>
+                                                <small class="text-muted">ID: {{ device.id || 'N/A' }}</small>
+                                            </div>
+                                        </div>
                                     </td>
                                     <td>
-                                        {{ device.ipv4_address || 'Unknown' }}
+                                        <span class="text-monospace">{{ device.ipv4_address }}</span>
                                     </td>
                                     <td>
-                                        <code>{{ device.mac }}</code>
+                                        <code class="text-uppercase bg-light px-2 py-1 rounded text-secondary"
+                                            style="font-size: 0.85rem;">
+                                    {{ device.mac }}
+                                </code>
                                     </td>
                                     <td>
-                                        {{
-                                            device.hardware_vendor || 'Unknown'
-                                        }}
-                                    </td>
-                                    <td>
-                                        <span class="badge bg-info text-dark">{{
-                                            device.os_name || 'Network Device'
+                                        <span class="text-secondary">{{ device.hardware_vendor || 'Unknown Vendor'
                                         }}</span>
                                     </td>
+                                    <td>
+                                        <span :class="[
+                                            'badge rounded-pill px-3 py-2',
+                                            device.os_name ? 'bg-info-subtle text-info' : 'bg-secondary-subtle text-secondary'
+                                        ]">
+                                            <i class="bi bi-cpu me-1"></i>
+                                            {{ device.os_name || 'Network Device' }}
+                                        </span>
+                                    </td>
+                                    <td class="text-end pe-4">
+                                        <button class="btn btn-sm btn-outline-primary border-0">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                    </td>
                                 </tr>
+
                                 <tr v-if="deviceList.length === 0">
-                                    <td
-                                        colspan="5"
-                                        class="text-muted py-4 text-center"
-                                    >
-                                        No device found
+                                    <td colspan="6" class="text-center py-5">
+                                        <div class="text-muted">
+                                            <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+                                            <span>No devices found in the network.</span>
+                                        </div>
                                     </td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
+
+                    <div class="d-flex justify-content-between align-items-center border-top p-4">
+                        <div class="text-muted small">
+                            Showing
+                            <span class="fw-semibold">{{ (currentPage - 1) * itemsPerPage + 1 }}</span> to
+                            <span class="fw-semibold">{{ Math.min(currentPage * itemsPerPage, deviceList.length)
+                            }}</span>
+                            of <span class="fw-semibold">{{ deviceList.length }}</span> entries
+                        </div>
+
+                        <nav v-if="totalPages > 1" aria-label="Table navigation">
+                            <ul class="pagination pagination-sm mb-0">
+                                <li class="page-item" :class="{ disabled: currentPage === 1 }">
+                                    <a class="page-link" href="#" @click.prevent="setPage(1)"><i
+                                            class="bi bi-chevron-double-left"></i></a>
+                                </li>
+                                <li class="page-item" :class="{ disabled: currentPage === 1 }">
+                                    <a class="page-link" href="#" @click.prevent="setPage(currentPage - 1)">Previous</a>
+                                </li>
+
+                                <li class="page-item active">
+                                    <span class="page-link">{{ currentPage }}</span>
+                                </li>
+
+                                <li class="page-item" :class="{ disabled: currentPage === totalPages }">
+                                    <a class="page-link" href="#" @click.prevent="setPage(currentPage + 1)">Next</a>
+                                </li>
+                                <li class="page-item" :class="{ disabled: currentPage === totalPages }">
+                                    <a class="page-link" href="#" @click.prevent="setPage(totalPages)"><i
+                                            class="bi bi-chevron-double-right"></i></a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
                 </div>
 
-                <div
-                    class="card-footer d-flex justify-content-between align-items-center bg-white py-3"
-                >
-                    <div class="text-muted small">
-                        Showing {{ (currentPage - 1) * itemsPerPage + 1 }} to
-                        {{
-                            Math.min(
-                                currentPage * itemsPerPage,
-                                deviceList.length,
-                            )
-                        }}
-                        of {{ deviceList.length }}
-                    </div>
-                    <nav v-if="totalPages > 1" class="ms-auto">
-                        <ul class="pagination pagination-sm mb-0 gap-1">
-                            <li
-                                class="page-item"
-                                :class="{ disabled: currentPage === 1 }"
-                            >
-                                <a
-                                    class="page-link"
-                                    href="#"
-                                    @click.prevent="setPage(1)"
-                                    >&lt;&lt;</a
-                                >
-                            </li>
-                            <li
-                                class="page-item"
-                                :class="{ disabled: currentPage === 1 }"
-                            >
-                                <a
-                                    class="page-link"
-                                    href="#"
-                                    @click.prevent="setPage(currentPage - 1)"
-                                    >previous</a
-                                >
-                            </li>
-                            <li class="page-item disabled">
-                                <span class="page-link">{{ currentPage }}</span>
-                            </li>
-                            <li
-                                class="page-item"
-                                :class="{
-                                    disabled: currentPage === totalPages,
-                                }"
-                            >
-                                <a
-                                    class="page-link"
-                                    href="#"
-                                    @click.prevent="setPage(currentPage + 1)"
-                                    >next</a
-                                >
-                            </li>
-                            <li
-                                class="page-item"
-                                :class="{
-                                    disabled: currentPage === totalPages,
-                                }"
-                            >
-                                <a
-                                    class="page-link"
-                                    href="#"
-                                    @click.prevent="setPage(totalPages)"
-                                    >&gt;&gt;</a
-                                >
-                            </li>
-                        </ul>
-                    </nav>
-                </div>
+
             </div>
         </div>
     </div>
