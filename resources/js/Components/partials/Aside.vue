@@ -103,6 +103,16 @@ const handleCategoryClick = () => {
                                 <p>Automation</p>
                             </Link>
                         </li>
+                        <li class="nav-item">
+                            <Link
+                                :href="route('credentials.index')"
+                                class="nav-link"
+                                @click="handleCategoryClick"
+                            >
+                                <i class="bi bi-key-fill"></i>
+                                <p>Credentials</p>
+                            </Link>
+                        </li>
                         <!--
                         <li class="nav-item">
                             <a href="#" class="nav-link">

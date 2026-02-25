@@ -14,7 +14,7 @@
                                                                          each of one of this.
 
                                                             NOTE: FOR THE FUTURE SYSTEM ANALYST PROGRAMMER, PLEASE DON'T TAKE ANY CREDITS FOR
-                                                                  THIS SYSTEM, I AM ASKING POLITELY TO CONSIDER MY EFFORT IN THE DEVELOPMENT
+                                                                  THIS SYSTEM, I'M ASKING POLITELY TO CONSIDER MY EFFORT IN THE DEVELOPMENT
                                                                   OF THIS SYSTEM. THANK YOU.
 
     -->
@@ -32,7 +32,7 @@
         rel="stylesheet">
 
     @routes
-    @vite(['resources/js/app.js', 'resources/css/app.css'])
+    @vite(['resources/js/app.js'])
     @inertiaHead
 </head>
 

@@ -46,6 +46,13 @@ const navCard = [
         color: 'secondary',
         desc: 'License Inventory',
     },
+    // {
+    //     label: 'Credentials',
+    //     url: route('credentials.index'),
+    //     icon: 'bi bi-lock-fill',
+    //     color: 'warning',
+    //     desc: 'Secure login info',
+    // },
     {
         label: 'Networking',
         url: '#', // Placeholder for future routes

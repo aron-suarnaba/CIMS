@@ -73,6 +73,17 @@ Route::middleware('auth')->group(function () {
             Route::post('/run', [AutomationController::class, 'run'])->name('automation.run');
         });
 
+        // Credentials management
+        Route::prefix('Credentials')->group(function () {
+            Route::get('/', [\App\Http\Controllers\CredentialController::class, 'index'])->name('credentials.index');
+            Route::get('/create', [\App\Http\Controllers\CredentialController::class, 'create'])->name('credentials.create');
+            Route::post('/', [\App\Http\Controllers\CredentialController::class, 'store'])->name('credentials.store');
+            Route::get('/{credential}', [\App\Http\Controllers\CredentialController::class, 'show'])->whereNumber('credential')->name('credentials.show');
+            Route::post('/{credential}/reveal', [\App\Http\Controllers\CredentialController::class, 'reveal'])->whereNumber('credential')->name('credentials.reveal');
+            Route::put('/{credential}', [\App\Http\Controllers\CredentialController::class, 'update'])->whereNumber('credential')->name('credentials.update');
+            Route::delete('/{credential}', [\App\Http\Controllers\CredentialController::class, 'destroy'])->whereNumber('credential')->name('credentials.destroy');
+        });
+
         // Your existing transaction store (if used for logging)
         // Route::post('/Phone/Transaction', [PhoneController::class, 'phoneTransStore'])
         //     ->name('phone.trans.store');
