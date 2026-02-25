@@ -25,6 +25,7 @@ const props = defineProps({
         type: [Object, null],
         default: null,
     },
+    qr_code: String,
 });
 
 const issuanceAccessoryText = (issuance) => {
@@ -507,44 +508,24 @@ onUnmounted(() => {
                             <h5 class="fw-bold mb-0">Device Specifications</h5>
                         </div>
                         <div class="card-body">
-                            <div class="mb-4 text-center">
-                                <img
-                                    :src="getPhoneImagePath(props.phone)"
-                                    class="img-fluid bg-light rounded p-3"
-                                    style="max-height: 220px"
-                                    :alt="props.phone.model"
-                                />
-                                <h3 class="fw-bold mb-0 mt-3">
-                                    {{
-                                        props.phone.brand
-                                            .charAt(0)
-                                            .toUpperCase() +
-                                        props.phone.brand.slice(1)
-                                    }}
-                                    {{ props.phone.model }}
-                                </h3>
-                                <span
-                                    :class="[
-                                        'badge mt-2 px-3 py-2',
-                                        {
-                                            'bg-success':
-                                                props.phone.status ===
-                                                'available',
-                                            'bg-primary':
-                                                props.phone.status === 'issued',
-                                            'bg-warning text-dark':
-                                                props.phone.status ===
-                                                'returned',
-                                        },
-                                    ]"
-                                >
-                                    {{
-                                        props.phone.status
-                                            .charAt(0)
-                                            .toUpperCase() +
-                                        props.phone.status.slice(1)
-                                    }}
-                                </span>
+                            <div class="flip-card mb-4 mx-auto">
+                                <div class="flip-card-inner">
+                                    <div class="flip-card-front d-flex align-items-center justify-content-center bg-light rounded shadow-sm">
+                                        <img
+                                            :src="getPhoneImagePath(props.phone)"
+                                            class="img-fluid p-3"
+                                            style="max-height: 220px"
+                                            :alt="props.phone.model"
+                                        />
+                                    </div>
+                                    <div class="flip-card-back d-flex flex-column align-items-center justify-content-center bg-white rounded shadow-sm border">
+                                        <div class="p-3 text-center">
+                                            <img :src="qr_code" alt="Phone QR Code" class="img-fluid mb-2" style="max-width: 140px;" />
+                                            <p class="text-muted small mb-0">Scan for Details</p>
+                                            <span class="badge bg-dark mt-2">{{ props.phone.serial_num }}</span>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
 
                             <ul class="list-group list-group-flush border-top">

@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
 use Barryvdh\DomPDF\Facade\Pdf;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class PhoneController extends Controller
 {
@@ -142,18 +143,18 @@ class PhoneController extends Controller
             'remarks' => 'nullable|string',
         ]);
 
-        if($request->hasFile('image')){
+        if ($request->hasFile('image')) {
             $file = $request->file('image');
             File::ensureDirectoryExists(public_path('img/phone_uploads'));
 
-        // Generate a clean, unique filename
-        $fileName = time() . '_' . preg_replace('/\s+/', '_', $file->getClientOriginalName());
+            // Generate a clean, unique filename
+            $fileName = time() . '_' . preg_replace('/\s+/', '_', $file->getClientOriginalName());
 
-        // Move to public/img/phone_uploads
-        $file->move(public_path('img/phone_uploads'), $fileName);
+            // Move to public/img/phone_uploads
+            $file->move(public_path('img/phone_uploads'), $fileName);
 
-        // Save the path string to the database column
-        $validated['image_path'] = 'img/phone_uploads/' . $fileName;
+            // Save the path string to the database column
+            $validated['image_path'] = 'img/phone_uploads/' . $fileName;
 
         }
 
@@ -292,13 +293,22 @@ class PhoneController extends Controller
     {
         $phone->load(['issuances.return']);
 
-        $currentIssuance = $phone->currentIssuance()->first();
-        $currentReturn = $currentIssuance?->return;
+        // Generate the QR Code with a logo
+        // We convert it to base64 so it can be used in an <img> tag in Vue/React
+        // If your image is located at public/img/logo.png
+        $qrCode = QrCode::format('svg')
+            // ->merge(public_path('img/logo.png'), 0.3, true) // Comment this out for now
+            ->size(300)
+            ->errorCorrection('H')
+            ->generate(route('phone.show', $phone->id));
+
+        $base64Qr = 'data:image/svg+xml;base64,' . base64_encode($qrCode);
 
         return Inertia::render('AssetInventoryManagement/PhoneDetails', [
             'phone' => $phone,
-            'phone_issuance' => $currentIssuance,
-            'phone_return' => $currentReturn,
+            'phone_issuance' => $phone->currentIssuance()->first(),
+            'phone_return' => $phone->currentIssuance()?->first()?->return,
+            'qr_code' => $base64Qr, // Pass it here
         ]);
     }
 
