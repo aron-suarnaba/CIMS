@@ -5,6 +5,7 @@ import Modals from '@/Components/Modals.vue';
 import { useDateFormatter } from '@/composables/useDateFormatter';
 import HomeLayout from '@/Layouts/HomeLayout.vue';
 import { router, useForm } from '@inertiajs/vue3';
+import Pagination from '@/Components/Pagination.vue';
 import debounce from 'lodash/debounce';
 import Swal from 'sweetalert2';
 import { ref, watch } from 'vue';
@@ -39,6 +40,16 @@ const debouncedSearch = debounce(() => {
 watch(searchQuery, () => {
     debouncedSearch();
 });
+
+// helper to navigate pages using current filters
+const gotoPageNumber = (page) => {
+    if (!page) return;
+    router.get(route('minipc.index'), {
+        search: searchQuery,
+        sort: currentSort,
+        page,
+    });
+};
 
 const closeAllModals = () => {
     document.querySelectorAll('.modal.show').forEach((element) => {
@@ -409,85 +420,14 @@ watch(
                             }}</span>
                             entries
                         </div>
-                        <nav>
-                            <ul class="pagination mb-0 gap-1">
-                                <li
-                                    class="page-item"
-                                    :class="{
-                                        disabled: props.pcs.current_page === 1,
-                                    }"
-                                >
-                                    <a
-                                        class="page-link"
-                                        href="#"
-                                        @click.prevent="
-                                            router.get(route('minipc.index'), {
-                                                search: searchQuery,
-                                                sort: currentSort,
-                                                page: 1,
-                                            })
-                                        "
-                                        >&lt;&lt;</a
-                                    >
-                                </li>
-                                <li
-                                    class="page-item"
-                                    :class="{
-                                        disabled: !props.pcs.prev_page_url,
-                                    }"
-                                >
-                                    <a
-                                        class="page-link"
-                                        href="#"
-                                        @click.prevent="
-                                            router.get(props.pcs.prev_page_url)
-                                        "
-                                        >previous</a
-                                    >
-                                </li>
-                                <li class="page-item disabled">
-                                    <span class="page-link">
-                                        {{ props.pcs.current_page }}
-                                    </span>
-                                </li>
-                                <li
-                                    class="page-item"
-                                    :class="{
-                                        disabled: !props.pcs.next_page_url,
-                                    }"
-                                >
-                                    <a
-                                        class="page-link"
-                                        href="#"
-                                        @click.prevent="
-                                            router.get(props.pcs.next_page_url)
-                                        "
-                                        >next</a
-                                    >
-                                </li>
-                                <li
-                                    class="page-item"
-                                    :class="{
-                                        disabled:
-                                            props.pcs.current_page ===
-                                            props.pcs.last_page,
-                                    }"
-                                >
-                                    <a
-                                        class="page-link"
-                                        href="#"
-                                        @click.prevent="
-                                            router.get(route('minipc.index'), {
-                                                search: searchQuery,
-                                                sort: currentSort,
-                                                page: props.pcs.last_page,
-                                            })
-                                        "
-                                        >&gt;&gt;</a
-                                    >
-                                </li>
-                            </ul>
-                        </nav>
+                        <div class="d-flex">
+                            <Pagination
+                                :current-page="props.pcs.current_page"
+                                :last-page="props.pcs.last_page"
+                                container-classes="pagination mb-0 gap-1"
+                                @update:page="gotoPageNumber"
+                            />
+                        </div>
                     </div>
                 </div>
             </div>
@@ -495,7 +435,7 @@ watch(
     </div>
 
     <!-- Add Mini PC Modal -->
-    <Modals id="AddMiniPcModal" title="Add Mini PC" size="modal-lg" header-class="bg-primary text-white">
+    <Modals id="AddMiniPcModal" title="Add Mini PC" size="modal-lg" header-class="bg-primary text-white" layout="bento">
         <template #body>
             <form @submit.prevent="submitAddForm">
                 <div class="row g-3">

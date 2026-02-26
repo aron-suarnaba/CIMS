@@ -878,77 +878,12 @@ const submitPullout = () => {
                                         }}
                                         of {{ filteredHistory.length }} entries
                                     </div>
-                                    <nav>
-                                        <ul
-                                            class="pagination pagination-sm mb-0"
-                                        >
-                                            <li
-                                                class="page-item"
-                                                :class="{
-                                                    disabled: currentPage === 1,
-                                                }"
-                                            >
-                                                <button
-                                                    class="page-link"
-                                                    @click="currentPage = 1"
-                                                >
-                                                    &lt;&lt;
-                                                </button>
-                                            </li>
-                                            <li
-                                                class="page-item"
-                                                :class="{
-                                                    disabled: currentPage === 1,
-                                                }"
-                                            >
-                                                <button
-                                                    class="page-link"
-                                                    @click="prevPage"
-                                                >
-                                                    previous
-                                                </button>
-                                            </li>
-
-                                            <li class="page-item disabled">
-                                                <span class="page-link">
-                                                    {{ currentPage }}
-                                                </span>
-                                            </li>
-
-                                            <li
-                                                class="page-item"
-                                                :class="{
-                                                    disabled:
-                                                        currentPage ===
-                                                        totalPages,
-                                                }"
-                                            >
-                                                <button
-                                                    class="page-link"
-                                                    @click="nextPage"
-                                                >
-                                                    next
-                                                </button>
-                                            </li>
-                                            <li
-                                                class="page-item"
-                                                :class="{
-                                                    disabled:
-                                                        currentPage ===
-                                                        totalPages,
-                                                }"
-                                            >
-                                                <button
-                                                    class="page-link"
-                                                    @click="
-                                                        currentPage = totalPages
-                                                    "
-                                                >
-                                                    &gt;&gt;
-                                                </button>
-                                            </li>
-                                        </ul>
-                                    </nav>
+                                    <Pagination
+                                        :current-page="currentPage"
+                                        :last-page="totalPages"
+                                        container-classes="pagination pagination-sm mb-0"
+                                        @update:page="(p) => currentPage = p"
+                                    />
                                 </div>
                             </div>
                         </div>
@@ -963,6 +898,7 @@ const submitPullout = () => {
         id="IssueMiniPcModal"
         title="Issue Mini PC Asset"
         header-class="bg-primary text-white bg-gradient"
+        layout="bento"
     >
         <template #body>
             <form @submit.prevent="submitIssue" id="issueMiniPcForm">

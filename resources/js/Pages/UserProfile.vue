@@ -173,7 +173,8 @@ const submitPersonalInfoEdit = () => {
     <Modals
         title="Edit Personal Information"
         id="personalInfoEditModals"
-        headerClass="bg-warning bg-gradient text-white"
+        headerClass="bg-primary bg-gradient text-white"
+        layout="bento"
     >
         <template #body>
             <form

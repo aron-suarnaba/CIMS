@@ -4,6 +4,7 @@ import HomeLayout from '@/Layouts/HomeLayout.vue';
 import { router } from '@inertiajs/vue3';
 import axios from 'axios';
 import { computed, onMounted, ref } from 'vue';
+import Pagination from '@/Components/Pagination.vue';
 
 defineOptions({
     layout: HomeLayout,
@@ -142,70 +143,12 @@ const myBreadcrumb = [
                                 of {{ deviceList.length }} entries
                             </div>
 
-                            <nav v-if="totalPages > 1">
-                                <ul class="pagination mb-0">
-                                    <li
-                                        class="page-item"
-                                        :class="{ disabled: currentPage === 1 }"
-                                    >
-                                        <a
-                                            class="page-link"
-                                            href="#"
-                                            @click.prevent="setPage(1)"
-                                            >&lt;&lt;</a
-                                        >
-                                    </li>
-                                    <li
-                                        class="page-item"
-                                        :class="{ disabled: currentPage === 1 }"
-                                    >
-                                        <a
-                                            class="page-link"
-                                            href="#"
-                                            @click.prevent="
-                                                setPage(currentPage - 1)
-                                            "
-                                            >previous</a
-                                        >
-                                    </li>
-                                    <li class="page-item disabled">
-                                        <span class="page-link">{{
-                                            currentPage
-                                        }}</span>
-                                    </li>
-
-                                    <li
-                                        class="page-item"
-                                        :class="{
-                                            disabled:
-                                                currentPage === totalPages,
-                                        }"
-                                    >
-                                        <a
-                                            class="page-link"
-                                            href="#"
-                                            @click.prevent="
-                                                setPage(currentPage + 1)
-                                            "
-                                            >next</a
-                                        >
-                                    </li>
-                                    <li
-                                        class="page-item"
-                                        :class="{
-                                            disabled:
-                                                currentPage === totalPages,
-                                        }"
-                                    >
-                                        <a
-                                            class="page-link"
-                                            href="#"
-                                            @click.prevent="setPage(totalPages)"
-                                            >&gt;&gt;</a
-                                        >
-                                    </li>
-                                </ul>
-                            </nav>
+                            <Pagination
+                                :current-page="currentPage"
+                                :last-page="totalPages"
+                                container-classes="pagination mb-0"
+                                @update:page="setPage"
+                            />
                         </div>
                     </div>
                 </div>

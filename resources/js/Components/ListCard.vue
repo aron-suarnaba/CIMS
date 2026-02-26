@@ -1,28 +1,34 @@
-<script setup></script>
+<setup script></setup>
 <template>
-    <div class="card phone-card clickable-card rounded-3">
-        <div class="card-body d-flex flex-column align-items-center text-wrap">
-            <slot />
-        </div>
+  <div class="computer-card h-100 shadow-sm border-0 rounded-3 transition-all">
+    <div class="card-body d-flex flex-column align-items-center p-3">
+      <slot />
     </div>
+  </div>
 </template>
+
 <style scoped>
-.phone-card {
-    width: 150px;
-    height: 250px;
-
-    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
-    transition: 0.3s;
-    border-radius: 5px;
-    text-align: center;
-}
-.phone-card:hover {
-    box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
-    transform: translate(1, 1);
+.computer-card {
+  background: #fff;
+  cursor: pointer;
+  /* Remove fixed width/height to let Bootstrap grid handle it */
+  min-height: 280px;
+  display: flex;
+  flex-direction: column;
 }
 
+.transition-all {
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.computer-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 20px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Ensure the body expands to push the badge to the bottom */
 .card-body {
-    height: 100%;
-    justify-content: space-between;
+  height: 100%;
+  justify-content: space-between;
 }
 </style>

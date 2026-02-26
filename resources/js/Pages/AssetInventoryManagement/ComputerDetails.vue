@@ -2,6 +2,7 @@
 import BackButton from '@/Components/BackButton.vue';
 import Breadcrumb from '@/Components/Breadcrumb.vue';
 import Modals from '@/Components/Modals.vue';
+import Pagination from '@/Components/Pagination.vue';
 import HomeLayout from '@/Layouts/HomeLayout.vue';
 import { router, useForm } from '@inertiajs/vue3';
 import Swal from 'sweetalert2';
@@ -778,73 +779,12 @@ const returnSubmit = () => {
                                     }}
                                     of {{ filteredHistory.length }} entries
                                 </div>
-                                <nav>
-                                    <ul class="pagination pagination-sm mb-0">
-                                        <li
-                                            class="page-item"
-                                            :class="{
-                                                disabled: currentPage === 1,
-                                            }"
-                                        >
-                                            <button
-                                                class="page-link"
-                                                @click="currentPage = 1"
-                                            >
-                                                &lt;&lt;
-                                            </button>
-                                        </li>
-                                        <li
-                                            class="page-item"
-                                            :class="{
-                                                disabled: currentPage === 1,
-                                            }"
-                                        >
-                                            <button
-                                                class="page-link"
-                                                @click="currentPage--"
-                                            >
-                                                previous
-                                            </button>
-                                        </li>
-
-                                        <li class="page-item disabled">
-                                            <span class="page-link">
-                                                {{ currentPage }}
-                                            </span>
-                                        </li>
-
-                                        <li
-                                            class="page-item"
-                                            :class="{
-                                                disabled:
-                                                    currentPage === totalPages,
-                                            }"
-                                        >
-                                            <button
-                                                class="page-link"
-                                                @click="currentPage++"
-                                            >
-                                                next
-                                            </button>
-                                        </li>
-                                        <li
-                                            class="page-item"
-                                            :class="{
-                                                disabled:
-                                                    currentPage === totalPages,
-                                            }"
-                                        >
-                                            <button
-                                                class="page-link"
-                                                @click="
-                                                    currentPage = totalPages
-                                                "
-                                            >
-                                                &gt;&gt;
-                                            </button>
-                                        </li>
-                                    </ul>
-                                </nav>
+                                <Pagination
+                                    :current-page="currentPage"
+                                    :last-page="totalPages"
+                                    container-classes="pagination pagination-sm mb-0"
+                                    @update:page="(p) => currentPage = p"
+                                />
                             </div>
                         </div>
                     </div>
@@ -858,6 +798,7 @@ const returnSubmit = () => {
         id="IssueComputerModal"
         title="Deploy Workstation"
         header-class="bg-primary text-white bg-gradient"
+        layout="bento"
     >
         <template #body>
             <form @submit.prevent="submit" id="deployComputerForm">
@@ -938,7 +879,8 @@ const returnSubmit = () => {
     <Modals
         id="ReturnComputerModal"
         title="Return Computer Asset"
-        header-class="bg-warning text-white bg-gradient"
+        header-class="bg-primary text-white bg-gradient"
+        layout="bento"
     >
         <template #body>
             <form @submit.prevent="returnSubmit" id="returnForm">

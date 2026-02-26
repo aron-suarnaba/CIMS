@@ -5,6 +5,7 @@ import Modals from '@/Components/Modals.vue';
 import { useDateFormatter } from '@/composables/useDateFormatter';
 import HomeLayout from '@/Layouts/HomeLayout.vue';
 import { router, useForm } from '@inertiajs/vue3';
+import Pagination from '@/Components/Pagination.vue';
 import debounce from 'lodash/debounce';
 import Swal from 'sweetalert2';
 import { ref, watch } from 'vue';
@@ -86,6 +87,16 @@ const applyFilter = (sortValue = null) => {
 
 const debouncedSearch = debounce(() => applyFilter(), 300);
 watch(searchQuery, () => debouncedSearch());
+
+// pagination helper preserving filters
+const gotoLicensePage = (page) => {
+    if (!page) return;
+    router.get(route('software-license.index'), {
+        search: searchQuery,
+        sort: currentSort,
+        page,
+    });
+};
 
 const openUpdateModal = (item) => {
     updateForm.id = item.id;
@@ -354,99 +365,14 @@ const deleteItem = (id) => {
                             }}</span>
                             entries
                         </div>
-                        <nav>
-                            <ul class="pagination mb-0 gap-1">
-                                <li
-                                    class="page-item"
-                                    :class="{
-                                        disabled:
-                                            props.licenses.current_page === 1,
-                                    }"
-                                >
-                                    <a
-                                        class="page-link"
-                                        href="#"
-                                        @click.prevent="
-                                            router.get(
-                                                route('software-license.index'),
-                                                {
-                                                    search: searchQuery,
-                                                    sort: currentSort,
-                                                    page: 1,
-                                                },
-                                            )
-                                        "
-                                        >&lt;&lt;</a
-                                    >
-                                </li>
-                                <li
-                                    class="page-item"
-                                    :class="{
-                                        disabled: !props.licenses.prev_page_url,
-                                    }"
-                                >
-                                    <a
-                                        class="page-link"
-                                        href="#"
-                                        @click.prevent="
-                                            props.licenses.prev_page_url &&
-                                            router.get(
-                                                props.licenses.prev_page_url,
-                                            )
-                                        "
-                                        >previous</a
-                                    >
-                                </li>
-                                <li class="page-item disabled">
-                                    <span class="page-link">
-                                        {{ props.licenses.current_page }}
-                                    </span>
-                                </li>
-                                <li
-                                    class="page-item"
-                                    :class="{
-                                        disabled: !props.licenses.next_page_url,
-                                    }"
-                                >
-                                    <a
-                                        class="page-link"
-                                        href="#"
-                                        @click.prevent="
-                                            props.licenses.next_page_url &&
-                                            router.get(
-                                                props.licenses.next_page_url,
-                                            )
-                                        "
-                                        >next</a
-                                    >
-                                </li>
-                                <li
-                                    class="page-item"
-                                    :class="{
-                                        disabled:
-                                            props.licenses.current_page ===
-                                            props.licenses.last_page,
-                                    }"
-                                >
-                                    <a
-                                        class="page-link"
-                                        href="#"
-                                        @click.prevent="
-                                            router.get(
-                                                route('software-license.index'),
-                                                {
-                                                    search: searchQuery,
-                                                    sort: currentSort,
-                                                    page: props.licenses
-                                                        .last_page,
-                                                },
-                                            )
-                                        "
-                                        >&gt;&gt;</a
-                                    >
-                                </li>
-                            </ul>
-                        </nav>
+                        <div class="d-flex">
+                            <Pagination
+                                :current-page="props.licenses.current_page"
+                                :last-page="props.licenses.last_page"
+                                container-classes="pagination mb-0 gap-1"
+                                @update:page="gotoLicensePage"
+                            />
+                        </div>
                     </div>
                 </div>
             </div>

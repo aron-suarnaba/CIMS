@@ -977,73 +977,12 @@ onUnmounted(() => {
                                     }}
                                     of {{ filteredHistory.length }} entries
                                 </div>
-                                <nav>
-                                    <ul
-                                        class="pagination pagination-sm mb-0 gap-2"
-                                    >
-                                        <li
-                                            class="page-item"
-                                            :class="{
-                                                disabled: currentPage === 1,
-                                            }"
-                                        >
-                                            <button
-                                                class="page-link"
-                                                @click="currentPage = 1"
-                                            >
-                                                &lt;&lt;
-                                            </button>
-                                        </li>
-                                        <li
-                                            class="page-item"
-                                            :class="{
-                                                disabled: currentPage === 1,
-                                            }"
-                                        >
-                                            <button
-                                                class="page-link"
-                                                @click="prevPage"
-                                            >
-                                                previous
-                                            </button>
-                                        </li>
-                                        <li class="page-item disabled">
-                                            <span class="page-link">
-                                                {{ currentPage }}
-                                            </span>
-                                        </li>
-                                        <li
-                                            class="page-item"
-                                            :class="{
-                                                disabled:
-                                                    currentPage === totalPages,
-                                            }"
-                                        >
-                                            <button
-                                                class="page-link"
-                                                @click="nextPage"
-                                            >
-                                                next
-                                            </button>
-                                        </li>
-                                        <li
-                                            class="page-item"
-                                            :class="{
-                                                disabled:
-                                                    currentPage === totalPages,
-                                            }"
-                                        >
-                                            <button
-                                                class="page-link"
-                                                @click="
-                                                    currentPage = totalPages
-                                                "
-                                            >
-                                                &gt;&gt;
-                                            </button>
-                                        </li>
-                                    </ul>
-                                </nav>
+                                <Pagination
+                                    :current-page="currentPage"
+                                    :last-page="totalPages"
+                                    container-classes="pagination pagination-sm mb-0 gap-2"
+                                    @update:page="(p) => currentPage = p"
+                                />
                             </div>
                         </div>
                     </div>
@@ -1057,6 +996,7 @@ onUnmounted(() => {
         id="IssuePhoneModal"
         title="Issue Phone Asset"
         header-class="bg-primary text-white bg-gradient"
+        layout="bento"
     >
         <template #body>
             <form @submit.prevent="submit" id="issueForm">
@@ -1259,7 +1199,8 @@ onUnmounted(() => {
     <Modals
         id="ReturnPhoneModal"
         title="Return Phone Asset"
-        header-class="bg-warning text-white bg-gradient"
+        header-class="bg-primary text-white bg-gradient"
+        layout="bento"
     >
         <template #body>
             <form @submit.prevent="returnSubmit" id="returnForm">
@@ -1404,7 +1345,8 @@ onUnmounted(() => {
     <Modals
         id="UpdatePhoneModal"
         title="Update Phone Asset"
-        header-class="bg-warning text-white bg-gradient"
+        header-class="bg-primary text-white bg-gradient"
+        layout="bento"
     >
         <template #body>
             <form @submit.prevent="updateSubmit" id="updateForm">

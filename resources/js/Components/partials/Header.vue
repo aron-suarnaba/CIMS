@@ -39,6 +39,18 @@ const navItem = [
         url: '#ctaSection',
     },
 ];
+
+// ensure anchors always navigate to the welcome page
+const resolveHref = (url) => {
+    if (typeof url === 'string' && url.startsWith('#')) {
+        // if already on welcome page, use fragment only to avoid full reload
+        if (window.location.pathname === HomePath) {
+            return url;
+        }
+        return HomePath + url;
+    }
+    return url;
+};
 </script>
 
 <template>
@@ -57,7 +69,7 @@ const navItem = [
 
                 <ul class="nav nav-pills">
                     <li class="nav-item" v-for="nav in navItem" :key="nav.name">
-                        <a :href="nav.url" class="nav-link text-primary">{{
+                        <a :href="resolveHref(nav.url)" class="nav-link text-primary">{{
                             nav.name
                         }}</a>
                     </li>

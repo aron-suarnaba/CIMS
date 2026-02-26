@@ -11,3 +11,13 @@ import Header from '@/Components/partials/Header.vue';
         <Footer />
     </div>
 </template>
+
+<style scoped>
+#main {
+    padding-bottom: 13rem;
+    min-height: 90vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+</style>

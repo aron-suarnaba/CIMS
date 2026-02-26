@@ -30,6 +30,12 @@ const gotoPage = (url) => {
     );
 };
 
+const gotoPageNumber = (page) => {
+    if (!page || page < 1) return;
+    const url = route('phone.index', { page });
+    gotoPage(url);
+};
+
 const myBreadcrumb = [
     { label: 'Dashboard', url: route('dashboard') },
     {
@@ -299,86 +305,13 @@ const brandsOption = [
                         {{ props.phones?.to || 0 }} of
                         {{ props.phones?.total || 0 }} phones
                     </div>
-                    <nav aria-label="Phone pagination">
-                        <ul
-                            class="pagination d-flex justify-content-center align-items-center mb-0 gap-2"
-                        >
-                            <li
-                                class="page-item"
-                                :class="{
-                                    disabled: props.phones.current_page === 1,
-                                }"
-                            >
-                                <button
-                                    class="page-link"
-                                    @click.prevent="
-                                        gotoPage(props.phones.first_page_url)
-                                    "
-                                    :disabled="props.phones.current_page === 1"
-                                >
-                                    &lt;&lt;
-                                </button>
-                            </li>
-                            <li
-                                class="page-item"
-                                :class="{
-                                    disabled: !props.phones.prev_page_url,
-                                }"
-                            >
-                                <button
-                                    class="page-link"
-                                    @click.prevent="
-                                        gotoPage(props.phones.prev_page_url)
-                                    "
-                                    :disabled="!props.phones.prev_page_url"
-                                >
-                                    previous
-                                </button>
-                            </li>
-                            <li class="page-item disabled">
-                                <span class="page-link">
-                                    {{ props.phones.current_page }}
-                                </span>
-                            </li>
-                            <li
-                                class="page-item"
-                                :class="{
-                                    disabled: !props.phones.next_page_url,
-                                }"
-                            >
-                                <button
-                                    class="page-link"
-                                    @click.prevent="
-                                        gotoPage(props.phones.next_page_url)
-                                    "
-                                    :disabled="!props.phones.next_page_url"
-                                >
-                                    next
-                                </button>
-                            </li>
-                            <li
-                                class="page-item"
-                                :class="{
-                                    disabled:
-                                        props.phones.current_page ===
-                                        props.phones.last_page,
-                                }"
-                            >
-                                <button
-                                    class="page-link"
-                                    @click.prevent="
-                                        gotoPage(props.phones.last_page_url)
-                                    "
-                                    :disabled="
-                                        props.phones.current_page ===
-                                        props.phones.last_page
-                                    "
-                                >
-                                    &gt;&gt;
-                                </button>
-                            </li>
-                        </ul>
-                    </nav>
+                    <div class="d-flex justify-content-center">
+                        <Pagination
+                            :current-page="props.phones.current_page"
+                            :last-page="props.phones.last_page"
+                            @update:page="gotoPageNumber"
+                        />
+                    </div>
                 </div>
             </div>
         </div>
@@ -386,7 +319,8 @@ const brandsOption = [
     <Modals
         id="AddPhoneModal"
         title="Add new phone"
-        header-class="bg-success text-white bg-gradient"
+        header-class="bg-primary text-white bg-gradient"
+        layout="bento"
     >
         <template #body>
             <form @submit.prevent="submitAddForm" id="addPhoneForm">

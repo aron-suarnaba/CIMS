@@ -5,6 +5,8 @@ defineProps({
     size: { type: String, default: '' },
     headerClass: { type: String, default: '' },
     headerIcon: { type: String, default: '' },
+    // layout style for body; 'bento' puts children in flex-wrap grid
+    layout: { type: String, default: 'bento' },
 });
 </script>
 
@@ -31,7 +33,7 @@ defineProps({
                     ></button>
                 </div>
 
-                <div class="modal-body">
+                <div :class="['modal-body', layout === 'bento' ? 'p-4 d-flex flex-wrap gap-3' : 'p-3']">
                     <slot name="body"></slot>
                 </div>
 

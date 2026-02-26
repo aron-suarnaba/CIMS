@@ -5,6 +5,7 @@ import Modals from '@/Components/Modals.vue';
 import { useDateFormatter } from '@/composables/useDateFormatter';
 import HomeLayout from '@/Layouts/HomeLayout.vue';
 import { router, useForm } from '@inertiajs/vue3';
+import Pagination from '@/Components/Pagination.vue';
 import debounce from 'lodash/debounce';
 import Swal from 'sweetalert2';
 import { onMounted, onUnmounted, ref, watch } from 'vue';
@@ -401,11 +402,9 @@ const brandsOption = [
     <div class="app-content">
         <div class="container">
             <div class="d-flex justify-content-between align-items-center mb-3">
-                <BackButton
-                    @click.prevent="
-                        router.get(route('AssetAndInventoryManagement'))
-                    "
-                />
+                <BackButton @click.prevent="
+                    router.get(route('AssetAndInventoryManagement'))
+                    " />
             </div>
 
             <div class="card mb-5 border-0 shadow-sm">
@@ -419,55 +418,32 @@ const brandsOption = [
 
                         <div class="col-md-4">
                             <div class="input-group">
-                                <span
-                                    class="input-group-text bg-light border-end-0"
-                                >
+                                <span class="input-group-text bg-light border-end-0">
                                     <i class="bi bi-search"></i>
                                 </span>
-                                <input
-                                    v-model="searchQuery"
-                                    type="text"
-                                    class="form-control bg-light border-start-0"
-                                    placeholder="Search model or serial..."
-                                    @input="debouncedSearch"
-                                />
+                                <input v-model="searchQuery" type="text" class="form-control bg-light border-start-0"
+                                    placeholder="Search model or serial..." @input="debouncedSearch" />
                             </div>
                         </div>
 
-                        <div
-                            class="col-md-4 d-flex justify-content-md-end gap-2"
-                        >
-                            <button
-                                class="btn btn-primary shadow-sm"
-                                data-bs-toggle="modal"
-                                data-bs-target="#AddPhoneModal"
-                            >
+                        <div class="col-md-4 d-flex justify-content-md-end gap-2">
+                            <button class="btn btn-primary shadow-sm" data-bs-toggle="modal"
+                                data-bs-target="#AddPhoneModal">
                                 <i class="bi bi-plus-lg me-1"></i> Add Phone
                             </button>
 
                             <div class="dropdown">
-                                <button
-                                    class="btn btn-outline-secondary dropdown-toggle"
-                                    data-bs-toggle="dropdown"
-                                >
+                                <button class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">
                                     <i class="bi bi-filter-right me-1"></i> Sort
                                 </button>
                                 <ul class="dropdown-menu dropdown-menu-end">
-                                    <li
-                                        v-for="opt in sortOption"
-                                        :key="opt.value"
-                                    >
-                                        <a
-                                            href="#"
-                                            class="dropdown-item"
-                                            :class="{
-                                                active:
-                                                    currentSort === opt.value,
-                                            }"
-                                            @click.prevent="
+                                    <li v-for="opt in sortOption" :key="opt.value">
+                                        <a href="#" class="dropdown-item" :class="{
+                                            active:
+                                                currentSort === opt.value,
+                                        }" @click.prevent="
                                                 applyFilter(opt.value)
-                                            "
-                                        >
+                                                ">
                                             {{ opt.label }}
                                         </a>
                                     </li>
@@ -492,54 +468,39 @@ const brandsOption = [
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr
-                                    v-for="(phone, i) in props.phones.data"
-                                    :key="phone.id"
-                                    @click="
-                                        router.get(
-                                            route('phone.show', {
-                                                id: phone.id,
-                                            }),
-                                        )
-                                    "
-                                    style="cursor: pointer"
-                                >
+                                <tr v-for="(phone, i) in props.phones.data" :key="phone.id" @click="
+                                    router.get(
+                                        route('phone.show', {
+                                            id: phone.id,
+                                        }),
+                                    )
+                                    " style="cursor: pointer">
                                     <td class="text-muted ps-4">
                                         {{ getRowNumber(i) }}
                                     </td>
                                     <td>
                                         <div class="d-flex align-items-center">
-                                            <img
-                                                :src="getPhoneImagePath(phone)"
-                                                class="me-3"
-                                                style="
+                                            <img :src="getPhoneImagePath(phone)" class="me-3" style="
                                                     width: 24px;
                                                     height: 24px;
                                                     object-fit: contain;
-                                                "
-                                            />
-                                            <span
-                                                class="fw-semibold text-capitalize"
-                                                >{{ phone.brand }}
-                                                {{ phone.model }}</span
-                                            >
+                                                " />
+                                            <span class="fw-semibold text-capitalize">{{ phone.brand }}
+                                                {{ phone.model }}</span>
                                         </div>
                                     </td>
                                     <td>
-                                        <span
-                                            class="badge"
-                                            :class="{
-                                                'text-bg-success':
-                                                    phone.status ===
-                                                    'available',
-                                                'text-bg-warning':
-                                                    phone.status === 'issued',
-                                                'text-bg-danger':
-                                                    phone.status ===
-                                                        'returned' ||
-                                                    phone.status === 'return',
-                                            }"
-                                        >
+                                        <span class="badge" :class="{
+                                            'text-bg-success':
+                                                phone.status ===
+                                                'available',
+                                            'text-bg-warning':
+                                                phone.status === 'issued',
+                                            'text-bg-danger':
+                                                phone.status ===
+                                                'returned' ||
+                                                phone.status === 'return',
+                                        }">
                                             {{
                                                 phone.status
                                                     .charAt(0)
@@ -549,20 +510,15 @@ const brandsOption = [
                                         </span>
                                     </td>
                                     <td>
-                                        <small class="text-muted"
-                                            >{{ phone.ram }} GB /
-                                            {{ phone.rom }} GB</small
-                                        >
+                                        <small class="text-muted">{{ phone.ram }} GB /
+                                            {{ phone.rom }} GB</small>
                                     </td>
                                     <td>
-                                        <span
-                                            :class="
-                                                phone.current_transaction
-                                                    ?.issued_to
-                                                    ? 'text-dark'
-                                                    : 'text-muted fst-italic'
-                                            "
-                                        >
+                                        <span :class="phone.current_transaction
+                                                ?.issued_to
+                                                ? 'text-dark'
+                                                : 'text-muted fst-italic'
+                                            ">
                                             {{
                                                 phone.current_transaction
                                                     ?.issued_to ||
@@ -578,32 +534,19 @@ const brandsOption = [
                                             ) || 'Not yet Issued'
                                         }}
                                     </td>
-                                    <td
-                                        class="d-flex justify-content-center align-items-center gap-2"
-                                    >
-                                        <button
-                                            type="button"
-                                            class="btn btn-outline-warning"
-                                            data-bs-toggle="modal"
-                                            data-bs-target="#UpdatePhoneModal"
-                                            @click.stop="openUpdateModal(phone)"
-                                        >
+                                    <td class="d-flex justify-content-center align-items-center gap-2">
+                                        <button type="button" class="btn btn-outline-warning" data-bs-toggle="modal"
+                                            data-bs-target="#UpdatePhoneModal" @click.stop="openUpdateModal(phone)">
                                             <i class="bi bi-pencil"></i>
                                         </button>
-                                        <button
-                                            type="button"
-                                            class="btn btn-outline-danger"
-                                            @click.stop="deleteItem(phone.id)"
-                                        >
+                                        <button type="button" class="btn btn-outline-danger"
+                                            @click.stop="deleteItem(phone.id)">
                                             <i class="bi bi-trash"></i>
                                         </button>
                                     </td>
                                 </tr>
                                 <tr v-if="props.phones.data.length === 0">
-                                    <td
-                                        colspan="7"
-                                        class="text-muted py-5 text-center"
-                                    >
+                                    <td colspan="7" class="text-muted py-5 text-center">
                                         No phones found matching your criteria.
                                     </td>
                                 </tr>
@@ -613,151 +556,39 @@ const brandsOption = [
                 </div>
 
                 <div class="card-footer border-top-0 bg-white py-3">
-                    <div
-                        class="d-flex align-items-center justify-content-between p-3"
-                    >
+                    <div class="d-flex align-items-center justify-content-between p-3">
                         <div class="text-secondary small">
                             Showing
                             <span class="fw-bold text-dark">{{
                                 props.phones.from ?? 0
-                            }}</span>
+                                }}</span>
                             to
                             <span class="fw-bold text-dark">{{
                                 props.phones.to ?? 0
-                            }}</span>
+                                }}</span>
                             of
                             <span class="fw-bold text-dark">{{
                                 props.phones.total
-                            }}</span>
+                                }}</span>
                             entries
                         </div>
 
-                        <nav aria-label="Phone pagination">
-                            <ul class="pagination pagination-sm mb-0 gap-1">
-                                <li
-                                    class="page-item"
-                                    :class="{
-                                        disabled:
-                                            props.phones.current_page === 1,
-                                    }"
-                                >
-                                    <button
-                                        class="page-link text-dark border-0 px-3"
-                                        @click="
-                                            router.get(
-                                                route('phone.index'),
-                                                {
-                                                    ...$page.props.filters,
-                                                    page: 1,
-                                                },
-                                                { preserveScroll: true },
-                                            )
-                                        "
-                                        :disabled="
-                                            props.phones.current_page === 1
-                                        "
-                                    >
-                                        &lt;&lt;
-                                    </button>
-                                </li>
-                                <li
-                                    class="page-item"
-                                    :class="{
-                                        disabled:
-                                            props.phones.current_page === 1,
-                                    }"
-                                >
-                                    <button
-                                        class="page-link text-dark border-0 px-3"
-                                        @click="
-                                            router.get(
-                                                route('phone.index'),
-                                                {
-                                                    ...$page.props.filters,
-                                                    page:
-                                                        props.phones
-                                                            .current_page - 1,
-                                                },
-                                                { preserveScroll: true },
-                                            )
-                                        "
-                                        :disabled="
-                                            props.phones.current_page === 1
-                                        "
-                                    >
-                                        previous
-                                    </button>
-                                </li>
+                        <div class="d-flex">
+                            <Pagination
+                                :current-page="props.phones.current_page"
+                                :last-page="props.phones.last_page"
+                                container-classes="pagination pagination-sm mb-0 gap-1"
+                                page-link-classes="text-dark border-0 px-3"
+                                active-page-link-classes="text-dark fw-medium border-0 bg-transparent px-3"
+                                @update:page="(p) =>
+                                    router.get(
+                                        route('phone.index'),
+                                        { ...$page.props.filters, page: p },
+                                        { preserveScroll: true },
+                                    )"
+                            />
+                        </div>
 
-                                <li class="page-item disabled">
-                                    <span
-                                        class="page-link text-dark fw-medium border-0 bg-transparent px-3"
-                                    >
-                                        {{ props.phones.current_page }}
-                                    </span>
-                                </li>
-
-                                <li
-                                    class="page-item"
-                                    :class="{
-                                        disabled:
-                                            props.phones.current_page ===
-                                            props.phones.last_page,
-                                    }"
-                                >
-                                    <button
-                                        class="page-link text-dark border-0 px-3"
-                                        @click="
-                                            router.get(
-                                                route('phone.index'),
-                                                {
-                                                    ...$page.props.filters,
-                                                    page:
-                                                        props.phones
-                                                            .current_page + 1,
-                                                },
-                                                { preserveScroll: true },
-                                            )
-                                        "
-                                        :disabled="
-                                            props.phones.current_page ===
-                                            props.phones.last_page
-                                        "
-                                    >
-                                        next
-                                    </button>
-                                </li>
-                                <li
-                                    class="page-item"
-                                    :class="{
-                                        disabled:
-                                            props.phones.current_page ===
-                                            props.phones.last_page,
-                                    }"
-                                >
-                                    <button
-                                        class="page-link text-dark border-0 px-3"
-                                        @click="
-                                            router.get(
-                                                route('phone.index'),
-                                                {
-                                                    ...$page.props.filters,
-                                                    page: props.phones
-                                                        .last_page,
-                                                },
-                                                { preserveScroll: true },
-                                            )
-                                        "
-                                        :disabled="
-                                            props.phones.current_page ===
-                                            props.phones.last_page
-                                        "
-                                    >
-                                        &gt;&gt;
-                                    </button>
-                                </li>
-                            </ul>
-                        </nav>
                     </div>
                 </div>
             </div>
@@ -765,62 +596,35 @@ const brandsOption = [
     </div>
 
     <!-- Update Modals -->
-    <Modals
-        id="UpdatePhoneModal"
-        title="Update Phone Asset"
-        header-class="bg-warning text-white bg-gradient"
-    >
+    <Modals id="UpdatePhoneModal" title="Update Phone Asset" header-class="bg-primary text-white bg-gradient" layout="bento">
         <template #body>
             <form @submit.prevent="updateSubmit" id="updateForm">
                 <div class="row d-flex align-items-center mb-3">
                     <div class="col-12">
-                        <img
-                            :src="updateSamplePic"
-                            alt="update-asset-image"
-                            class="preview-image-fixed img-thumbnail rounded-circle d-block mx-auto border border-2 shadow-md"
-                        />
+                        <img :src="updateSamplePic" alt="update-asset-image"
+                            class="preview-image-fixed img-thumbnail rounded-circle d-block mx-auto border border-2 shadow-md" />
                     </div>
                 </div>
 
                 <div class="row d-flex align-items-center mb-3">
                     <div class="col-sm-12">
                         <div class="input-group">
-                            <label
-                                class="input-group-text"
-                                for="updatePhoneImageInput"
-                                >Upload</label
-                            >
-                            <input
-                                type="file"
-                                class="form-control"
-                                id="updatePhoneImageInput"
-                                accept="image/*"
-                                @change="onUpdateFileSelect"
-                            />
+                            <label class="input-group-text" for="updatePhoneImageInput">Upload</label>
+                            <input type="file" class="form-control" id="updatePhoneImageInput" accept="image/*"
+                                @change="onUpdateFileSelect" />
                         </div>
                     </div>
                 </div>
 
                 <div class="row mb-3">
                     <div class="col-md-6">
-                        <label for="update_brand" class="form-label"
-                            >Brand</label
-                        >
-                        <select
-                            class="form-select"
-                            aria-label="Update Brand"
-                            id="update_brand"
-                            v-model="updateForm.brand"
-                            required
-                        >
+                        <label for="update_brand" class="form-label">Brand</label>
+                        <select class="form-select" aria-label="Update Brand" id="update_brand"
+                            v-model="updateForm.brand" required>
                             <option selected disabled value="">
                                 Select Brand
                             </option>
-                            <option
-                                v-for="brand in brandsOption"
-                                :key="`update-${brand}`"
-                                :value="brand"
-                            >
+                            <option v-for="brand in brandsOption" :key="`update-${brand}`" :value="brand">
                                 {{
                                     brand.charAt(0).toUpperCase() +
                                     brand.slice(1)
@@ -829,199 +633,100 @@ const brandsOption = [
                         </select>
                     </div>
                     <div class="col-md-6">
-                        <label for="update_model" class="form-label"
-                            >Model</label
-                        >
-                        <input
-                            type="text"
-                            id="update_model"
-                            v-model="updateForm.model"
-                            class="form-control"
-                            required
-                        />
+                        <label for="update_model" class="form-label">Model</label>
+                        <input type="text" id="update_model" v-model="updateForm.model" class="form-control" required />
                     </div>
                 </div>
 
                 <div class="row mb-3">
                     <div class="col-md-6">
-                        <label for="update_serial_num" class="form-label"
-                            >Serial Number</label
-                        >
-                        <input
-                            type="text"
-                            id="update_serial_num"
-                            v-model="updateForm.serial_num"
-                            class="form-control"
-                            required
-                        />
+                        <label for="update_serial_num" class="form-label">Serial Number</label>
+                        <input type="text" id="update_serial_num" v-model="updateForm.serial_num" class="form-control"
+                            required />
                     </div>
                     <div class="col-md-6">
-                        <label for="update_sim_no" class="form-label"
-                            >SIM Number</label
-                        >
-                        <input
-                            type="text"
-                            id="update_sim_no"
-                            v-model="updateForm.sim_no"
-                            class="form-control"
-                        />
+                        <label for="update_sim_no" class="form-label">SIM Number</label>
+                        <input type="text" id="update_sim_no" v-model="updateForm.sim_no" class="form-control" />
                     </div>
                 </div>
 
                 <div class="row mb-3">
                     <div class="col-md-6">
-                        <label for="update_imei_one" class="form-label"
-                            >IMEI One</label
-                        >
-                        <input
-                            type="text"
-                            id="update_imei_one"
-                            v-model="updateForm.imei_one"
-                            class="form-control"
-                            required
-                        />
+                        <label for="update_imei_one" class="form-label">IMEI One</label>
+                        <input type="text" id="update_imei_one" v-model="updateForm.imei_one" class="form-control"
+                            required />
                     </div>
                     <div class="col-md-6">
-                        <label for="update_imei_two" class="form-label"
-                            >IMEI Two</label
-                        >
-                        <input
-                            type="text"
-                            id="update_imei_two"
-                            v-model="updateForm.imei_two"
-                            class="form-control"
-                        />
+                        <label for="update_imei_two" class="form-label">IMEI Two</label>
+                        <input type="text" id="update_imei_two" v-model="updateForm.imei_two" class="form-control" />
                     </div>
                 </div>
 
                 <div class="row mb-3">
                     <div class="col-md-6">
                         <label for="update_ram" class="form-label">RAM</label>
-                        <input
-                            type="text"
-                            id="update_ram"
-                            v-model="updateForm.ram"
-                            class="form-control"
-                            required
-                        />
+                        <input type="text" id="update_ram" v-model="updateForm.ram" class="form-control" required />
                     </div>
                     <div class="col-md-6">
                         <label for="update_rom" class="form-label">ROM</label>
-                        <input
-                            type="text"
-                            id="update_rom"
-                            v-model="updateForm.rom"
-                            class="form-control"
-                            required
-                        />
+                        <input type="text" id="update_rom" v-model="updateForm.rom" class="form-control" required />
                     </div>
                 </div>
 
                 <div class="row mb-3">
                     <div class="col-md-6">
-                        <label for="update_purchase_date" class="form-label"
-                            >Purchase Date</label
-                        >
-                        <input
-                            type="date"
-                            id="update_purchase_date"
-                            v-model="updateForm.purchase_date"
-                            class="form-control"
-                        />
+                        <label for="update_purchase_date" class="form-label">Purchase Date</label>
+                        <input type="date" id="update_purchase_date" v-model="updateForm.purchase_date"
+                            class="form-control" />
                     </div>
                 </div>
 
                 <div class="mb-3">
-                    <label for="update_remarks" class="form-label"
-                        >Remarks</label
-                    >
-                    <textarea
-                        v-model="updateForm.remarks"
-                        id="update_remarks"
-                        rows="3"
-                        class="form-control"
-                    ></textarea>
+                    <label for="update_remarks" class="form-label">Remarks</label>
+                    <textarea v-model="updateForm.remarks" id="update_remarks" rows="3" class="form-control"></textarea>
                 </div>
             </form>
         </template>
 
         <template #footer>
-            <button
-                type="button"
-                class="btn btn-secondary"
-                data-bs-dismiss="modal"
-            >
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                 Cancel
             </button>
-            <button
-                type="submit"
-                class="btn btn-warning"
-                form="updateForm"
-                :disabled="updateForm.processing"
-            >
-                <span
-                    v-if="updateForm.processing"
-                    class="spinner-border spinner-border-sm me-1"
-                ></span>
+            <button type="submit" class="btn btn-warning" form="updateForm" :disabled="updateForm.processing">
+                <span v-if="updateForm.processing" class="spinner-border spinner-border-sm me-1"></span>
                 Update Asset
             </button>
         </template>
     </Modals>
 
-    <Modals
-        id="AddPhoneModal"
-        title="Add New Phone"
-        header-icon="bi bi-plus-lg me-1 fs-4"
+    <Modals id="AddPhoneModal" title="Add New Phone" header-icon="bi bi-plus-lg me-1 fs-4"
         header-class="bg-primary text-white"
+        layout="bento"
     >
         <template #body>
             <form @submit.prevent="submitAddForm" id="addPhoneForm">
                 <div class="row d-flex align-items-center mb-3">
                     <div class="col-12">
-                        <img
-                            :src="samplePic"
-                            alt="asset-image"
-                            class="preview-image-fixed img-thumbnail rounded-circle d-block mx-auto border border-2 shadow-md"
-                        />
+                        <img :src="samplePic" alt="asset-image"
+                            class="preview-image-fixed img-thumbnail rounded-circle d-block mx-auto border border-2 shadow-md" />
                     </div>
                 </div>
                 <div class="row d-flex align-items-center mb-3">
                     <div class="col-sm-12">
                         <div class="input-group">
-                            <label
-                                class="input-group-text"
-                                for="inputGroupFile01"
-                                >Upload</label
-                            >
-                            <input
-                                type="file"
-                                class="form-control"
-                                id="inputGroupFile01"
-                                @change="onFileSelect"
-                                accept="image/*"
-                            />
+                            <label class="input-group-text" for="inputGroupFile01">Upload</label>
+                            <input type="file" class="form-control" id="inputGroupFile01" @change="onFileSelect"
+                                accept="image/*" />
                         </div>
                     </div>
                 </div>
                 <div class="row d-flex align-items-center mb-3">
                     <div class="col-sm-12 col-md-6">
-                        <label for="brandInput" class="form-label"
-                            >Brand<i class="text-danger">*</i></label
-                        >
+                        <label for="brandInput" class="form-label">Brand<i class="text-danger">*</i></label>
 
-                        <select
-                            class="form-select"
-                            aria-label="Brand"
-                            id="brandInput"
-                            v-model="addForm.brand"
-                            required
-                        >
+                        <select class="form-select" aria-label="Brand" id="brandInput" v-model="addForm.brand" required>
                             <option selected disabled>Select Brand</option>
-                            <option
-                                :value="brand"
-                                :key="brand"
-                                v-for="brand in brandsOption"
-                            >
+                            <option :value="brand" :key="brand" v-for="brand in brandsOption">
                                 {{
                                     brand.charAt(0).toUpperCase() +
                                     brand.slice(1)
@@ -1030,143 +735,65 @@ const brandsOption = [
                         </select>
                     </div>
                     <div class="col-sm-12 col-md-6">
-                        <label for="modelInput" class="form-label"
-                            >Model<i class="text-danger">*</i></label
-                        >
-                        <input
-                            type="text"
-                            id="modelInput"
-                            v-model="addForm.model"
-                            placeholder="(e.g. iPhone 17)"
-                            class="form-control"
-                            required
-                        />
+                        <label for="modelInput" class="form-label">Model<i class="text-danger">*</i></label>
+                        <input type="text" id="modelInput" v-model="addForm.model" placeholder="(e.g. iPhone 17)"
+                            class="form-control" required />
                     </div>
                 </div>
 
                 <div class="row d-flex align-items-center mb-3">
                     <div class="col-sm-12 col-md-6">
-                        <label for="serialNumInput" class="form-label"
-                            >Serial Number<i class="text-danger">*</i></label
-                        >
-                        <input
-                            type="text"
-                            id="serialNumInput"
-                            v-model="addForm.serial_num"
-                            placeholder="e.g. C39F2V9JCL"
-                            class="form-control"
-                            required
-                        />
+                        <label for="serialNumInput" class="form-label">Serial Number<i class="text-danger">*</i></label>
+                        <input type="text" id="serialNumInput" v-model="addForm.serial_num"
+                            placeholder="e.g. C39F2V9JCL" class="form-control" required />
                     </div>
                     <div class="col-sm-12 col-md-6">
-                        <label for="simNoInput" class="form-label"
-                            >SIM Number</label
-                        >
-                        <input
-                            type="text"
-                            id="simNoInput"
-                            placeholder="(e.g. 09072853112)"
-                            v-model="addForm.sim_no"
-                            class="form-control"
-                        />
+                        <label for="simNoInput" class="form-label">SIM Number</label>
+                        <input type="text" id="simNoInput" placeholder="(e.g. 09072853112)" v-model="addForm.sim_no"
+                            class="form-control" />
                     </div>
                 </div>
                 <div class="row d-flex align-items-center mb-3">
                     <div class="col-sm-12 col-md-6">
-                        <label for="imeiOneInput" class="form-label"
-                            >IMEI One<i class="text-danger">*</i></label
-                        >
-                        <input
-                            type="text"
-                            id="imeiOneInput"
-                            placeholder="e.g. 356938035643809"
-                            v-model="addForm.imei_one"
-                            class="form-control"
-                            required
-                        />
+                        <label for="imeiOneInput" class="form-label">IMEI One<i class="text-danger">*</i></label>
+                        <input type="text" id="imeiOneInput" placeholder="e.g. 356938035643809"
+                            v-model="addForm.imei_one" class="form-control" required />
                     </div>
                     <div class="col-sm-12 col-md-6">
-                        <label for="imeiTwoInput" class="form-label"
-                            >IMEI Two</label
-                        >
-                        <input
-                            type="text"
-                            id="imeiTwoInput"
-                            v-model="addForm.imei_two"
-                            class="form-control"
-                        />
+                        <label for="imeiTwoInput" class="form-label">IMEI Two</label>
+                        <input type="text" id="imeiTwoInput" v-model="addForm.imei_two" class="form-control" />
                     </div>
                 </div>
                 <div class="row d-flex align-items-center mb-3">
                     <div class="col-sm-12 col-md-6">
-                        <label for="ramInput" class="form-label"
-                            >RAM<i class="text-danger">*</i> (GB)</label
-                        >
-                        <input
-                            type="text"
-                            id="ramInput"
-                            v-model="addForm.ram"
-                            placeholder="e.g. 8"
-                            class="form-control"
-                            required
-                        />
+                        <label for="ramInput" class="form-label">RAM<i class="text-danger">*</i> (GB)</label>
+                        <input type="text" id="ramInput" v-model="addForm.ram" placeholder="e.g. 8" class="form-control"
+                            required />
                     </div>
                     <div class="col-sm-12 col-md-6">
-                        <label for="romInput" class="form-label"
-                            >ROM<i class="text-danger">*</i> (GB)</label
-                        >
-                        <input
-                            type="text"
-                            id="romInput"
-                            v-model="addForm.rom"
-                            placeholder="e.g. 256"
-                            class="form-control"
-                            required
-                        />
+                        <label for="romInput" class="form-label">ROM<i class="text-danger">*</i> (GB)</label>
+                        <input type="text" id="romInput" v-model="addForm.rom" placeholder="e.g. 256"
+                            class="form-control" required />
                     </div>
                 </div>
                 <div class="row d-flex align-items-center mb-3">
                     <div class="col-sm-12 col-md-6">
-                        <label for="purchaseDate" class="form-label"
-                            >Purchase Date</label
-                        >
-                        <input
-                            type="date"
-                            id="purchaseDate"
-                            v-model="addForm.purchase_date"
-                            class="form-control"
-                        />
+                        <label for="purchaseDate" class="form-label">Purchase Date</label>
+                        <input type="date" id="purchaseDate" v-model="addForm.purchase_date" class="form-control" />
                     </div>
                 </div>
                 <div class="mb-3">
                     <label for="remarksInput" class="form-label">Remarks</label>
-                    <textarea
-                        id="remarksInput"
-                        v-model="addForm.remarks"
-                        class="form-control"
-                        rows="2"
-                    ></textarea>
+                    <textarea id="remarksInput" v-model="addForm.remarks" class="form-control" rows="2"></textarea>
                 </div>
             </form>
         </template>
         <template #footer>
-            <button
-                type="button"
-                class="btn btn-secondary"
-                data-bs-dismiss="modal"
-            >
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                 Close
             </button>
-            <button
-                type="submit"
-                form="addPhoneForm"
-                class="btn btn-primary"
-                :disabled="addForm.processing"
-            >
-                <span
-                    v-if="addForm.processing"
-                    class="spinner-border spinner-border-sm me-1"
-                ></span>
+            <button type="submit" form="addPhoneForm" class="btn btn-primary" :disabled="addForm.processing">
+                <span v-if="addForm.processing" class="spinner-border spinner-border-sm me-1"></span>
                 <i class="bi bi-plus-lg me-1"></i>
                 Add Asset
             </button>
@@ -1181,6 +808,7 @@ const brandsOption = [
     letter-spacing: 0.5px;
     font-weight: 600;
 }
+
 .badge {
     font-weight: 500;
     padding: 0.5em 0.8em;

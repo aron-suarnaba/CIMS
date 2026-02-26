@@ -167,34 +167,20 @@ const submitAdd = () => {
             <div class="mt-4">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>Showing {{ props.credentials.from || 0 }} to {{ props.credentials.to || 0 }} of {{ props.credentials.total }} entries</div>
-                    <nav>
-                        <ul class="pagination mb-0">
-                            <li
-                                class="page-item"
-                                :class="{ disabled: !props.credentials.prev_page_url }"
-                            >
-                                <a
-                                    class="page-link"
-                                    :href="props.credentials.prev_page_url"
-                                >Prev</a>
-                            </li>
-                            <li
-                                class="page-item"
-                                :class="{ disabled: !props.credentials.next_page_url }"
-                            >
-                                <a
-                                    class="page-link"
-                                    :href="props.credentials.next_page_url"
-                                >Next</a>
-                            </li>
-                        </ul>
-                    </nav>
+                    <div class="d-flex">
+                        <Pagination
+                            :current-page="props.credentials.current_page"
+                            :last-page="props.credentials.last_page"
+                            container-classes="pagination mb-0"
+                            @update:page="(p) => router.get(props.credentials.path + '?page=' + p)"
+                        />
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-<Modals id="AddCredentialModal" title="Create New Credential" size="modal-lg" header-class="bg-primary text-white">
+<Modals id="AddCredentialModal" title="Create New Credential" size="modal-lg" header-class="bg-primary text-white" layout="bento">
     <template #body>
         <form @submit.prevent="submitAdd" id="addCredentialForm" class="p-2">
             <div class="row g-4">
@@ -246,7 +232,7 @@ const submitAdd = () => {
     </template>
 </Modals>
 
-    <Modals id="CredentialDetailModal" title="Credential Details" size="modal-lg" header-class="bg-primary text-white">
+    <Modals id="CredentialDetailModal" title="Credential Details" size="modal-lg" header-class="bg-primary text-white" layout="bento">
     <template #body>
         <div v-if="selected" class="p-2">
             <div class="d-flex align-items-center mb-4 p-3 bg-light rounded-3">

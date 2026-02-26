@@ -2,6 +2,7 @@
 import BackButton from '@/Components/BackButton.vue';
 import Breadcrumb from '@/Components/Breadcrumb.vue';
 import HomeLayout from '@/Layouts/HomeLayout.vue';
+import Pagination from '@/Components/Pagination.vue';
 import { router } from '@inertiajs/vue3';
 import axios from 'axios';
 import { computed, onMounted, ref } from 'vue'; // Added computed
@@ -190,29 +191,11 @@ onMounted(fetchDevices);
                             of <span class="fw-semibold">{{ deviceList.length }}</span> entries
                         </div>
 
-                        <nav v-if="totalPages > 1" aria-label="Table navigation">
-                            <ul class="pagination pagination-sm mb-0">
-                                <li class="page-item" :class="{ disabled: currentPage === 1 }">
-                                    <a class="page-link" href="#" @click.prevent="setPage(1)"><i
-                                            class="bi bi-chevron-double-left"></i></a>
-                                </li>
-                                <li class="page-item" :class="{ disabled: currentPage === 1 }">
-                                    <a class="page-link" href="#" @click.prevent="setPage(currentPage - 1)">Previous</a>
-                                </li>
-
-                                <li class="page-item active">
-                                    <span class="page-link">{{ currentPage }}</span>
-                                </li>
-
-                                <li class="page-item" :class="{ disabled: currentPage === totalPages }">
-                                    <a class="page-link" href="#" @click.prevent="setPage(currentPage + 1)">Next</a>
-                                </li>
-                                <li class="page-item" :class="{ disabled: currentPage === totalPages }">
-                                    <a class="page-link" href="#" @click.prevent="setPage(totalPages)"><i
-                                            class="bi bi-chevron-double-right"></i></a>
-                                </li>
-                            </ul>
-                        </nav>
+                        <Pagination
+                        :current-page="currentPage"
+                        :last-page="totalPages"
+                        @update:page="setPage"
+                    />
                     </div>
                 </div>
 
