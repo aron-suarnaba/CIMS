@@ -286,7 +286,8 @@ const submitAdd = () => {
                                     type="password"
                                     v-model="revealForm.password"
                                     class="form-control border-start-0 py-2"
-                                    placeholder="Enter Master Password to reveal"
+                                    placeholder="Enter your login password to reveal"
+                                    autocomplete="current-password"
                                 />
                                 <button class="btn btn-primary px-4" :disabled="!revealForm.password">
                                     <i class="bi bi-eye"></i> Reveal

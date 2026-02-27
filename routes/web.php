@@ -7,6 +7,8 @@ use App\Http\Controllers\AutomationController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\FortigateController;
 use App\Http\Controllers\NetworkMonitoringController;
+use App\Http\Controllers\NetworkingAssetController;
+use App\Http\Controllers\PeripheralAssetController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -101,6 +103,28 @@ Route::middleware('auth')->group(function () {
             Route::post('/{computer:host_name}/return', [ComputersController::class, 'return'])->name('computer.return');
             Route::delete('/{computer:host_name}', [ComputersController::class, 'destroy'])->name('computer.destroy');
 
+        });
+
+        Route::prefix('Networking')->group(function () {
+            Route::get('/', [NetworkingAssetController::class, 'index'])->name('networking.index');
+            Route::post('/', [NetworkingAssetController::class, 'store'])->name('networking.store');
+            Route::get('/{networking}', [NetworkingAssetController::class, 'show'])->whereNumber('networking')->name('networking.show');
+            Route::put('/{networking}', [NetworkingAssetController::class, 'update'])->whereNumber('networking')->name('networking.update');
+            Route::delete('/{networking}', [NetworkingAssetController::class, 'destroy'])->whereNumber('networking')->name('networking.destroy');
+            Route::post('/{networking}/issue', [NetworkingAssetController::class, 'issue'])->whereNumber('networking')->name('networking.issue');
+            Route::post('/{networking}/return', [NetworkingAssetController::class, 'return'])->whereNumber('networking')->name('networking.return');
+            Route::get('/{networking}/logsheet', [NetworkingAssetController::class, 'generateLogsheetReport'])->whereNumber('networking')->name('networking.logsheet');
+        });
+
+        Route::prefix('Peripherals')->group(function () {
+            Route::get('/', [PeripheralAssetController::class, 'index'])->name('peripherals.index');
+            Route::post('/', [PeripheralAssetController::class, 'store'])->name('peripherals.store');
+            Route::get('/{peripheral}', [PeripheralAssetController::class, 'show'])->whereNumber('peripheral')->name('peripherals.show');
+            Route::put('/{peripheral}', [PeripheralAssetController::class, 'update'])->whereNumber('peripheral')->name('peripherals.update');
+            Route::delete('/{peripheral}', [PeripheralAssetController::class, 'destroy'])->whereNumber('peripheral')->name('peripherals.destroy');
+            Route::post('/{peripheral}/issue', [PeripheralAssetController::class, 'issue'])->whereNumber('peripheral')->name('peripherals.issue');
+            Route::post('/{peripheral}/return', [PeripheralAssetController::class, 'return'])->whereNumber('peripheral')->name('peripherals.return');
+            Route::get('/{peripheral}/logsheet', [PeripheralAssetController::class, 'generateLogsheetReport'])->whereNumber('peripheral')->name('peripherals.logsheet');
         });
     });
 

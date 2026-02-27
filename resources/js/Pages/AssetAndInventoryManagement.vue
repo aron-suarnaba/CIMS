@@ -55,14 +55,14 @@ const navCard = [
     // },
     {
         label: 'Networking',
-        url: '#', // Placeholder for future routes
+        url: route('networking.index'),
         icon: 'bi bi-router',
         color: 'info',
         desc: 'Switches & APs',
     },
     {
         label: 'Peripherals',
-        url: '#',
+        url: route('peripherals.index'),
         icon: 'bi bi-printer',
         color: 'warning',
         desc: 'Printers & Scanners',
