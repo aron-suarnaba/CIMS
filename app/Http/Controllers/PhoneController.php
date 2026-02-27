@@ -293,14 +293,23 @@ class PhoneController extends Controller
     {
         $phone->load(['issuances.return']);
 
-        // Generate the QR Code with a logo
-        // We convert it to base64 so it can be used in an <img> tag in Vue/React
-        // If your image is located at public/img/logo.png
+        // Generate the QR Code with key device details (multiline text)
+        $qrPayloadLines = [
+            'Brand: ' . ($phone->brand ?? 'N/A'),
+            'Model: ' . ($phone->model ?? 'N/A'),
+            'Serial Number: ' . ($phone->serial_num ?? 'N/A'),
+            'SIM Number: ' . ($phone->sim_no ?? 'N/A'),
+            'IMEI 1: ' . ($phone->imei_one ?? 'N/A'),
+            'IMEI 2: ' . ($phone->imei_two ?? 'N/A'),
+            'RAM/ROM: ' . (($phone->ram ?? 'N/A') . '/' . ($phone->rom ?? 'N/A')),
+            'Purchase Date: ' . ($phone->purchase_date ?? 'N/A'),
+        ];
+        $qrPayload = implode("\n", $qrPayloadLines);
+
         $qrCode = QrCode::format('svg')
-            // ->merge(public_path('img/logo.png'), 0.3, true) // Comment this out for now
             ->size(300)
             ->errorCorrection('H')
-            ->generate(route('phone.show', $phone->id));
+            ->generate($qrPayload);
 
         $base64Qr = 'data:image/svg+xml;base64,' . base64_encode($qrCode);
 

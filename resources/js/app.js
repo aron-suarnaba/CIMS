@@ -1,5 +1,5 @@
-import '@/bootstrap';
-import '@css/app.css';
+import './bootstrap';
+import '../css/app.css';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faHouse, faUser } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
@@ -12,7 +12,7 @@ import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import Swal from 'sweetalert2';
 import { createApp, h, watch } from 'vue';
 import VueApexCharts from 'vue3-apexcharts';
-import { ZiggyVue } from 'ziggy-js';
+import { ZiggyVue } from '../../vendor/tightenco/ziggy/dist/index.esm.js';
 window.bootstrap = bootstrap;
 
 const appName = import.meta.env.VITE_APP_NAME || 'CIMS';
